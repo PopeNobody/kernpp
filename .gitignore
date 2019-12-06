@@ -6,6 +6,10 @@
 *.lo
 *.o
 *.obj
+*.s
+*.i
+*.ii
+*.d
 
 # Precompiled Headers
 *.gch
@@ -30,3 +34,14 @@
 *.exe
 *.out
 *.app
+
+
+bin/cat
+bin/echo
+bin/false
+bin/ls
+bin/true
+bin/malloc_test
+
+bin/sc
+bin/vec
