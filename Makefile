@@ -60,7 +60,7 @@ $(CXX_EXE): %: %.o lib/start.o lib/libkernpp.a
 	$(LD) $(START) -o $@ $< lib/libkernpp.a
 
 %.s: %.cc
-	$(CXX) $(CXX_FLAGS) $(CPP_FLAGS) -S $< -o $@
+	$(CXX) $(CXX_FLAGS) $(CPP_FLAGS) -S $< -o $@ -g
 
 %.o: %.s
 	$(CXX) -c $< -o $@
@@ -70,7 +70,7 @@ all: $(BIN_EXE)
 bin/%.out: bin/%.sh bin/%
 	bash $< > $@
 
-test: all $(patsubst %,%.out,$(BIN_EXE))
+test: all
 
 clean:
 	rm -f $(BIN_GEN) $(ASM_EXE) $(CXX_EXE) $(LIB_GEN) lib/libkernpp.a

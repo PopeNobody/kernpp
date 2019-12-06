@@ -107,20 +107,38 @@ struct options {
 	};
 	options() = default;
 };
-int ls_main(const options &opts) {
-	write(1,"prog_name: ");
-	write(1,opts.prog_name);
-	write(1,"\nargs:\n");
-	if(opts.argc) {
-		for(int i = 0; i < opts.argc; i++) {
-			write(1,"\t");
-			write(1,opts.argv[i]);
-			write(1,"\n");
-		};
+class fmtbuf_t {
+	enum { npos=4000 };
+	char buf[npos];
+	unsigned short pos;
+	unsigned short end;
+	public:
+	fmtbuf_t()
+	: pos(0), end(0)
+	{
+		memset(buf,0,sizeof(buf));
+		const char *msg="this is a test\nthis is only a test\n";
+		while(*msg)
+			buf[end++]=*msg++;
 	};
+	bool oflow() {
+		if(end>pos) {
+			ssize_t res=write(1,buf+pos,end-pos);
+			if(res<0) {
+				write(2,"write faile\n");
+				return false;
+			};
+			pos+=res;
+		};
+		return true;
+	};
+};
+fmtbuf_t buf;
+int ls_main(const options &opts) {
 	return 0;
 };
 int main(int argc, char**argv) 
 {
+	buf.oflow();
 	return ls_main(options::parse(argc,argv));
 };
