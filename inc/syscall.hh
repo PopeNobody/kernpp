@@ -133,7 +133,29 @@ extern "C" {
 				);
 		return res;
 	}
-
+	inline int stat(const char *pathname, struct stat *statbuf)
+	{
+		int res=-1;
+		asm (
+				"syscall\n" 
+				: "=a"(res) 
+				: "a"(4), "D"(pathname), "S"(statbuf)
+				: "rcx", "r11", "memory"
+				);
+		return set_errno(res);
+	};
+#if 0
+	inline int brk(void *brk) {
+		int res=-1;
+		asm (
+				"syscall\n" 
+				: "=a"(res) 
+				: "0"(12), "D"(brk)
+				: "rcx", "r11", "memory"
+				);
+		return set_errno(res);
+	};
+#endif
 	inline char *mmap(
 			void *addr, size_t length, int prot, int flags, fd_t fd, off_t off
 			)
@@ -207,17 +229,6 @@ inline ssize_t write(int fd, const char *buf)
 
 
 
-inline int stat(const char *pathname, struct stat *statbuf)
-{
-	int res=-1;
-	asm (
-			"syscall\n" 
-			: "=a"(res) 
-			: "a"(4), "D"(pathname), "S"(statbuf)
-			: "rcx", "r11", "memory"
-			);
-	return res;
-};
 extern "C" {
 	inline void abort(){
 		exit(1);

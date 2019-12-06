@@ -11,7 +11,6 @@ typedef unsigned uint32_t;
 typedef unsigned long uint64_t;
 typedef unsigned short int uint16_t;
 
-struct statbuf;
 struct iocb;
 struct fd_set;
 struct sigaction;
@@ -53,6 +52,8 @@ struct iocb;
 struct itimerspec;
 struct epoll_event;
 struct mq_attr;
+struct stat;
+typedef stat* stat_p;
 typedef iocb* iocb_p;
 typedef cap_user_header* cap_user_header_t;
 typedef cap_user_data* cap_user_data_t;
@@ -74,8 +75,9 @@ typedef int32_t pid_t;
 //   typedef int64_t blksize_t;
 //   typedef int64_t fsword_t;
 //   typedef int64_t intmax_t;
-//   typedef int64_t intptr_t;
-//   typedef int64_t off64_t;
+typedef int64_t intptr_t;
+typedef uint64_t uintptr_t;
+typedef int64_t off64_t;
 typedef uint32_t fd_t;
 typedef int64_t clock_t;
 typedef int64_t off_t;
@@ -114,12 +116,24 @@ typedef uint64_t __uint64_t;
 typedef uint64_t __uintmax_t;
 typedef uint64_t __u_long;
 typedef uint64_t __u_quad_t;
+typedef uint64_t ino64_t;
 typedef unsigned short int __u_short;
 typedef void * __timer_t;
 struct timespec
 {
   time_t tv_sec;
   int64_t tv_nsec;
+};
+struct linux_dirent {
+	ino64_t        d_ino;    /* 64-bit inode number */
+	off64_t        d_off;    /* 64-bit offset to next structure */
+	unsigned short d_reclen; /* Size of this dirent */
+	unsigned char  d_type;   /* File type */
+	char           d_name[]; /* Filename (null-terminated) */
+
+	linux_dirent *next() {
+		return (linux_dirent*)(((char*)this)+this->d_reclen);
+	};
 };
 
 #endif

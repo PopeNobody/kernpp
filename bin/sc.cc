@@ -3,7 +3,7 @@
 #define AAI __attribute__ ((__always_inline__)) \
 	\
 
-
+typedef struct stat statbuf;
 
 #define syscall0(name,rt) \
 	inline rt name() AAI
@@ -34,9 +34,9 @@
 	syscall3(write,fd_t,fd,const char*,buf,size_t,len,ssize_t); \
 	syscall2(open,cstr_t,path,int,flags,fd_t); \
 	syscall1(close,fd_t,fd,int); \
-	syscall2(stat,cstr_t,path,statbuf*,buf,int); \
-	syscall2(fstat,fd_t,fd,statbuf*,buf,int); \
-	syscall2(lstat,cstr_t,path,statbuf*,buf,int); \
+	syscall2(stat,cstr_t,path,stat_p,buf,int); \
+	syscall2(fstat,fd_t,fd,stat_p,buf,int); \
+	syscall2(lstat,cstr_t,path,stat_p,buf,int); \
 	syscall3(poll,pollfd*,ufds,uint32_t,nfds,int64_t,tm,int); \
 	syscall3(lseek,fd_t,fd,off_t,off,uint32_t,from,ssize_t); \
 	syscall6(mmap,void*,addr,size_t,len,int,prot,int,flags,fd_t,fd,off_t,off,char*); \

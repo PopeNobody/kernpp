@@ -41,27 +41,11 @@ void handle_error(errno_t err, const char *call)
 	exit(1);
 
 };
-struct linux_dirent {
-	ino64_t        d_ino;    /* 64-bit inode number */
-	off64_t        d_off;    /* 64-bit offset to next structure */
-	unsigned short d_reclen; /* Size of this dirent */
-	unsigned char  d_type;   /* File type */
-	char           d_name[]; /* Filename (null-terminated) */
-
-	linux_dirent *next() {
-		return (linux_dirent*)(((char*)this)+this->d_reclen);
-	};
-};
-static union {
-	char buffer[4096];
-	linux_dirent ent;
-};
-
-bool long_list=false;
-int lsdir(const char *dirname){
+char buffer[4096];
+bool lsarg(const char *dirname){
 	int fd = open(dirname,o_directory|o_rdonly);
 	if(fd<0)
-		handle_error(errno_t(-fd), "open");
+		return false;
 	for(;;){
 		int nread=getdents(fd,(linux_dirent*)buffer,sizeof(buffer)-4);
 		if(nread<0)
@@ -79,66 +63,21 @@ int lsdir(const char *dirname){
 		};
 	};
 };
-struct options {
-	char *prog_name;
-	int argc;
-	bool l_flag;
-	char **argv;
-	static options parse(int argc, char **argv)
-	{
-		options res;
-		if(argv && argv[0]){
-			res.prog_name=*argv++;
-			--argc;
-			res.argv=argv;
-			res.argc=argc;
-		} else {
-			static char prog_name[] = "(unknown)";
-			static char *empty_v[]={nullptr};
-			res.prog_name=prog_name;
-			res.argc=0;
-			res.argv=empty_v;
-			res.l_flag=false;
-		};
-		return res;
-	};
-	private:
-	bool add_arg(char *arg) {
-	};
-	options() = default;
-};
-class fmtbuf_t {
-	enum { npos=4000 };
-	char buf[npos];
-	unsigned short pos;
-	unsigned short end;
-	public:
-	fmtbuf_t()
-	: pos(0), end(0)
-	{
-		memset(buf,0,sizeof(buf));
-		const char *msg="this is a test\nthis is only a test\n";
-		while(*msg)
-			buf[end++]=*msg++;
-	};
-	bool oflow() {
-		if(end>pos) {
-			ssize_t res=write(1,buf+pos,end-pos);
-			if(res<0) {
-				write(2,"write faile\n");
-				return false;
-			};
-			pos+=res;
-		};
-		return true;
+class allocator {
+	struct block_t {
+		block_t *next;
+		block_t *prev;
 	};
 };
-fmtbuf_t buf;
-int ls_main(const options &opts) {
-	return 0;
-};
+
 int main(int argc, char**argv) 
 {
-	buf.oflow();
-	return ls_main(options::parse(argc,argv));
+//   	const char *prog=*argv++;
+//   	if(*argv) {
+//   		while(*argv)
+//   			lsarg(*argv++);
+//   	} else {
+//   		lsarg(".");
+//   	};
+	return 0;
 };
