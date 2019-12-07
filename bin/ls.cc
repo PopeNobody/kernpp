@@ -1,8 +1,5 @@
 #include <syscall.hh>
 
-typedef long unsigned int off64_t;
-typedef long unsigned int ino64_t;
-typedef long errno_t;
 enum open_mode {
 	o_rdonly  =  0000,
 	o_wronly  =  0001,

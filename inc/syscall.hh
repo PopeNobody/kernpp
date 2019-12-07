@@ -201,11 +201,38 @@ extern "C" {
 	};
 };
 
-#define  strlen   __builtin_strlen
+inline size_t strlen(const char *s)
+{
+	const char *p(s);
+	while(*p)
+		++p;
+	return p-s;
+};
+inline int sign(int val){
+	if(val<0)
+		return -1;
+	else if (val>0)
+		return 1;
+	else
+		return 0;
+};
+inline int strcmp(const char *s1, const char *s2)
+{
+	for(;;){
+		int d=*s1-*s2;
+		if(d)
+			return sign(d);
+		if(!*s1)
+			return 0;
+		++s1,++s2;
+	};
+};
 #define  strcmp   __builtin_strcmp
 #define  memset   __builtin_memset
 #define  strcpy   __builtin_strcpy
 #define  strncpy  __builtin_strncpy
+#define  memcpy   __builtin_memcpy
+#define memset __builtin_memset
 
 inline ssize_t write(int fd, const char *buf)
 	__attribute__ ((__always_inline__));

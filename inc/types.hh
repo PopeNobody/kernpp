@@ -1,3 +1,4 @@
+#include <errno.hh>
 #ifndef types_hh
 #define types_hh types_hh
 
@@ -75,6 +76,7 @@ typedef int32_t pid_t;
 //   typedef int64_t blksize_t;
 //   typedef int64_t fsword_t;
 //   typedef int64_t intmax_t;
+typedef long errno_t;
 typedef int64_t intptr_t;
 typedef uint64_t uintptr_t;
 typedef int64_t off64_t;
@@ -135,5 +137,4 @@ struct linux_dirent {
 		return (linux_dirent*)(((char*)this)+this->d_reclen);
 	};
 };
-
 #endif
