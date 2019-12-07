@@ -144,18 +144,6 @@ extern "C" {
 				);
 		return set_errno(res);
 	};
-#if 0
-	inline int brk(void *brk) {
-		int res=-1;
-		asm (
-				"syscall\n" 
-				: "=a"(res) 
-				: "0"(12), "D"(brk)
-				: "rcx", "r11", "memory"
-				);
-		return set_errno(res);
-	};
-#endif
 	inline char *mmap(
 			void *addr, size_t length, int prot, int flags, fd_t fd, off_t off
 			)
@@ -216,6 +204,16 @@ inline int sign(int val){
 	else
 		return 0;
 };
+extern "C" {
+	void *malloc(size_t);
+	void free(void *);
+	void *sbrk (intptr_t increment);
+	int strcmp(const char *s1, const char *s2);
+	void *memset(void *s, int c, size_t n);
+	void *memcpy(void *dest, const void *src, size_t n);
+	char* strcpy(char *d, const char *s);
+	char * strncpy(char *dst, const char *src, size_t n);
+};
 inline int strcmp(const char *s1, const char *s2)
 {
 	for(;;){
@@ -227,12 +225,37 @@ inline int strcmp(const char *s1, const char *s2)
 		++s1,++s2;
 	};
 };
-#define  strcmp   __builtin_strcmp
-#define  memset   __builtin_memset
-#define  strcpy   __builtin_strcpy
-#define  strncpy  __builtin_strncpy
-#define  memcpy   __builtin_memcpy
-#define memset __builtin_memset
+inline void *memset(void *s, int c, size_t n){
+	char *b=(char*)s;
+	for(int i=0;i<n;i++)
+		b[i]=c;
+	return s;
+};
+inline void *memcpy(void *dest, const void *src, size_t n){
+	char *d((char*)dest), *s((char*)src);
+	for(int i=0;i<n;i++)
+		d[i]=s[i];		
+	return dest;
+};
+inline char* strcpy(char *d, const char *s){
+	size_t p=0;
+	for(;;){
+		if(not(d[p]=s[p]))
+			return d;
+		++p;
+	};
+};
+inline char * strncpy(char *dst, const char *src, size_t n)
+{
+	size_t i;
+
+	for (i = 0; i < n && src[i] != '\0'; i++)
+		dst[i] = src[i];
+	for ( ; i < n; i++)
+		dst[i] = '\0';
+
+	return dst;
+}
 
 inline ssize_t write(int fd, const char *buf)
 	__attribute__ ((__always_inline__));

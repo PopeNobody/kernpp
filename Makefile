@@ -1,12 +1,21 @@
 test:
 
+test_algo: algo
+	./algo * */*.[ch][ch] *.cc *.cc *.cc
+
+algo: algo.cc
+	$(CXX) -g algo.cc -o algo
+
+
+test:
+
 MAKEFLAGS:=-rR
 ARFLAGS = rvU
 
-CXX:= g++
+CXX:= g++ -O0
 LD:= ld
 
-CPP_FLAGS= -MD -MF $@.d
+CPP_FLAGS= -MD -MF $*.d
 CPP_FLAGS+= -Iinc
 CPP_FLAGS+= -nostdinc
 
@@ -31,16 +40,20 @@ CXX_FLAGS+= -fomit-frame-pointer
 CXX_FLAGS+= -fno-stack-protector
 CXX_FLAGS+= -fverbose-asm
 
+DEPS=/dev/null
+
 BIN_CXX:=$(wildcard bin/*.cc)
 BIN_GEN:=$(patsubst %.cc, %.s, $(BIN_CXX))
 BIN_ASM:=$(filter-out $(BIN_GEN), $(wildcard bin/*.s))
 BIN_GEN+=$(patsubst %.s, %.o, $(BIN_GEN) $(BIN_ASM))
+DEPS+=$(patsubst %.cc,%.d,$(BIN_CXX))
 
-LIB_CXX:=$(wildcard lib/*.cc)
+LIB_CXX:=$(filter-out lib/save_this.cc, $(wildcard lib/*.cc))
 LIB_GEN:=$(patsubst %.cc, %.s, $(LIB_CXX))
-LIB_ASM:=$(filter-out $(LIB_GEN), $(wildcard lib/*.s))
+LIB_ASM:=$(filter-out  lib/save_this.s $(LIB_GEN), $(wildcard lib/*.s))
 LIB_OBJ:=$(patsubst %.s, %.o, $(LIB_GEN) $(LIB_ASM))
 LIB_GEN+=$(LIB_OBJ)
+DEPS+=$(patsubst %.cc,%.d,$(LIB_CXX))
 
 ASM_EXE:=$(patsubst %.s, %, $(BIN_ASM))
 CXX_EXE:=$(patsubst %.cc, %, $(BIN_CXX))
@@ -90,10 +103,18 @@ show:
 	@echo LIB_OBJ=$(LIB_OBJ)
 
 Makefile: ;
-	
-deps:
-	touch deps
+
+$(DEPS):
+	touch $@
+
+deps: $(wildcard $(DEPS))
+	cat $(sort $(wildcard $(DEPS))) > deps.new
+	diff deps deps.new || true
+	cmp deps deps.new && rm -f deps.new && touch deps || mv -v deps.new deps
 
 include deps
+
+check_env:
+	printenv
 
 .PHONY: test clean show all

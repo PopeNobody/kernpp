@@ -1,6 +1,7 @@
 #include <syscall.hh>
 #include <array.hh>
 
+
 struct num_fmt
 {
 	static char hex_dig(int val) {
@@ -77,42 +78,6 @@ struct str_fmt {
 	};
 };
 
-struct curbrk_t {
-	char *val;
-	curbrk_t()
-		:val(0)
-	{
-	};
-	void set(char *nval){
-		val=nval;
-	};
-	operator void*() const {
-		return val;
-	};
-};
-curbrk_t __curbrk;
-
-int __brk (void *addr)
-{
-	char *newbrk;
-
-	asm (
-			"syscall\n" 
-			: "=a"(newbrk) 
-			: "0"(12), "D"(addr)
-			: "rcx", "r11", "memory"
-			);
-
-	__curbrk.set(newbrk);
-
-  if (newbrk < addr)
-    {
-      set_errno (ENOMEM);
-      return -1;
-    }
-
-  return 0;
-}
 int alarm(int secs) {
 	int res=-1;
 	asm(
@@ -134,35 +99,6 @@ int nanosleep(timespec* itm, timespec *otm=0) {
 	return set_errno(res);
 };
 
-void * __sbrk (intptr_t increment)
-{
-  void *oldbrk;
-
-  /* If this is not part of the dynamic library or the library is used
-     via dynamic loading in a statically linked program update
-     __curbrk from the kernel's brk value.  That way two separate
-     instances of __brk and __sbrk can share the heap, returning
-     interleaved pieces of it.  */
-	if (!__curbrk && (__brk(0)<0))
-		return (void*)-1;
-
-  if (increment == 0)
-    return __curbrk;
-
-  oldbrk = __curbrk;
-  if (increment > 0
-      ? ((uintptr_t) oldbrk + (uintptr_t) increment < (uintptr_t) oldbrk)
-      : ((uintptr_t) oldbrk < (uintptr_t) -increment))
-    {
-      set_errno (ENOMEM);
-      return (void *) -1;
-    }
-
-  if (__brk (str_t(oldbrk) + increment) < 0)
-    return (void *) -1;
-
-  return oldbrk;
-}
 
 
 time_t sleep(time_t sec, long nsec=0) {
@@ -221,28 +157,12 @@ void do_disp(buf_t &buf, const char *tag, val_t val)
 		.stream(nl);
 };
 #define disp(x) do_disp(buf,#x,x)
-
 int main(int argc, char**argv){
-	ptr_fmt ptr(argv);
 	buf_t buf(1);
-	str_fmt nl("\n");
-	disp(__sbrk(0));
-	disp(nullptr);
-	disp((char*)sizeof(buf));
-	for(auto b(argv), e(argv+argc); b!=e; b++) {
-		buf.stream(str_fmt(*b)).stream(nl);
+	for(int i=0;i<10000;i++){
+		char *mem=(char*)malloc(100);
+		disp(mem);
+		memset(mem,0xde,100);
 	};
-	__sbrk(0);
-	char *orig=(char*)(void*)__curbrk;
-	disp(__curbrk);
-	disp(__sbrk(0));
-	disp(__curbrk);
-	disp(__sbrk(4096*16+12345));
-	disp(__curbrk);
-	disp(__sbrk(0));
-	disp(__curbrk);
-	disp(__sbrk(4096*16+12345));
-	disp(__curbrk);
-
 	return 0;
 }

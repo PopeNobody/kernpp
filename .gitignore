@@ -1,3 +1,14 @@
+#programs
+bin/cat
+bin/echo
+bin/false
+bin/ls
+bin/true
+bin/malloc_test
+bin/sc
+bin/vec
+bin/brk
+
 # Prerequisites
 *.d
 
@@ -36,12 +47,3 @@
 *.app
 
 
-bin/cat
-bin/echo
-bin/false
-bin/ls
-bin/true
-bin/malloc_test
-
-bin/sc
-bin/vec
