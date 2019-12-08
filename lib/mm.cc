@@ -34,7 +34,7 @@ int brk (void *addr)
 
   return 0;
 }
-void * sbrk (intptr_t increment)
+void * sbrk (ssize_t increment)
 {
   void *oldbrk;
 
@@ -58,7 +58,7 @@ void * sbrk (intptr_t increment)
       return (void *) -1;
     }
 
-  if (brk (str_t(oldbrk) + increment) < 0)
+  if (brk (ostr_t(oldbrk) + increment) < 0)
     return (void *) -1;
 
   return oldbrk;

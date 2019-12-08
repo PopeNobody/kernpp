@@ -1,7 +1,7 @@
 #ifndef fmt_hh
 #define fmt_hh
 
-namespace num_fmt
+namespace fmt
 {
 	inline char hex_dig(int val) {
 		static char digs[]="0123456789abcdef";
@@ -12,6 +12,18 @@ namespace num_fmt
 		for(int i=0;i<2*sizeof(val);i++){
 			*--end=hex_dig(val);
 			val/=0x10;
+		};
+		return end;
+	};
+	inline char *fmt_dec(unsigned long val, char *beg, char *end)
+	{
+		if(val) {
+			while(val) {
+				*--end=hex_dig(val%10);
+				val/=10;
+			};
+		}else{
+			*--end='0';
 		};
 		return end;
 	};

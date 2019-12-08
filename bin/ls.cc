@@ -1,4 +1,6 @@
 #include <syscall.hh>
+#include <new.hh>
+#include <fmt.hh>
 
 enum open_mode {
 	o_rdonly  =  0000,
@@ -60,14 +62,43 @@ bool lsarg(const char *dirname){
 		};
 	};
 };
+using namespace fmt;
+template <typename val_t>
+ssize_t write_dec(val_t val, int width=0){
+	bool neg=val<0;
+	if(neg)
+		val*=-1;
+	char buf[sizeof(val)*4];
+	char *end=buf+sizeof(buf);
+	*--end=0;
+	char *pos=end;
+	pos=fmt_dec(val,buf,end);
+	if(neg)
+		*--pos='-';
+	while(end-pos<width)
+		*--pos=' ';
+	return write(1,pos,end);
+};
+
+using namespace fmt;
+
 int main(int argc, char**argv) 
 {
-	const char *prog=*argv++;
-	if(*argv) {
-		while(*argv)
-			lsarg(*argv++);
-	} else {
-		lsarg(".");
+	write_lit(1,"main called with argc=");
+	write_dec(argc);
+	write_lit(1,"\n");
+
+	int *argl = new int[argc];
+	for(int i=0;i<argc;i++) {
+		argl[i]=strlen(argv[i]);
 	};
+	for(int i=0;i<argc;i++){
+		write_dec(argl[i],10);
+		write_lit(1," ");
+		write(1,argv[i],argl[i]);	
+		write_lit(1,"\n");
+	};	
+
+//	throw "test\n";
 	return 0;
 };

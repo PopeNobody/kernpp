@@ -2,6 +2,7 @@
 #define syscall_hh syscall_hh
 
 #include <types.hh>
+#include <syscall_fwd.hh>
 
 #define AAI __attribute__ ((__always_inline__))
 
@@ -87,12 +88,12 @@ extern "C" {
 };
 extern "C" {
 
-	inline fd_t open(const char *pathname, int flags) AAI;
+	inline fd_t open(const char *pathname, int flags, int mode) AAI;
 	inline int close(fd_t fd) AAI;
 	inline int stat(const char *pathname, struct stat *statbuf) AAI;
 	inline ssize_t getdents(fd_t fd, linux_dirent64 *buf, size_t len) AAI;
 	inline ssize_t read(fd_t fd, char *buf, size_t len) AAI;
-	inline ssize_t write( fd_t fd,  const char *buf,  size_t len) AAI;
+	inline ssize_t sys_write( fd_t fd,  const char *buf,  size_t len) AAI;
 	inline time_t time(time_t *) AAI;
 	inline void _exit(int res) AAI;
 
@@ -108,7 +109,7 @@ extern "C" {
 		return set_errno(res);
 	};
 	// __NR_write=1
-	inline ssize_t write( fd_t fd,  const char *buf,  size_t len)
+	inline ssize_t sys_write( fd_t fd,  const char *buf,  size_t len)
 	{
 		long res;
 		asm (
@@ -120,13 +121,13 @@ extern "C" {
 		return set_errno(res);
 	};
 	// __NR_open=2
-	inline fd_t open(const char *pathname, int flags)
+	inline fd_t open(const char *pathname, int flags, int mode=0)
 	{
 		int fd=-1;
 		asm (
 				"syscall\n"
 				: "=a"(fd)
-				: "0"(2), "D"(pathname),"S"(flags)
+				: "0"(2), "D"(pathname),"S"(flags), "d"(mode)
 				: "rcx", "r11", "memory"
 				);
 		return fd;
@@ -269,40 +270,28 @@ inline char * strncpy(char *dst, const char *src, size_t n)
 	return dst;
 }
 
-
+inline ssize_t write(int fd, const char *buf, size_t len)
+{
+	return sys_write(fd,buf,len);
+};
 inline ssize_t write(int fd, const char *buf, const char *end)
 {
 	return write(fd,buf,end-buf);
 };
-//   inline ssize_t write(int fd, char ch)
-//   	__attribute__ ((__always_inline__));
-//   inline ssize_t write(int fd, char ch)
-//   {
-//   	return write(fd,&ch,1);
-//   }
 
-template<typename char_t>
-inline ssize_t write(fd_t fd, char_t *buf) AAI;
-
-template<typename char_t, size_t n>
-inline ssize_t write(int fd, char_t (&buf)[n]) AAI;
-
-template<typename char_t>
-inline ssize_t write(fd_t fd, char_t *buf){
-	asm ("# Write char*");
+inline ssize_t write(fd_t fd, char *buf){
 	return write(fd,buf,strlen(buf));
 };
 
-template<typename char_t, size_t n>
-inline ssize_t write(int fd, char_t (&buf)[n]){
-	asm ("# Write char[]");
-	return write(fd,buf,n);
+template<typename char_t, size_t size>
+inline ssize_t write_lit(fd_t fd, char_t (&buf)[size])
+{
+	return write(fd,buf,size-1);
 };
 
 extern "C" {
 	inline void abort(){
 		do {
-			asm("# abort");
 			asm("int3");
 		} while(true);
 	};

@@ -17,3 +17,4 @@
  -fomit-frame-pointer
  -fno-stack-protector
  -fverbose-asm
+-g

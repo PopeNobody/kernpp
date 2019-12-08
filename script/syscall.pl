@@ -17,11 +17,11 @@
         'count'
       ]
     ],
-    'ret' => 'int'
+    'ret' => 'ssize_t'
   },
-  'write' => {
+  'sys_write' => {
     'code' => 1,
-    'name' => 'write',
+    'name' => 'sys_write',
     'impl' => 1,
     'args' => [
       [
@@ -37,7 +37,7 @@
         'count'
       ]
     ],
-    'ret' => 'int'
+    'ret' => 'ssize_t'
   },
   'open' => {
     'code' => 2,
@@ -57,7 +57,7 @@
         'mode'
       ]
     ],
-    'ret' => 'int'
+    'ret' => 'fd_t'
   },
   'close' => {
     'code' => 3,
@@ -81,7 +81,7 @@
         'filename'
       ],
       [
-        'struct stat *',
+        'stat_p',
         'statbuf'
       ]
     ],
@@ -97,7 +97,7 @@
         'fd'
       ],
       [
-        'struct stat *',
+        'stat_p',
         'statbuf'
       ]
     ],
@@ -109,11 +109,11 @@
     'impl' => 1,
     'args' => [
       [
-        'fconst char *',
+        'istr_t',
         'filename'
       ],
       [
-        'struct stat *',
+        'stat_p',
         'statbuf'
       ]
     ],
@@ -125,11 +125,11 @@
     'impl' => 1,
     'args' => [
       [
-        'struct poll_fd *',
+        'pollfd_p',
         'ufds'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'nfds'
       ],
       [
@@ -153,7 +153,7 @@
         'offset'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'origin'
       ]
     ],
@@ -165,19 +165,19 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'void*',
         'addr'
       ],
       [
-        'unsigned long',
+        'size_t',
         'len'
       ],
       [
-        'unsigned long',
+        'int',
         'prot'
       ],
       [
-        'unsigned long',
+        'int',
         'flags'
       ],
       [
@@ -185,11 +185,11 @@
         'fd'
       ],
       [
-        'unsigned long',
+        'off_t',
         'off'
       ]
     ],
-    'ret' => 'int'
+    'ret' => 'char*'
   },
   'mprotect' => {
     'code' => 10,
@@ -197,7 +197,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'start'
       ],
       [
@@ -205,7 +205,7 @@
         'len'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'prot'
       ]
     ],
@@ -217,7 +217,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'addr'
       ],
       [
@@ -233,7 +233,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'void_p',
         'brk'
       ]
     ],
@@ -249,11 +249,11 @@
         'sig'
       ],
       [
-        'const struct sigaction *',
+        'sigaction_p',
         'act'
       ],
       [
-        'struct sigaction *',
+        'sigaction_p',
         'oact'
       ],
       [
@@ -273,11 +273,11 @@
         'how'
       ],
       [
-        'sigset_t *',
+        'sigset_p',
         'nset'
       ],
       [
-        'sigset_t *',
+        'sigset_p',
         'oset'
       ],
       [
@@ -293,7 +293,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         '__unused'
       ]
     ],
@@ -309,11 +309,11 @@
         'fd'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'cmd'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg'
       ]
     ],
@@ -337,7 +337,7 @@
         'count'
       ],
       [
-        'loff_t',
+        'off_t',
         'pos'
       ]
     ],
@@ -361,7 +361,7 @@
         'count'
       ],
       [
-        'loff_t',
+        'off_t',
         'pos'
       ]
     ],
@@ -377,11 +377,11 @@
         'fd'
       ],
       [
-        'const struct iovec *',
+        'iovec_p',
         'vec'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'vlen'
       ]
     ],
@@ -397,11 +397,11 @@
         'fd'
       ],
       [
-        'const struct iovec *',
+        'iovec_p',
         'vec'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'vlen'
       ]
     ],
@@ -445,19 +445,19 @@
         'n'
       ],
       [
-        'fd_set *',
+        'fd_set_p',
         'inp'
       ],
       [
-        'fd_set *',
+        'fd_set_p',
         'outp'
       ],
       [
-        'fd_set*',
+        'fd_set_p',
         'exp'
       ],
       [
-        'struct timeval *',
+        'timeval_p',
         'tvp'
       ]
     ],
@@ -476,23 +476,23 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'addr'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'old_len'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'new_len'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'flags'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'new_addr'
       ]
     ],
@@ -504,7 +504,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'start'
       ],
       [
@@ -524,7 +524,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'start'
       ],
       [
@@ -532,7 +532,7 @@
         'len'
       ],
       [
-        'unsigned char *',
+        'ostr_t',
         'vec'
       ]
     ],
@@ -544,7 +544,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'start'
       ],
       [
@@ -612,7 +612,7 @@
         'cmd'
       ],
       [
-        'struct shmid_ds *',
+        'shmid_ds_p',
         'buf'
       ]
     ],
@@ -624,7 +624,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'fildes'
       ]
     ],
@@ -659,11 +659,11 @@
     'impl' => 1,
     'args' => [
       [
-        'struct timespec *',
+        'timespec_p',
         'rqtp'
       ],
       [
-        'struct timespec *',
+        'timespec_p',
         'rmtp'
       ]
     ],
@@ -679,7 +679,7 @@
         'which'
       ],
       [
-        'struct itimerval *',
+        'itimerval_p',
         'value'
       ]
     ],
@@ -691,7 +691,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'seconds'
       ]
     ],
@@ -707,11 +707,11 @@
         'which'
       ],
       [
-        'struct itimerval *',
+        'itimerval_p',
         'value'
       ],
       [
-        'struct itimerval *',
+        'itimerval_p',
         'ovalue'
       ]
     ],
@@ -738,7 +738,7 @@
         'in_fd'
       ],
       [
-        'off_t *',
+        'off_p',
         'offset'
       ],
       [
@@ -778,7 +778,7 @@
         'fd'
       ],
       [
-        'struct sockaddr *',
+        'sockaddr_p',
         'uservaddr'
       ],
       [
@@ -798,11 +798,11 @@
         'fd'
       ],
       [
-        'struct sockaddr *',
+        'sockaddr_p',
         'upeer_sockaddr'
       ],
       [
-        'int *',
+        'int32_p',
         'upeer_addrlen'
       ]
     ],
@@ -818,7 +818,7 @@
         'fd'
       ],
       [
-        'void *',
+        'void_p',
         'buff'
       ],
       [
@@ -830,7 +830,7 @@
         'flags'
       ],
       [
-        'struct sockaddr *',
+        'sockaddr_p',
         'addr'
       ],
       [
@@ -850,7 +850,7 @@
         'fd'
       ],
       [
-        'void *',
+        'void_p',
         'ubuf'
       ],
       [
@@ -862,11 +862,11 @@
         'flags'
       ],
       [
-        'struct sockaddr *',
+        'sockaddr_p',
         'addr'
       ],
       [
-        'int *',
+        'int32_p',
         'addr_len'
       ]
     ],
@@ -882,7 +882,7 @@
         'fd'
       ],
       [
-        'struct msghdr *',
+        'msghdr_p',
         'msg'
       ],
       [
@@ -902,11 +902,11 @@
         'fd'
       ],
       [
-        'struct msghdr *',
+        'msghdr_p',
         'msg'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -938,7 +938,7 @@
         'fd'
       ],
       [
-        'struct sokaddr *',
+        'sockaddr_p',
         'umyaddr'
       ],
       [
@@ -974,11 +974,11 @@
         'fd'
       ],
       [
-        'struct sockaddr *',
+        'sockaddr_p',
         'usockaddr'
       ],
       [
-        'int *',
+        'int32_p',
         'usockaddr_len'
       ]
     ],
@@ -994,11 +994,11 @@
         'fd'
       ],
       [
-        'struct sockaddr *',
+        'sockaddr_p',
         'usockaddr'
       ],
       [
-        'int *',
+        'int32_p',
         'usockaddr_len'
       ]
     ],
@@ -1022,7 +1022,7 @@
         'protocol'
       ],
       [
-        'int *',
+        'int32_p',
         'usockvec'
       ]
     ],
@@ -1078,7 +1078,7 @@
         'optval'
       ],
       [
-        'int *',
+        'int32_p',
         'optlen'
       ]
     ],
@@ -1090,19 +1090,19 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'clone_flags'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'newsp'
       ],
       [
-        'void *',
+        'void_p',
         'parent_tid'
       ],
       [
-        'void *',
+        'void_p',
         'child_tid'
       ]
     ],
@@ -1128,21 +1128,21 @@
     'impl' => 1,
     'args' => [
       [
-        'istr_t',
+        'const char *',
         'filename'
       ],
       [
-        'const char * const',
-        'argv[]'
+        'char *const *',
+        'argv'
       ],
       [
-        'const char * const',
-        'envp[]'
+        'char *const *',
+        'envp'
       ]
     ],
     'ret' => 'int'
   },
-  'exit' => {
+  '_exit' => {
     'code' => 60,
     'name' => 'exit',
     'impl' => 1,
@@ -1152,7 +1152,7 @@
         'error_code'
       ]
     ],
-    'ret' => 'int'
+    'ret' => 'void'
   },
   'wait4' => {
     'code' => 61,
@@ -1164,7 +1164,7 @@
         'upid'
       ],
       [
-        'int *',
+        'int32_p',
         'stat_addr'
       ],
       [
@@ -1172,7 +1172,7 @@
         'options'
       ],
       [
-        'struct rusage *',
+        'rusage_p',
         'ru'
       ]
     ],
@@ -1200,7 +1200,7 @@
     'impl' => 1,
     'args' => [
       [
-        'struct old_utsname *',
+        'utsname_p',
         'name'
       ]
     ],
@@ -1236,7 +1236,7 @@
         'semid'
       ],
       [
-        'struct sembuf *',
+        'sembuf_p',
         'tsops'
       ],
       [
@@ -1308,7 +1308,7 @@
         'msqid'
       ],
       [
-        'struct msgbuf *',
+        'msgbuf_p',
         'msgp'
       ],
       [
@@ -1332,7 +1332,7 @@
         'msqid'
       ],
       [
-        'struct msgbuf *',
+        'msgbuf_p',
         'msgp'
       ],
       [
@@ -1364,7 +1364,7 @@
         'cmd'
       ],
       [
-        'struct msqid_ds *',
+        'msqid_ds_p',
         'buf'
       ]
     ],
@@ -1380,11 +1380,11 @@
         'fd'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'cmd'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg'
       ]
     ],
@@ -1400,7 +1400,7 @@
         'fd'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'cmd'
       ]
     ],
@@ -1456,7 +1456,7 @@
         'fd'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'length'
       ]
     ],
@@ -1472,15 +1472,15 @@
         'fd'
       ],
       [
-        'struct linux_dirent *',
+        'linux_dirent_p',
         'dirent'
       ],
       [
-        'unsigned int',
+        'size_t',
         'count'
       ]
     ],
-    'ret' => 'int'
+    'ret' => 'ssize_t'
   },
   'getcwd' => {
     'code' => 79,
@@ -1492,7 +1492,7 @@
         'buf'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'size'
       ]
     ],
@@ -1756,11 +1756,11 @@
     'impl' => 1,
     'args' => [
       [
-        'struct timeval *',
+        'timeval_p',
         'tv'
       ],
       [
-        'struct timezone *',
+        'timezone_p',
         'tz'
       ]
     ],
@@ -1772,11 +1772,11 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'resource'
       ],
       [
-        'struct rlimit *',
+        'rlimit_p',
         'rlim'
       ]
     ],
@@ -1792,7 +1792,7 @@
         'who'
       ],
       [
-        'struct rusage *',
+        'rusage_p',
         'ru'
       ]
     ],
@@ -1804,7 +1804,7 @@
     'impl' => 1,
     'args' => [
       [
-        'struct sysinfo *',
+        'sysinfo_p',
         'info'
       ]
     ],
@@ -1816,7 +1816,7 @@
     'impl' => 1,
     'args' => [
       [
-        'struct sysinfo *',
+        'sysinfo_p',
         'info'
       ]
     ],
@@ -1836,11 +1836,11 @@
         'pid'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'addr'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'data'
       ]
     ],
@@ -1997,7 +1997,7 @@
         'gidsetsize'
       ],
       [
-        'gid_t *',
+        'gid_p',
         'grouplist'
       ]
     ],
@@ -2013,7 +2013,7 @@
         'gidsetsize'
       ],
       [
-        'gid_t *',
+        'gid_p',
         'grouplist'
       ]
     ],
@@ -2025,15 +2025,15 @@
     'impl' => 1,
     'args' => [
       [
-        'uid_t *',
+        'uid_p',
         'ruid'
       ],
       [
-        'uid_t *',
+        'uid_p',
         'euid'
       ],
       [
-        'uid_t *',
+        'uid_p',
         'suid'
       ]
     ],
@@ -2045,15 +2045,15 @@
     'impl' => 1,
     'args' => [
       [
-        'uid_t *',
+        'uid_p',
         'ruid'
       ],
       [
-        'uid_t *',
+        'uid_p',
         'euid'
       ],
       [
-        'uid_t *',
+        'uid_p',
         'suid'
       ]
     ],
@@ -2085,15 +2085,15 @@
     'impl' => 1,
     'args' => [
       [
-        'gid_t *',
+        'gid_p',
         'rgid'
       ],
       [
-        'gid_t *',
+        'gid_p',
         'egid'
       ],
       [
-        'gid_t *',
+        'gid_p',
         'sgid'
       ]
     ],
@@ -2185,7 +2185,7 @@
     'impl' => 1,
     'args' => [
       [
-        'sigset_t *',
+        'sigset_p',
         'set'
       ],
       [
@@ -2201,15 +2201,15 @@
     'impl' => 1,
     'args' => [
       [
-        'const sigset_t *',
+        'const sigset_p',
         'uthese'
       ],
       [
-        'siginfo_t *',
+        'siginfo_p',
         'uinfo'
       ],
       [
-        'const struct timespec *',
+        'timespec_p',
         'uts'
       ],
       [
@@ -2233,7 +2233,7 @@
         'sig'
       ],
       [
-        'siginfo_t *',
+        'siginfo_p',
         'uinfo'
       ]
     ],
@@ -2245,7 +2245,7 @@
     'impl' => 1,
     'args' => [
       [
-        'sigset_t *',
+        'sigset_p',
         'unewset'
       ],
       [
@@ -2261,11 +2261,11 @@
     'impl' => 1,
     'args' => [
       [
-        'const stack_t *',
+        'const stack_p',
         'uss'
       ],
       [
-        'stack_t *',
+        'stack_p',
         'uoss'
       ]
     ],
@@ -2281,7 +2281,7 @@
         'filename'
       ],
       [
-        'struct utimbuf *',
+        'utimbuf_p',
         'times'
       ]
     ],
@@ -2318,7 +2318,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'personality'
       ]
     ],
@@ -2334,7 +2334,7 @@
         'dev'
       ],
       [
-        'struct ustat *',
+        'ustat_p',
         'ubuf'
       ]
     ],
@@ -2350,7 +2350,7 @@
         'pathname'
       ],
       [
-        'struct statfs *',
+        'statfs_p',
         'buf'
       ]
     ],
@@ -2366,7 +2366,7 @@
         'fd'
       ],
       [
-        'struct statfs *',
+        'statfs_p',
         'buf'
       ]
     ],
@@ -2382,11 +2382,11 @@
         'option'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg1'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg2'
       ]
     ],
@@ -2438,7 +2438,7 @@
         'pid'
       ],
       [
-        'struct sched_param *',
+        'sched_param_p',
         'param'
       ]
     ],
@@ -2454,7 +2454,7 @@
         'pid'
       ],
       [
-        'struct sched_param *',
+        'sched_param_p',
         'param'
       ]
     ],
@@ -2474,7 +2474,7 @@
         'policy'
       ],
       [
-        'struct sched_param *',
+        'sched_param_p',
         'param'
       ]
     ],
@@ -2526,7 +2526,7 @@
         'pid'
       ],
       [
-        'struct timespec *',
+        'timespec_p',
         'interval'
       ]
     ],
@@ -2538,7 +2538,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'void_p',
         'start'
       ],
       [
@@ -2554,7 +2554,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'void_p',
         'start'
       ],
       [
@@ -2600,11 +2600,11 @@
         'func'
       ],
       [
-        'void *',
+        'void_p',
         'ptr'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'bytecount'
       ]
     ],
@@ -2632,7 +2632,7 @@
     'impl' => 1,
     'args' => [
       [
-        'struct __sysctl_args *',
+        'sysctl_args_p',
         'args'
       ]
     ],
@@ -2648,19 +2648,19 @@
         'option'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg2'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg3'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg4'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg5'
       ]
     ],
@@ -2672,7 +2672,7 @@
     'impl' => 1,
     'args' => [
       [
-        'struct task_struct *',
+        'task_struct_p',
         'task'
       ],
       [
@@ -2680,7 +2680,7 @@
         'code'
       ],
       [
-        'unsigned long *',
+        'uint64_t',
         'addr'
       ]
     ],
@@ -2692,7 +2692,7 @@
     'impl' => 1,
     'args' => [
       [
-        'struct timex *',
+        'timex_p',
         'txc_p'
       ]
     ],
@@ -2704,11 +2704,11 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'resource'
       ],
       [
-        'struct rlimit *',
+        'rlimit_p',
         'rlim'
       ]
     ],
@@ -2751,11 +2751,11 @@
     'impl' => 1,
     'args' => [
       [
-        'struct timeval *',
+        'timeval_p',
         'tv'
       ],
       [
-        'struct timezone *',
+        'timezone_p',
         'tz'
       ]
     ],
@@ -2779,11 +2779,11 @@
         'type'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'flags'
       ],
       [
-        'void *',
+        'void_p',
         'data'
       ]
     ],
@@ -2847,11 +2847,11 @@
         'magic2'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'cmd'
       ],
       [
-        'void *',
+        'void_p',
         'arg'
       ]
     ],
@@ -2895,11 +2895,11 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'level'
       ],
       [
-        'struct pt_regs *',
+        'pt_regs_p',
         'regs'
       ]
     ],
@@ -2911,11 +2911,11 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'from'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'num'
       ],
       [
@@ -2928,13 +2928,7 @@
   'create_module' => {
     'code' => 174,
     'name' => 'create_module',
-    'impl' => 1,
-    'args' => [
-      [
-        'REMOVED IN Linux',
-        '2.6'
-      ]
-    ],
+    'impl' => 0,
     'ret' => 'int'
   },
   'init_module' => {
@@ -2943,11 +2937,11 @@
     'impl' => 1,
     'args' => [
       [
-        'void *',
+        'void_p',
         'umod'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'len'
       ],
       [
@@ -2963,11 +2957,11 @@
     'impl' => 1,
     'args' => [
       [
-        'const chat *',
+        'istr_t',
         'name_user'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -2976,26 +2970,12 @@
   'get_kernel_syms' => {
     'code' => 177,
     'name' => 'get_kernel_syms',
-    'impl' => 1,
-    'args' => [
-      [
-        'REMOVED IN Linux',
-        '2.6'
-      ]
-    ],
-    'ret' => 'int'
+    'impl' => 0
   },
   'query_module' => {
     'code' => 178,
     'name' => 'query_module',
-    'impl' => 1,
-    'args' => [
-      [
-        'REMOVED IN Linux',
-        '2.6'
-      ]
-    ],
-    'ret' => 'int'
+    'impl' => 0
   },
   'quotactl' => {
     'code' => 179,
@@ -3003,7 +2983,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'cmd'
       ],
       [
@@ -3015,7 +2995,7 @@
         'id'
       ],
       [
-        'void *',
+        'void_p',
         'addr'
       ]
     ],
@@ -3068,7 +3048,7 @@
         'fd'
       ],
       [
-        'loff_t',
+        'off_t',
         'offset'
       ],
       [
@@ -3092,7 +3072,7 @@
         'name'
       ],
       [
-        'const void *',
+        'const void_p',
         'value'
       ],
       [
@@ -3120,7 +3100,7 @@
         'name'
       ],
       [
-        'const void *',
+        'const void_p',
         'value'
       ],
       [
@@ -3148,7 +3128,7 @@
         'name'
       ],
       [
-        'const void *',
+        'const void_p',
         'value'
       ],
       [
@@ -3176,7 +3156,7 @@
         'name'
       ],
       [
-        'void *',
+        'void_p',
         'value'
       ],
       [
@@ -3200,7 +3180,7 @@
         'name'
       ],
       [
-        'void *',
+        'void_p',
         'value'
       ],
       [
@@ -3220,11 +3200,11 @@
         'fd'
       ],
       [
-        'const har *',
+        'istr_t',
         'name'
       ],
       [
-        'void *',
+        'void_p',
         'value'
       ],
       [
@@ -3352,7 +3332,7 @@
         'pid'
       ],
       [
-        'ing',
+        'int',
         'sig'
       ]
     ],
@@ -3364,11 +3344,11 @@
     'impl' => 1,
     'args' => [
       [
-        'time_t *',
+        'time_p',
         'tloc'
       ]
     ],
-    'ret' => 'int'
+    'ret' => 'time_t'
   },
   'futex' => {
     'code' => 202,
@@ -3376,7 +3356,7 @@
     'impl' => 1,
     'args' => [
       [
-        'u32 *',
+        'uint32_p',
         'uaddr'
       ],
       [
@@ -3384,19 +3364,19 @@
         'op'
       ],
       [
-        'u32',
+        'uint32_t',
         'val'
       ],
       [
-        'struct timespec *',
+        'timespec_p',
         'utime'
       ],
       [
-        'u32 *',
+        'uint32_p',
         'uaddr2'
       ],
       [
-        'u32',
+        'uint32_t',
         'val3'
       ]
     ],
@@ -3412,11 +3392,11 @@
         'pid'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'len'
       ],
       [
-        'unsigned long *',
+        'uint64_p',
         'user_mask_ptr'
       ]
     ],
@@ -3432,11 +3412,11 @@
         'pid'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'len'
       ],
       [
-        'unsigned long *',
+        'uint64_p',
         'user_mask_ptr'
       ]
     ],
@@ -3445,14 +3425,7 @@
   'set_thread_area' => {
     'code' => 205,
     'name' => 'set_thread_area',
-    'impl' => 1,
-    'args' => [
-      [
-        'NOT IMPLEMENTED. Use',
-        'arch_prctl'
-      ]
-    ],
-    'ret' => 'int'
+    'impl' => 0
   },
   'io_setup' => {
     'code' => 206,
@@ -3464,7 +3437,7 @@
         'nr_events'
       ],
       [
-        'aio_context_t *',
+        'aio_context_p',
         'ctxp'
       ]
     ],
@@ -3500,7 +3473,7 @@
         'nr'
       ],
       [
-        'struct io_event *',
+        'io_event_p',
         'events'
       ]
     ],
@@ -3520,7 +3493,7 @@
         'nr'
       ],
       [
-        'struct iocb * *',
+        'iocb_p',
         'iocbpp'
       ]
     ],
@@ -3536,11 +3509,11 @@
         'ctx_id'
       ],
       [
-        'struct iocb *',
+        'iocb_p',
         'iocb'
       ],
       [
-        'struct io_event *',
+        'io_event_p',
         'result'
       ]
     ],
@@ -3549,14 +3522,7 @@
   'get_thread_area' => {
     'code' => 211,
     'name' => 'get_thread_area',
-    'impl' => 1,
-    'args' => [
-      [
-        'NOT IMPLEMENTED. Use',
-        'arch_prctl'
-      ]
-    ],
-    'ret' => 'int'
+    'impl' => 0
   },
   'lookup_dcookie' => {
     'code' => 212,
@@ -3564,7 +3530,7 @@
     'impl' => 1,
     'args' => [
       [
-        'u64',
+        'uint64_t',
         'cookie64'
       ],
       [
@@ -3606,23 +3572,23 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'start'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'size'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'prot'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'pgoff'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'flags'
       ]
     ],
@@ -3638,11 +3604,11 @@
         'fd'
       ],
       [
-        'struct linux_dirent64 *',
+        'linux_dirent64_p',
         'dirent'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'count'
       ]
     ],
@@ -3654,7 +3620,7 @@
     'impl' => 1,
     'args' => [
       [
-        'int *',
+        'int32_p',
         'tidptr'
       ]
     ],
@@ -3677,7 +3643,7 @@
         'semid'
       ],
       [
-        'struct sembuf *',
+        'sembuf_p',
         'tsops'
       ],
       [
@@ -3685,7 +3651,7 @@
         'nsops'
       ],
       [
-        'const struct timespec *',
+        'timespec_p',
         'timeout'
       ]
     ],
@@ -3701,7 +3667,7 @@
         'fd'
       ],
       [
-        'loff_t',
+        'off_t',
         'offset'
       ],
       [
@@ -3725,11 +3691,11 @@
         'which_clock'
       ],
       [
-        'struct sigevent *',
+        'sigevent_p',
         'timer_event_spec'
       ],
       [
-        'timer_t *',
+        'timer_p',
         'created_timer_id'
       ]
     ],
@@ -3749,11 +3715,11 @@
         'flags'
       ],
       [
-        'const struct itimerspec *',
+        'itimerspec_p',
         'new_setting'
       ],
       [
-        'struct itimerspec *',
+        'itimerspec_p',
         'old_setting'
       ]
     ],
@@ -3769,7 +3735,7 @@
         'timer_id'
       ],
       [
-        'struct itimerspec *',
+        'itimerspec_p',
         'setting'
       ]
     ],
@@ -3809,7 +3775,7 @@
         'which_clock'
       ],
       [
-        'const struct timespec *',
+        'timespec_p',
         'tp'
       ]
     ],
@@ -3825,7 +3791,7 @@
         'which_clock'
       ],
       [
-        'struct timespec *',
+        'timespec_p',
         'tp'
       ]
     ],
@@ -3841,7 +3807,7 @@
         'which_clock'
       ],
       [
-        'struct timespec *',
+        'timespec_p',
         'tp'
       ]
     ],
@@ -3861,11 +3827,11 @@
         'flags'
       ],
       [
-        'const struct timespec *',
+        'timespec_p',
         'rqtp'
       ],
       [
-        'struct timespec *',
+        'timespec_p',
         'rmtp'
       ]
     ],
@@ -3893,7 +3859,7 @@
         'epfd'
       ],
       [
-        'struct epoll_event *',
+        'epoll_event_p',
         'events'
       ],
       [
@@ -3925,7 +3891,7 @@
         'fd'
       ],
       [
-        'struct epoll_event *',
+        'epoll_event_p',
         'event'
       ]
     ],
@@ -3961,7 +3927,7 @@
         'filename'
       ],
       [
-        'struct timeval *',
+        'timeval_p',
         'utimes'
       ]
     ],
@@ -3978,23 +3944,23 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'start'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'len'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'mode'
       ],
       [
-        'unsigned long *',
+        'uint64_p',
         'nmask'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'maxnode'
       ],
       [
@@ -4014,11 +3980,11 @@
         'mode'
       ],
       [
-        'unsigned long *',
+        'uint64_p',
         'nmask'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'maxnode'
       ]
     ],
@@ -4030,23 +3996,23 @@
     'impl' => 1,
     'args' => [
       [
-        'int *',
+        'int32_p',
         'policy'
       ],
       [
-        'unsigned long *',
+        'uint64_p',
         'nmask'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'maxnode'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'addr'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'flags'
       ]
     ],
@@ -4070,7 +4036,7 @@
         'mode'
       ],
       [
-        'struct mq_attr *',
+        'mq_attr_p',
         'u_attr'
       ]
     ],
@@ -4106,11 +4072,11 @@
         'msg_len'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'msg_prio'
       ],
       [
-        'const stuct timespec *',
+        'timespec_p',
         'u_abs_timeout'
       ]
     ],
@@ -4134,11 +4100,11 @@
         'msg_len'
       ],
       [
-        'unsigned int *',
+        'uint32_p',
         'u_msg_prio'
       ],
       [
-        'const struct timespec *',
+        'timespec_p',
         'u_abs_timeout'
       ]
     ],
@@ -4154,7 +4120,7 @@
         'mqdes'
       ],
       [
-        'const struct sigevent *',
+        'sigevent_p',
         'u_notification'
       ]
     ],
@@ -4170,11 +4136,11 @@
         'mqdes'
       ],
       [
-        'const struct mq_attr *',
+        'mq_attr_p',
         'u_mqstat'
       ],
       [
-        'struct mq_attr *',
+        'mq_attr_p',
         'u_omqstat'
       ]
     ],
@@ -4186,19 +4152,19 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'entry'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'nr_segments'
       ],
       [
-        'struct kexec_segment *',
+        'kexec_segment_p',
         'segments'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'flags'
       ]
     ],
@@ -4218,7 +4184,7 @@
         'upid'
       ],
       [
-        'struct siginfo *',
+        'siginfo_p',
         'infop'
       ],
       [
@@ -4226,7 +4192,7 @@
         'options'
       ],
       [
-        'struct rusage *',
+        'rusage_p',
         'ru'
       ]
     ],
@@ -4246,7 +4212,7 @@
         '_description'
       ],
       [
-        'const void *',
+        'const void_p',
         '_payload'
       ],
       [
@@ -4274,7 +4240,7 @@
         '_callout_info'
       ],
       [
-        'key_serial_t',
+        'uint64_t',
         'destringid'
       ]
     ],
@@ -4290,19 +4256,19 @@
         'option'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg2'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg3'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg4'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'arg5'
       ]
     ],
@@ -4365,7 +4331,7 @@
         'pathname'
       ],
       [
-        'u32',
+        'uint32_t',
         'mask'
       ]
     ],
@@ -4381,7 +4347,7 @@
         'fd'
       ],
       [
-        '__s32',
+        'int32_t',
         'wd'
       ]
     ],
@@ -4397,15 +4363,15 @@
         'pid'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'maxnode'
       ],
       [
-        'const unsigned long *',
+        'uint64_p',
         'old_nodes'
       ],
       [
-        'const unsigned long *',
+        'uint64_p',
         'new_nodes'
       ]
     ],
@@ -4521,7 +4487,7 @@
         'filename'
       ],
       [
-        'struct timeval *',
+        'timeval_p',
         'utimes'
       ]
     ],
@@ -4541,7 +4507,7 @@
         'filename'
       ],
       [
-        'struct stat *',
+        'stat_p',
         'statbuf'
       ],
       [
@@ -4717,23 +4683,23 @@
         'n'
       ],
       [
-        'fd_set *',
+        'fd_set_p',
         'inp'
       ],
       [
-        'fd_set *',
+        'fd_set_p',
         'outp'
       ],
       [
-        'fd_set *',
+        'fd_set_p',
         'exp'
       ],
       [
-        'struct timespec *',
+        'timespec_p',
         'tsp'
       ],
       [
-        'void *',
+        'void_p',
         'sig'
       ]
     ],
@@ -4745,19 +4711,19 @@
     'impl' => 1,
     'args' => [
       [
-        'struct pollfd *',
+        'pollfd_p',
         'ufds'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'nfds'
       ],
       [
-        'struct timespec *',
+        'timespec_p',
         'tsp'
       ],
       [
-        'const sigset_t *',
+        'const sigset_p',
         'sigmask'
       ],
       [
@@ -4773,7 +4739,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'unshare_flags'
       ]
     ],
@@ -4785,7 +4751,7 @@
     'impl' => 1,
     'args' => [
       [
-        'struct robust_list_head *',
+        'robust_list_head_p',
         'head'
       ],
       [
@@ -4805,11 +4771,11 @@
         'pid'
       ],
       [
-        'struct robust_list_head * *',
+        'robust_list_head_p',
         'head_ptr'
       ],
       [
-        'size_t *',
+        'size_p',
         'len_ptr'
       ]
     ],
@@ -4825,7 +4791,7 @@
         'fd_in'
       ],
       [
-        'loff_t *',
+        'off_p',
         'off_in'
       ],
       [
@@ -4833,7 +4799,7 @@
         'fd_out'
       ],
       [
-        'loff_t *',
+        'off_p',
         'off_out'
       ],
       [
@@ -4841,7 +4807,7 @@
         'len'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -4865,7 +4831,7 @@
         'len'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -4881,11 +4847,11 @@
         'fd'
       ],
       [
-        'loff_t',
+        'off_t',
         'offset'
       ],
       [
-        'loff_t',
+        'off_t',
         'bytes'
       ],
       [
@@ -4905,15 +4871,15 @@
         'fd'
       ],
       [
-        'const struct iovec *',
+        'iovec_p',
         'iov'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'nr_segs'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -4929,19 +4895,19 @@
         'pid'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'nr_pages'
       ],
       [
-        'const void * *',
+        'void_p',
         'pages'
       ],
       [
-        'const int *',
+        'int32_p',
         'nodes'
       ],
       [
-        'int *',
+        'int32_p',
         'status'
       ],
       [
@@ -4965,7 +4931,7 @@
         'filename'
       ],
       [
-        'struct timespec *',
+        'timespec_p',
         'utimes'
       ],
       [
@@ -4985,7 +4951,7 @@
         'epfd'
       ],
       [
-        'struct epoll_event *',
+        'epoll_event_p',
         'events'
       ],
       [
@@ -4997,7 +4963,7 @@
         'timeout'
       ],
       [
-        'const sigset_t *',
+        'const sigset_p',
         'sigmask'
       ],
       [
@@ -5017,7 +4983,7 @@
         'ufd'
       ],
       [
-        'sigset_t *',
+        'sigset_p',
         'user_mask'
       ],
       [
@@ -5049,7 +5015,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'count'
       ]
     ],
@@ -5069,11 +5035,11 @@
         'mode'
       ],
       [
-        'loff_t',
+        'off_t',
         'offset'
       ],
       [
-        'loff_t',
+        'off_t',
         'len'
       ]
     ],
@@ -5093,11 +5059,11 @@
         'flags'
       ],
       [
-        'const struct itimerspec *',
+        'itimerspec_p',
         'utmr'
       ],
       [
-        'struct itimerspec *',
+        'itimerspec_p',
         'otmr'
       ]
     ],
@@ -5113,7 +5079,7 @@
         'ufd'
       ],
       [
-        'struct itimerspec *',
+        'itimerspec_p',
         'otmr'
       ]
     ],
@@ -5129,11 +5095,11 @@
         'fd'
       ],
       [
-        'struct sockaddr *',
+        'sockaddr_p',
         'upeer_sockaddr'
       ],
       [
-        'int *',
+        'int32_p',
         'upeer_addrlen'
       ],
       [
@@ -5153,7 +5119,7 @@
         'ufd'
       ],
       [
-        'sigset_t *',
+        'sigset_p',
         'user_mask'
       ],
       [
@@ -5173,7 +5139,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'count'
       ],
       [
@@ -5253,19 +5219,19 @@
         'fd'
       ],
       [
-        'const struct iovec *',
+        'iovec_p',
         'vec'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'vlen'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'pos_l'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'pos_h'
       ]
     ],
@@ -5281,19 +5247,19 @@
         'fd'
       ],
       [
-        'const struct iovec *',
+        'iovec_p',
         'vec'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'vlen'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'pos_l'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'pos_h'
       ]
     ],
@@ -5317,7 +5283,7 @@
         'sig'
       ],
       [
-        'siginfo_t *',
+        'siginfo_p',
         'uinfo'
       ]
     ],
@@ -5329,7 +5295,7 @@
     'impl' => 1,
     'args' => [
       [
-        'struct perf_event_attr *',
+        'perf_event_attr_p',
         'attr_uptr'
       ],
       [
@@ -5345,7 +5311,7 @@
         'group_fd'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'flags'
       ]
     ],
@@ -5361,19 +5327,19 @@
         'fd'
       ],
       [
-        'struct msghdr *',
+        'msghdr_p',
         'mmsg'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'vlen'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ],
       [
-        'struct timespec *',
+        'timespec_p',
         'timeout'
       ]
     ],
@@ -5385,11 +5351,11 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'event_f_flags'
       ]
     ],
@@ -5409,7 +5375,7 @@
         'flags'
       ],
       [
-        '__u64',
+        'uint64_t',
         'mask'
       ],
       [
@@ -5433,15 +5399,15 @@
         'pid'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'resource'
       ],
       [
-        'const struct rlimit64 *',
+        'rlimit64_p',
         'new_rlim'
       ],
       [
-        'struct rlimit64 *',
+        'rlimit64_p',
         'old_rlim'
       ]
     ],
@@ -5461,11 +5427,11 @@
         'name'
       ],
       [
-        'struct file_handle *',
+        'file_handle_p',
         'handle'
       ],
       [
-        'int *',
+        'int32_p',
         'mnt_id'
       ],
       [
@@ -5489,11 +5455,11 @@
         'name'
       ],
       [
-        'struct file_handle *',
+        'file_handle_p',
         'handle'
       ],
       [
-        'int *',
+        'int32_p',
         'mnt_id'
       ],
       [
@@ -5513,7 +5479,7 @@
         'which_clock'
       ],
       [
-        'struct timex *',
+        'timex_p',
         'tx'
       ]
     ],
@@ -5541,15 +5507,15 @@
         'fd'
       ],
       [
-        'struct mmsghdr *',
+        'msghdr_p',
         'mmsg'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'vlen'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -5577,15 +5543,15 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned *',
+        'uint32_p',
         'cpup'
       ],
       [
-        'unsigned *',
+        'uint32_p',
         'nodep'
       ],
       [
-        'struct getcpu_cache *',
+        'uint64_t',
         'unused'
       ]
     ],
@@ -5601,23 +5567,23 @@
         'pid'
       ],
       [
-        'const struct iovec *',
+        'iovec_p',
         'lvec'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'liovcnt'
       ],
       [
-        'const struct iovec *',
+        'iovec_p',
         'rvec'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'riovcnt'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'flags'
       ]
     ],
@@ -5633,23 +5599,23 @@
         'pid'
       ],
       [
-        'const struct iovec *',
+        'iovec_p',
         'lvec'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'liovcnt'
       ],
       [
-        'const struct iovcc *',
+        'iovec_p',
         'rvec'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'riovcnt'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'flags'
       ]
     ],
@@ -5673,11 +5639,11 @@
         'type'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'idx1'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'idx2'
       ]
     ],
@@ -5693,7 +5659,7 @@
         'fd'
       ],
       [
-        'const char __user *',
+        'istr_t',
         'uargs'
       ],
       [
@@ -5713,11 +5679,11 @@
         'pid'
       ],
       [
-        'struct sched_attr __user *',
+        'sched_attr_p',
         'attr'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -5733,15 +5699,15 @@
         'pid'
       ],
       [
-        'struct sched_attr __user *',
+        'sched_attr_p',
         'attr'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'size'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -5757,7 +5723,7 @@
         'olddfd'
       ],
       [
-        'const char __user *',
+        'istr_t',
         'oldname'
       ],
       [
@@ -5765,11 +5731,11 @@
         'newdfd'
       ],
       [
-        'const char __user *',
+        'istr_t',
         'newname'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -5781,15 +5747,15 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned int',
+        'unsigned',
         'op'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ],
       [
-        'const char __user *',
+        'istr_t',
         'uargs'
       ]
     ],
@@ -5801,7 +5767,7 @@
     'impl' => 1,
     'args' => [
       [
-        'char __user *',
+        'ostr_t',
         'buf'
       ],
       [
@@ -5809,7 +5775,7 @@
         'count'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -5821,12 +5787,11 @@
     'impl' => 1,
     'args' => [
       [
-        'const char __user *',
+        'istr_t',
         'uname_ptr'
       ],
       [
-        'unsigned
-			int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -5846,15 +5811,15 @@
         'initrd_fd'
       ],
       [
-        'unsigned long',
+        'size_t',
         'cmdline_len'
       ],
       [
-        'const char __user *',
+        'istr_t',
         'cmdline_ptr'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'flags'
       ]
     ],
@@ -5870,11 +5835,11 @@
         'cmd'
       ],
       [
-        'union bpf_attr *',
+        'bpf_attr_p',
         'attr'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'size'
       ]
     ],
@@ -5890,15 +5855,15 @@
         'dfd'
       ],
       [
-        'const char __user *',
+        'istr_t',
         'filename'
       ],
       [
-        'const char __user * const __user *',
+        'istr_v',
         'argv'
       ],
       [
-        'const char __user * const __user *',
+        'istr_v',
         'envp'
       ],
       [
@@ -5942,7 +5907,7 @@
     'impl' => 1,
     'args' => [
       [
-        'unsigned long',
+        'uint64_t',
         'start'
       ],
       [
@@ -5962,19 +5927,19 @@
     'impl' => 1,
     'args' => [
       [
-        'int',
+        'fd_t',
         'fd_in'
       ],
       [
-        'loff_t __user *',
+        'off_p',
         'off_in'
       ],
       [
-        'int',
+        'fd_t',
         'fd_out'
       ],
       [
-        'loff_t __user * ',
+        'off_p',
         'off_out'
       ],
       [
@@ -5982,7 +5947,7 @@
         'len'
       ],
       [
-        'unsigned int',
+        'unsigned',
         'flags'
       ]
     ],
@@ -5998,19 +5963,19 @@
         'fd'
       ],
       [
-        'const struct iovec __user *',
+        'iovec_p',
         'vec'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'vlen'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'pos_l'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'pos_h'
       ],
       [
@@ -6030,19 +5995,19 @@
         'fd'
       ],
       [
-        'const struct iovec __user *',
+        'iovec_p',
         'vec'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'vlen'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'pos_l'
       ],
       [
-        'unsigned long',
+        'uint64_t',
         'pos_h'
       ],
       [

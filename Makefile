@@ -1,5 +1,10 @@
-test: test_static
-CXX_DEB=-g
+test: test_ls
+
+
+test_ls: bin/ls | all
+	@echo testing $<
+	bin/ls */*.[ch][ch]
+
 test_%: bin/% | all
 	@echo testing $<
 	./bin/$*
@@ -17,13 +22,18 @@ ARFLAGS = rvU
 CXX:= g++
 LD= ld -Map $@.map
 
-CPP_FLAGS= -MD -MF $*.d
+CPP_FLAGS= -MD -MF $@.d
 CPP_FLAGS+= -Iinclude
 CPP_FLAGS+= -nostdinc
 
 CXX_FLAGS:= @cxx_flags
 
+#bin/ls.s: CXX_FLAGS+=-fexceptions
+
 DEPS=/dev/null
+
+include/syscall_fwd.hh: script/genheaders.pl script/syscall.pl
+	perl script/genheaders.pl > $@
 
 BIN_CXX:=$(wildcard bin/*.cc)
 BIN_GEN:=$(patsubst %.cc, %.s, $(BIN_CXX))
@@ -59,12 +69,18 @@ else
 	$(LD) $(START) -o $@ $< lib/libkernpp.a
 endif
 
-%.ii: %.cc cxx_flags
-	$(CXX) $(CXX_DEB) $(CXX_FLAGS) $(CPP_FLAGS) -E $< -o $@ 
-
-
+ifdef SKIP_PREPROC
 %.s: %.cc cxx_flags
-	$(CXX) $(CXX_DEB) $(CXX_FLAGS) $(CPP_FLAGS) -S $< -o $@ 
+	$(CXX) $(CXX_FLAGS) $(CPP_FLAGS) -S $< -o $@ 
+else
+
+%.ii: %.cc cxx_flags
+	$(CXX) $(CXX_FLAGS) $(CPP_FLAGS) -E $< -o $@ 
+
+%.s: %.ii cxx_flags
+	$(CXX) $(CXX_FLAGS) $(CPP_FLAGS) -S $< -o $@ 
+
+endif
 
 #    bin/static.o: %.o: %.s
 #    	$(CXX) -g -c $< -o $@
@@ -110,7 +126,7 @@ check_env:
 	printenv
 
 SOURCES:= $(wildcard */*.cc */*.hh */*.s )
-tags: $(SOURCES)
+tags: .PHONY
 	ctags $(SOURCES)
 
 .PHONY: test clean show all

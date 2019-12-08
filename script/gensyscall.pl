@@ -23,21 +23,15 @@ sub fmt() {
 	for(@_){
 		$_=join(" ", @$_);
 	};
-	return "$name @_";
+	return "$name(",join(",",@_),")";
 };
-my %todo = map { $_, 1 } qw( filedes );
 for(keys %calls){
 	local *call=$calls{$_};
 	next unless $call{impl};
 	for(@{$call{args}}){
-		if( $todo{$_->[1]} ) {
-			$_->[0] = "fd_p";
+		if( $_->[0] eq "struct stat *"){
+			$_->[0] = "stat_p";
 		};
-		if($_->[0] eq "char *"){
-			$_->[0]="ostr_t";
-		} elsif ($_->[0] eq "const char *") {
-			$_->[0]="istr_t";
-		}
 	};
 };
 ##

@@ -102,7 +102,7 @@ struct ptr_fmt {
 			uint64_t raw;
 		};
 		ptr=val;
-		pos=num_fmt::fmt_hex(raw, text, text+sizeof(text))-text;
+		pos=fmt::fmt_hex(raw, text, text+sizeof(text))-text;
 		if(pos>1)
 			text[--pos]='x';
 		if(pos>1)
