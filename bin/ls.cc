@@ -84,9 +84,9 @@ using namespace fmt;
 
 int main(int argc, char**argv) 
 {
-	write_lit(1,"main called with argc=");
+	write(1,L("main called with argc="));
 	write_dec(argc);
-	write_lit(1,"\n");
+	write(1,L("\n"));
 
 	int *argl = new int[argc];
 	for(int i=0;i<argc;i++) {
@@ -94,9 +94,9 @@ int main(int argc, char**argv)
 	};
 	for(int i=0;i<argc;i++){
 		write_dec(argl[i],10);
-		write_lit(1," ");
+		write(1,L(" "));
 		write(1,argv[i],argl[i]);	
-		write_lit(1,"\n");
+		write(1,L("\n"));
 	};	
 
 //	throw "test\n";

@@ -279,15 +279,11 @@ inline ssize_t write(int fd, const char *buf, const char *end)
 	return write(fd,buf,end-buf);
 };
 
-inline ssize_t write(fd_t fd, char *buf){
+inline ssize_t write(fd_t fd, const char *buf){
 	return write(fd,buf,strlen(buf));
 };
 
-template<typename char_t, size_t size>
-inline ssize_t write_lit(fd_t fd, char_t (&buf)[size])
-{
-	return write(fd,buf,size-1);
-};
+#define L(x) x,sizeof(x)-1
 
 extern "C" {
 	inline void abort(){

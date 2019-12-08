@@ -22,7 +22,7 @@ ARFLAGS = rvU
 CXX:= g++
 LD= ld -Map $@.map
 
-CPP_FLAGS= -MD -MF $@.d
+CPP_FLAGS= -MD -MF $@.d -MT $@
 CPP_FLAGS+= -Iinclude
 CPP_FLAGS+= -nostdinc
 

@@ -3,8 +3,8 @@
 
 extern "C" {
 	static int calc() {
-		write_lit(2,__PRETTY_FUNCTION__);
-		write_lit(2,"\n");
+		write(2,L(__PRETTY_FUNCTION__));
+		write(2,L("\n"));
 		return 42;
 	};
 };
@@ -25,16 +25,16 @@ void write_hex(unsigned long val)
 };
 template<typename type, size_t n>
 void what_type(type (&t)[n]){
-	write(1,__PRETTY_FUNCTION__,sizeof(__PRETTY_FUNCTION__));
+	write(1,L(__PRETTY_FUNCTION__));
 };
 template<typename type>
 void what_type(const type &t) {
-	write(1,__PRETTY_FUNCTION__,sizeof(__PRETTY_FUNCTION__));
+	write(1,L(__PRETTY_FUNCTION__));
 };
 
 inline int poll(pollfd ufds, uint32_t nfds, int64_t tm) __attribute__ ((__always_inline__));
 int main(int, char**){
-	write_lit(1,__PRETTY_FUNCTION__);
+	write(1,L(__PRETTY_FUNCTION__));
 //   	what_type(__PRETTY_FUNCTION__);
 //   	what_type("test\n");
 //   	char buf[]="This is a test\n";

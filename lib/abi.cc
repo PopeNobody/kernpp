@@ -2,19 +2,19 @@
 
 extern "C" {
 	void __cxa_pure_virtual() { 
-		write_lit(2,"pure virtual function called\n");
+		write(2,L("pure virtual function called\n"));
 		abort();
 	}
 
 	void __cxa_guard_release(void*)
 	{
-		write_lit(1,__PRETTY_FUNCTION__);
-		write_lit(1,"\n");
+		write(1,L(__PRETTY_FUNCTION__));
+		write(1,L("\n"));
 	};
 	void __cxa_guard_acquire(void*)
 	{
-		write_lit(1,"hi!\n");
-		write_lit(1,"\n");
+		write(1,L("hi!\n"));
+		write(1,L("\n"));
 	};
 	void * __dso_handle=(void*)&__dso_handle;
 
@@ -24,7 +24,7 @@ extern "C" {
 			void * dso_handle
 			)
 	{
-		write_lit(2,__PRETTY_FUNCTION__);
-		write_lit(2,"\n");
+		write(2,L(__PRETTY_FUNCTION__));
+		write(2,L("\n"));
 	}
 }

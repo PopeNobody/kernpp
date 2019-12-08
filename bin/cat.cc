@@ -17,12 +17,12 @@ bool catfile(int fd) {
 	{
 		ssize_t wres=full_write(1,buf,buf+res);
 		if(wres!=res){
-			write_lit(2,"write error\n");
+			write(2,L("write error\n"));
 			return false;
 		};
 	}
 	if(res<0)
-		write_lit(2,"read error\n");
+		write(2,L("read error\n"));
 	return !res;
 };
 int main(int argc, char**argv) {
@@ -32,7 +32,7 @@ int main(int argc, char**argv) {
 		{
 			int fd=open(*argv,0);
 			if(fd<0){
-				write_lit(2,"open error\n");
+				write(2,L("open error\n"));
 				return 1;
 			};
 			catfile(fd);

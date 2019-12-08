@@ -2,7 +2,7 @@
 
 namespace {
 	int init_errno(){
-		write(1,"init_errno()\n");
+		write(1,L("init_errno()\n"));
 		return 0;
 	};
 };

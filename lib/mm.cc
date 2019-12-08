@@ -9,7 +9,7 @@ void *malloc(size_t size)
 	return block;
 }
 void free(void *vp) {
-	write(1,"free\n");
+	write(1,L("free\n"));
 };
 void *__curbrk;
 

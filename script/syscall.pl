@@ -21,7 +21,7 @@
   },
   'sys_write' => {
     'code' => 1,
-    'name' => 'sys_write',
+    'name' => 'write',
     'impl' => 1,
     'args' => [
       [

@@ -7,7 +7,7 @@ int main(int, char**) {
 	char buf[1024];
 	ssize_t nr=read(0,buf,sizeof(buf));
 	if(nr<0) {
-		write_lit(2,"read(0,buf,sizeof(buf)) failed\n");
+		write(2,L("read(0,buf,sizeof(buf)) failed\n"));
 		return 1;
 	};
 	char *pos=buf;
@@ -15,7 +15,7 @@ int main(int, char**) {
 	while(pos<end) {
 		ssize_t nw=write(1,pos,end-pos);
 		if(nw<0) {
-			write_lit(2,"write failed");
+			write(2,L("write failed"));
 			return 2;
 		};
 		pos+=nw;
