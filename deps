@@ -1,0 +1,27 @@
+bin/brk.s: bin/brk.cc include/syscall.hh include/types.hh \
+ include/errno.hh include/array.hh include/fmt.hh
+bin/cat.s: bin/cat.cc include/syscall.hh include/types.hh \
+ include/errno.hh
+bin/echo.s: bin/echo.cc include/syscall.hh include/types.hh \
+ include/errno.hh
+bin/ls.s: bin/ls.cc include/syscall.hh include/types.hh include/errno.hh
+bin/malloc_test.s: bin/malloc_test.cc include/syscall.hh include/types.hh \
+ include/errno.hh
+bin/new.s: bin/new.cc include/syscall.hh include/types.hh \
+ include/errno.hh include/stream.hh include/new.hh include/array.hh
+bin/rc.s: bin/rc.cc include/syscall.hh include/types.hh include/errno.hh \
+ include/new.hh include/rc.hh include/stream.hh
+bin/sc.s: bin/sc.cc include/syscall.hh include/types.hh include/errno.hh
+bin/static.s: bin/static.cc include/syscall.hh include/types.hh \
+ include/errno.hh include/fmt.hh
+bin/vec.s: bin/vec.cc include/syscall.hh include/types.hh \
+ include/errno.hh
+lib/abi.s: lib/abi.cc include/syscall.hh include/types.hh \
+ include/errno.hh
+lib/init_array.s: lib/init_array.cc
+lib/mm.s: lib/mm.cc include/syscall.hh include/types.hh include/errno.hh
+lib/rc.s: lib/rc.cc include/rc.hh
+lib/stream.s: lib/stream.cc include/stream.hh include/syscall.hh \
+ include/types.hh include/errno.hh
+lib/unistd.s: lib/unistd.cc include/syscall.hh include/types.hh \
+ include/errno.hh

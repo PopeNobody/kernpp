@@ -3,56 +3,60 @@ $|++;
 use strict;
 use warnings;
 use Data::Dumper;
+use FindBin;
+our(%calls);
+my $dump="$FindBin::Bin/syscall.pl";
+require $dump or die "$@";
+my @keys = qw(code name impl args ret);
 
+##
+## Put the code to modify the %calls hash here, and the modified version
+## Will appear in syscall.pl.new
+##
 $\="\n";
-$"=", ";
-my @keys = qw(code name args ret);
-for(@list) {
-	my @item=@$_;
-	my %item;
-	$_=\%item;
-	$item{code}=shift @item;
-	$item{name}=shift @item;
-	$item{name}=~s/^sys_//;
-	$item{ret}="int";
-	if(@item != 1) {
-		my @args;
-		$item{args}=\@args;
-		die "this is odd!" if @item%2;
-		while(@item){
-			push(@args, [ splice @item, 0, 2 ]);
+$,=" ";
+our(%call);
+our(@args);
+sub fmt() {
+	my $name=$call{name};
+	@_=@{$call{args}};
+	for(@_){
+		$_=join(" ", @$_);
+	};
+	return "$name @_";
+};
+my %todo = map { $_, 1 } qw( filedes );
+for(keys %calls){
+	local *call=$calls{$_};
+	next unless $call{impl};
+	for(@{$call{args}}){
+		if( $todo{$_->[1]} ) {
+			$_->[0] = "fd_p";
 		};
-	} else {
-		$item{args}=undef;
+		if($_->[0] eq "char *"){
+			$_->[0]="ostr_t";
+		} elsif ($_->[0] eq "const char *") {
+			$_->[0]="istr_t";
+		}
 	};
-	
 };
-my %call = map { $_->{name}, $_ } @list;
-my $call=\%call;
-my @call = sort { $call{$a}{code} <=> $call{$b}{code} } keys %call;
-local $Data::Dumper::Sortkeys=sub
+##
+## Don't change the code after this.
+##
 {
-	if( $_[0] eq $call ) {
-		return \@call;
-	} else {
-		return \@keys;
+	my $calls=\%calls;
+	open(STDOUT,">$dump.new") or die "open:$!";
+	my @calls = sort { $calls{$a}{code} <=> $calls{$b}{code} } keys %calls;
+	local $Data::Dumper::Sortkeys=sub
+	{
+		if( $_[0] eq $calls ) {
+			return \@calls;
+		} else {
+			return [ grep { exists $_[0]->{$_} } @keys ];
+		};
 	};
-};
-local $Data::Dumper::Indent=1;
-print Data::Dumper->Dump([\%call],[qw(*call)]);
-BEGIN{
-	open(STDOUT,"|tee xlist.pl");
-};
-#    for(my $i=0;$i<@list;$i++){
-#    	$list[$i][0]="unsigned long";
-#    	for(@{$list[$i]}){
-#    		s/ *struct \+/ /g;
-#    		s/ *__user \+/ /g;
-#    		next unless /unsigned long/;
-#    		next if /^unsigned long/;
-#    		print;
-#    	}
-#    }
-END{
-	close(STDOUT);
-};
+	local $Data::Dumper::Indent=1;
+	print Data::Dumper->Dump([\%calls],[qw(*calls)]);
+	system("mv $dump $dump.old");
+	system("mv $dump.new $dump");
+}
