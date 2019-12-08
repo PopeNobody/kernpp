@@ -1,23 +1,28 @@
+#ifndef syscall_hh
+#define syscall_hh syscall_hh
+
 #include <types.hh>
+
+#define AAI __attribute__ ((__always_inline__))
 
 #define O_ACCMODE	00000003
 #define O_RDONLY	00000000
 #define O_WRONLY	00000001
 #define O_RDWR		00000002
-#define O_CREAT		00000100	/* not fcntl */
-#define O_EXCL		00000200	/* not fcntl */
-#define O_NOCTTY	00000400	/* not fcntl */
-#define O_TRUNC		00001000	/* not fcntl */
+#define O_CREAT		00000100
+#define O_EXCL		00000200
+#define O_NOCTTY	00000400
+#define O_TRUNC		00001000
 #define O_APPEND	00002000
 #define O_NONBLOCK	00004000
-#define O_DSYNC		00010000	/* used to be O_SYNC, see below */
-#define FASYNC		00020000	/* fcntl, for BSD compatibility */
-#define O_DIRECT	00040000	/* direct disk access hint */
+#define O_DSYNC		00010000
+#define FASYNC		00020000
+#define O_DIRECT	00040000
 #define O_LARGEFILE	00100000
-#define O_DIRECTORY	00200000	/* must be a directory */
-#define O_NOFOLLOW	00400000	/* don't follow links */
+#define O_DIRECTORY	00200000
+#define O_NOFOLLOW	00400000
 #define O_NOATIME	01000000
-#define O_CLOEXEC	02000000	/* set close_on_exec */
+#define O_CLOEXEC	02000000
 #define __O_SYNC	04000000
 #define O_SYNC		(__O_SYNC|O_DSYNC)
 #define O_PATH		010000000
@@ -36,35 +41,36 @@
 #define linux_dirent64 linux_dirent
 
 struct stat {
-	unsigned long	st_dev;		/* Device.  */
-	unsigned long	st_ino;		/* File serial number.  */
-	unsigned int	st_mode;	/* File mode.  */
-	unsigned int	st_nlink;	/* Link count.  */
-	unsigned int	st_uid;		/* User ID of the file's owner.  */
-	unsigned int	st_gid;		/* Group ID of the file's group. */
-	unsigned long	st_rdev;	/* Device number, if device.  */
-	unsigned long	__pad1;
-	long		st_size;	/* Size of file, in bytes.  */
-	int		st_blksize;	/* Optimal block size for I/O.  */
-	int		__pad2;
-	long		st_blocks;	/* Number 512-byte blocks allocated. */
-	long		st_atime;	/* Time of last access.  */
-	unsigned long	st_atime_nsec;
-	long		st_mtime;	/* Time of last modification.  */
-	unsigned long	st_mtime_nsec;
-	long		st_ctime;	/* Time of last status change.  */
-	unsigned long	st_ctime_nsec;
-	unsigned int	__unused4;
-	unsigned int	__unused5;
+	uint64_t	st_dev;
+	uint64_t	st_ino;
+	uint32_t	st_mode;
+	uint32_t	st_nlink;
+	uint32_t	st_uid;
+	uint32_t	st_gid;
+	uint64_t	st_rdev;
+	uint64_t	__pad1;
+	int64_t   st_size;
+	int32_t	  st_blksize;
+	int32_t	  __pad2;
+	int64_t   st_blocks;
+	int64_t   st_atime;
+	uint64_t	st_atime_nsec;
+	int64_t		st_mtime;
+	uint64_t	st_mtime_nsec;
+	int64_t		st_ctime;
+	uint64_t	st_ctime_nsec;
+	uint32_t	__unused4;
+	uint32_t	__unused5;
 };
 struct pollfd {
-	fd_t   fd;         /* file descriptor */
-	short events;     /* requested events */
-	short revents;    /* returned events */
+	fd_t   fd;
+	short events;
+	short revents;
 };
 
 extern "C" {
 	extern int errno;
+	void exit(int res);
 	inline ssize_t set_errno(ssize_t err)
 		__attribute__ ((__always_inline__));
 	inline ssize_t set_errno(ssize_t err)
@@ -80,18 +86,22 @@ extern "C" {
 
 };
 extern "C" {
-#define AAI __attribute__ ((__always_inline__))
 
-	inline time_t time(time_t *) AAI;
-	inline void exit(int res) AAI;
+	inline fd_t open(const char *pathname, int flags) AAI;
+	inline int close(fd_t fd) AAI;
+	inline int stat(const char *pathname, struct stat *statbuf) AAI;
 	inline ssize_t getdents(fd_t fd, linux_dirent64 *buf, size_t len) AAI;
+	inline ssize_t read(fd_t fd, char *buf, size_t len) AAI;
+	inline ssize_t write( fd_t fd,  const char *buf,  size_t len) AAI;
+	inline time_t time(time_t *) AAI;
+	inline void _exit(int res) AAI;
 
 	// __NR_read=0
 	inline ssize_t read(fd_t fd, char *buf, size_t len)
 	{
 		long res;
 		asm (
-				"syscall" 
+				"syscall"
 				: "=a"(res)
 				: "a"(0), "D"(fd), "S"(buf),"d"(len)
 				: "rcx", "r11", "memory");
@@ -100,10 +110,10 @@ extern "C" {
 	// __NR_write=1
 	inline ssize_t write( fd_t fd,  const char *buf,  size_t len)
 	{
-		static long res;
+		long res;
 		asm (
-				"syscall\n" 
-				: "=a"(res) 
+				"syscall\n"
+				: "=a"(res)
 				: "a"(1), "D"(fd), "S"(buf),"d"(len)
 				: "rcx", "r11", "memory"
 				);
@@ -114,8 +124,8 @@ extern "C" {
 	{
 		int fd=-1;
 		asm (
-				"syscall\n" 
-				: "=a"(fd) 
+				"syscall\n"
+				: "=a"(fd)
 				: "0"(2), "D"(pathname),"S"(flags)
 				: "rcx", "r11", "memory"
 				);
@@ -126,8 +136,8 @@ extern "C" {
 	{
 		int res=-1;
 		asm (
-				"syscall\n" 
-				: "=a"(fd) 
+				"syscall\n"
+				: "=a"(fd)
 				: "0"(3), "D"(fd)
 				: "rcx", "r11", "memory"
 				);
@@ -137,8 +147,8 @@ extern "C" {
 	{
 		int res=-1;
 		asm (
-				"syscall\n" 
-				: "=a"(res) 
+				"syscall\n"
+				: "=a"(res)
 				: "a"(4), "D"(pathname), "S"(statbuf)
 				: "rcx", "r11", "memory"
 				);
@@ -165,13 +175,13 @@ extern "C" {
 
 		return (char*)set_errno(ret);
 	}
-	inline void exit(int res)
+	inline void _exit(int res)
 	{
-		static int exit_val;
+		int exit_val;
 		exit_val=res&0xff;
 		asm (
-				"syscall\n" 
-				: "=a"(res) 
+				"syscall\n"
+				: "=a"(res)
 				: "a"(60), "D"(exit_val)
 				: "rcx", "r11", "memory"
 				);
@@ -181,7 +191,7 @@ extern "C" {
 	{
 		long res;
 		asm (
-				"syscall" 
+				"syscall"
 				: "=a"(res)
 				: "a"(217), "D"(fd), "S"(buf),"d"(len)
 				: "rcx", "r11", "memory");
@@ -189,13 +199,6 @@ extern "C" {
 	};
 };
 
-inline size_t strlen(const char *s)
-{
-	const char *p(s);
-	while(*p)
-		++p;
-	return p-s;
-};
 inline int sign(int val){
 	if(val<0)
 		return -1;
@@ -207,12 +210,21 @@ inline int sign(int val){
 extern "C" {
 	void *malloc(size_t);
 	void free(void *);
-	void *sbrk (intptr_t increment);
-	int strcmp(const char *s1, const char *s2);
-	void *memset(void *s, int c, size_t n);
-	void *memcpy(void *dest, const void *src, size_t n);
-	char* strcpy(char *d, const char *s);
-	char * strncpy(char *dst, const char *src, size_t n);
+	inline void *sbrk (intptr_t increment)AAI;
+	inline int strcmp(const char *s1, const char *s2)AAI;
+	inline void *memset(void *s, int c, size_t n)AAI;
+	inline void *memcpy(void *dest, const void *src, size_t n)AAI;
+	inline char* strcpy(char *d, const char *s)AAI;
+	inline char * strncpy(char *dst, const char *src, size_t n)AAI;
+	inline char * strncpy(char *dst, const char *src, size_t n)AAI;
+	inline size_t strlen(const char *s)AAI;
+};
+inline size_t strlen(const char *s)
+{
+	const char *p(s);
+	while(*p)
+		++p;
+	return p-s;
 };
 inline int strcmp(const char *s1, const char *s2)
 {
@@ -234,7 +246,7 @@ inline void *memset(void *s, int c, size_t n){
 inline void *memcpy(void *dest, const void *src, size_t n){
 	char *d((char*)dest), *s((char*)src);
 	for(int i=0;i<n;i++)
-		d[i]=s[i];		
+		d[i]=s[i];
 	return dest;
 };
 inline char* strcpy(char *d, const char *s){
@@ -257,41 +269,54 @@ inline char * strncpy(char *dst, const char *src, size_t n)
 	return dst;
 }
 
-inline ssize_t write(int fd, const char *buf)
-	__attribute__ ((__always_inline__));
-
 
 inline ssize_t write(int fd, const char *buf, const char *end)
 {
 	return write(fd,buf,end-buf);
 };
-inline ssize_t write(int fd, char ch)
-	__attribute__ ((__always_inline__));
-inline ssize_t write(int fd, char ch)
-{
-	return write(fd,&ch,1);
-}
+//   inline ssize_t write(int fd, char ch)
+//   	__attribute__ ((__always_inline__));
+//   inline ssize_t write(int fd, char ch)
+//   {
+//   	return write(fd,&ch,1);
+//   }
 
-inline ssize_t write(int fd, const char *buf)
-{
+template<typename char_t>
+inline ssize_t write(fd_t fd, char_t *buf) AAI;
+
+template<typename char_t, size_t n>
+inline ssize_t write(int fd, char_t (&buf)[n]) AAI;
+
+template<typename char_t>
+inline ssize_t write(fd_t fd, char_t *buf){
+	asm ("# Write char*");
 	return write(fd,buf,strlen(buf));
 };
 
-
+template<typename char_t, size_t n>
+inline ssize_t write(int fd, char_t (&buf)[n]){
+	asm ("# Write char[]");
+	return write(fd,buf,n);
+};
 
 extern "C" {
 	inline void abort(){
-		exit(1);
+		do {
+			asm("# abort");
+			asm("int3");
+		} while(true);
 	};
 //#define __NR_time 201
 	inline time_t time(time_t *buf) {
 		time_t res=-1;
 		asm (
-				"syscall\n" 
-				: "=a"(res) 
+				"syscall\n"
+				: "=a"(res)
 				: "a"(4), "D"(buf)
 				: "rcx", "r11", "memory"
 				);
 		return res;
 	};
 };
+
+#endif

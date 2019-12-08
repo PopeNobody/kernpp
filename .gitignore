@@ -1,4 +1,7 @@
 #programs
+bin/new
+bin/rc
+bin/static
 bin/cat
 bin/echo
 bin/false
@@ -9,6 +12,7 @@ bin/sc
 bin/vec
 bin/brk
 
+*.map
 # Prerequisites
 *.d
 

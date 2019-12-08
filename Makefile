@@ -1,44 +1,27 @@
-test:
+test: test_static
+CXX_DEB=-g
+test_%: bin/% | all
+	@echo testing $<
+	./bin/$*
 
 test_algo: algo
 	./algo * */*.[ch][ch] *.cc *.cc *.cc
 
 algo: algo.cc
-	$(CXX) -g algo.cc -o algo
+	$(CXX) algo.cc -o algo
 
-
-test:
 
 MAKEFLAGS:=-rR
 ARFLAGS = rvU
 
-CXX:= g++ -O0
-LD:= ld
+CXX:= g++
+LD= ld -Map $@.map
 
 CPP_FLAGS= -MD -MF $*.d
-CPP_FLAGS+= -Iinc
+CPP_FLAGS+= -Iinclude
 CPP_FLAGS+= -nostdinc
 
-CXX_FLAGS:=
-CXX_FLAGS+= -fno-rtti
-CXX_FLAGS+= -fno-exceptions
-CXX_FLAGS+= -fno-chkp-instrument-calls
-CXX_FLAGS+= -ffast-math
-CXX_FLAGS+= -fno-PIC
-CXX_FLAGS+= -fno-chkp-check-incomplete-type
-CXX_FLAGS+= -fno-chkp-check-read
-CXX_FLAGS+= -fno-chkp-check-write
-CXX_FLAGS+= -fno-chkp-instrument-calls
-CXX_FLAGS+= -fno-chkp-narrow-bounds
-CXX_FLAGS+= -fno-chkp-optimize
-CXX_FLAGS+= -fno-chkp-store-bounds
-CXX_FLAGS+= -fno-chkp-use-static-bounds
-CXX_FLAGS+= -fno-chkp-use-static-const-bounds
-CXX_FLAGS+= -fno-chkp-use-wrappers
-CXX_FLAGS+= -fno-chkp-instrument-calls
-CXX_FLAGS+= -fomit-frame-pointer
-CXX_FLAGS+= -fno-stack-protector
-CXX_FLAGS+= -fverbose-asm
+CXX_FLAGS:= @cxx_flags
 
 DEPS=/dev/null
 
@@ -70,10 +53,21 @@ $(ASM_EXE): %: %.o
 	$(LD) -o $@ $<
 
 $(CXX_EXE): %: %.o lib/start.o lib/libkernpp.a
+ifdef LINK_WITH_CXX
+	$(CXX) -static -nostartfiles $(START) -o $@ $< lib/libkernpp.a
+else
 	$(LD) $(START) -o $@ $< lib/libkernpp.a
+endif
 
-%.s: %.cc
-	$(CXX) $(CXX_FLAGS) $(CPP_FLAGS) -S $< -o $@ -g
+%.ii: %.cc cxx_flags
+	$(CXX) $(CXX_DEB) $(CXX_FLAGS) $(CPP_FLAGS) -E $< -o $@ 
+
+
+%.s: %.cc cxx_flags
+	$(CXX) $(CXX_DEB) $(CXX_FLAGS) $(CPP_FLAGS) -S $< -o $@ 
+
+#    bin/static.o: %.o: %.s
+#    	$(CXX) -g -c $< -o $@
 
 %.o: %.s
 	$(CXX) -c $< -o $@
@@ -86,7 +80,9 @@ bin/%.out: bin/%.sh bin/%
 test: all
 
 clean:
-	rm -f $(BIN_GEN) $(ASM_EXE) $(CXX_EXE) $(LIB_GEN) lib/libkernpp.a
+	rm -f deps $(BIN_GEN) $(ASM_EXE) $(CXX_EXE) $(LIB_GEN) lib/libkernpp.a
+	rm -f $(patsubst %.cc,%.d,$(BIN_CXX) $(LIB_CXX))
+	touch deps
 
 show:
 	@echo ASM_EXE=$(ASM_EXE)
@@ -104,17 +100,17 @@ show:
 
 Makefile: ;
 
-$(DEPS):
-	touch $@
-
 deps: $(wildcard $(DEPS))
-	cat $(sort $(wildcard $(DEPS))) > deps.new
-	diff deps deps.new || true
-	cmp deps deps.new && rm -f deps.new && touch deps || mv -v deps.new deps
+	@cat $(sort $(wildcard $(DEPS))) > deps.new
+	@cmp deps deps.new && rm -f deps.new && touch deps || mv -v deps.new deps
 
 include deps
 
 check_env:
 	printenv
+
+SOURCES:= $(wildcard */*.cc */*.hh */*.s )
+tags: $(SOURCES)
+	ctags $(SOURCES)
 
 .PHONY: test clean show all

@@ -8,20 +8,10 @@ void *malloc(size_t size)
 		return nullptr;
 	return block;
 }
-struct curbrk_t {
-	char *val;
-	curbrk_t()
-		:val(0)
-	{
-	};
-	void set(char *nval){
-		val=nval;
-	};
-	operator void*() const {
-		return val;
-	};
+void free(void *vp) {
+	write(1,"free\n");
 };
-curbrk_t __curbrk;
+void *__curbrk;
 
 int brk (void *addr)
 {
@@ -34,7 +24,7 @@ int brk (void *addr)
 			: "rcx", "r11", "memory"
 			);
 
-	__curbrk.set(newbrk);
+	__curbrk=newbrk;
 
   if (newbrk < addr)
     {

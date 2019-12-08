@@ -1,24 +1,8 @@
 #include <syscall.hh>
 #include <array.hh>
+#include <fmt.hh>
 
 
-struct num_fmt
-{
-	static char hex_dig(int val) {
-		static char digs[]="0123456789abcdef";
-		return digs[val&0xf];
-	};
-	static char *fmt_hex(uint64_t val, char *beg, char *end)
-	{
-		if(beg!=end)
-			*--end=0;
-		for(int i=0;i<2*sizeof(val);i++){
-			*--end=hex_dig(val);
-			val/=0x10;
-		};
-		return end;
-	};
-};
 
 struct buf_t {
 	enum {size=256-2*sizeof(int)};

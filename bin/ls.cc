@@ -60,21 +60,14 @@ bool lsarg(const char *dirname){
 		};
 	};
 };
-class allocator {
-	struct block_t {
-		block_t *next;
-		block_t *prev;
-	};
-};
-
 int main(int argc, char**argv) 
 {
-//   	const char *prog=*argv++;
-//   	if(*argv) {
-//   		while(*argv)
-//   			lsarg(*argv++);
-//   	} else {
-//   		lsarg(".");
-//   	};
+	const char *prog=*argv++;
+	if(*argv) {
+		while(*argv)
+			lsarg(*argv++);
+	} else {
+		lsarg(".");
+	};
 	return 0;
 };
