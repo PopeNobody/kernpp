@@ -1,6 +1,7 @@
 #include <syscall.hh>
 #include <new.hh>
 #include <fmt.hh>
+#include "getopt.h"
 
 enum open_mode {
 	o_rdonly  =  0000,
@@ -55,7 +56,7 @@ bool lsarg(const char *dirname){
 		auto end = reinterpret_cast<linux_dirent*>(&buffer[nread]);
 		while(beg!=end){
 			if(*beg->d_name != '.') {
-				write(1,beg->d_name,strlen(beg->d_name));
+				write(1,beg->d_name);
 				write(1,"\n",1);
 			};
 			beg=beg->next();
@@ -63,42 +64,22 @@ bool lsarg(const char *dirname){
 	};
 };
 using namespace fmt;
-template <typename val_t>
-ssize_t write_dec(val_t val, int width=0){
-	bool neg=val<0;
-	if(neg)
-		val*=-1;
-	char buf[sizeof(val)*4];
-	char *end=buf+sizeof(buf);
-	*--end=0;
-	char *pos=end;
-	pos=fmt_dec(val,buf,end);
-	if(neg)
-		*--pos='-';
-	while(end-pos<width)
-		*--pos=' ';
-	return write(1,pos,end);
-};
 
 using namespace fmt;
 
 int main(int argc, char**argv) 
 {
-	write(1,L("main called with argc="));
-	write_dec(argc);
-	write(1,L("\n"));
-
-	int *argl = new int[argc];
-	for(int i=0;i<argc;i++) {
-		argl[i]=strlen(argv[i]);
+	char ch;
+	while((ch=getopt(argc,argv,"s"))!=-1)
+	{
+		write(1,"getopt()=>");
+		write(1,&ch,1);
+		write(1,"\n");
 	};
-	for(int i=0;i<argc;i++){
-		write_dec(argl[i],10);
-		write(1,L(" "));
-		write(1,argv[i],argl[i]);	
-		write(1,L("\n"));
-	};	
-
-//	throw "test\n";
+	for(int i=optind;i<argc;i++){
+		write(1,argv[i]);
+		write(1," ",1);
+	};
+	write(1,"\n");
 	return 0;
 };
