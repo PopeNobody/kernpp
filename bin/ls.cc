@@ -41,6 +41,8 @@ void handle_error(errno_t err, const char *call)
 	exit(1);
 
 };
+#define assert(x) do{auto r=(x);if(!r){handle_error(-1,#x);};}while(0)
+
 template<typename int_t>
 void write_dec(fd_t fd, int_t val) {
 	char buf[sizeof(val)*5];
@@ -53,26 +55,67 @@ void write_dec(fd_t fd, int_t val) {
 		str+=res;
 	};
 };
+#if 0
+#define ENTER do { write(2,L(__PRETTY_FUNCTION__)); write(2,L("\n")); } while(0)
+#else
+#define ENTER do { ; } while(0)
+#endif
 template<typename type_t>
 struct free_ptr {
 	type_t *ptr;
 	free_ptr(type_t *ptr)
 		: ptr(ptr)
 	{
+		ENTER;
 	};
 	~free_ptr()
 	{
+		ENTER;
 		free(ptr);
+		ptr=0;
+	};
+	type_t *drop()
+	{
+		ptr=0;
 	};
 	operator type_t*() const
 	{
+		ENTER;
 		return ptr;
 	};
 };
+struct dirents_t {
+	struct list_t {
+		linux_dirent* beg;
+		linux_dirent* end;
+	};
+	size_t size;
+	list_t *lists;
+	dirents_t()
+		:size(0), lists(0)
+	{
+	};
+	void push_back(linux_dirent*beg, linux_dirent *end)
+	{
+		if(size) {
+			list_t *nlist=new list_t[size+1];
+			memcpy(nlist,lists,sizeof(list_t)*size);
+			nlist[size].beg=beg;
+			nlist[size].end=end;
+			delete[] lists;
+			lists=nlist;
+		} else {
+			lists=new list_t[1];
+		};
+	};
+};
+
 void lsdir(int fd) {
 	enum { size = 4096 };
-	free_ptr<char> buf = (char*)malloc(size);
+	dirents_t ents;
 	for(;;){
+		free_ptr<char> buf=(char*)malloc(size);
+		assert((void*)buf);
 		int nread=getdents(fd,(linux_dirent*)(char*)buf,size);
 		if(nread<0)
 			handle_error(errno_t(-nread), "getdents");
@@ -80,13 +123,8 @@ void lsdir(int fd) {
 			return;
 		auto beg = reinterpret_cast<linux_dirent*>(&buf[0]);
 		auto end = reinterpret_cast<linux_dirent*>(&buf[nread]);
-		while(beg!=end){
-			if(*beg->d_name != '.') {
-				write(1,beg->d_name);
-				write(1,L("\n"));
-			};
-			beg=beg->next();
-		};
+		ents.push_back(beg,end);
+		buf.drop();
 	};
 };
 void lsarg(const char *path)

@@ -3,7 +3,8 @@ test: test_ls
 
 test_ls: bin/ls | all
 	@echo testing $<
-	bin/ls bin # */*.[ch][ch]
+	#bin/ls bin # */*.[ch][ch]
+	bin/ls .
 
 test_%: bin/% | all
 	@echo testing $<

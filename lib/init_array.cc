@@ -44,13 +44,13 @@ extern "C" {
 	}
 
 	static void __libc_fini_array() {
-		size_t count, i;
+		ssize_t count, i;
 
-		count = __preinit_array_end - __preinit_array_start;
+		count = __fini_array_end - __fini_array_start;
 		for (i = count - 1; i >= 0; i--)
 			__fini_array_start[i]();
 
-		_fini();
+		//_fini();
 	}
 
 #define MAX_ATEXIT 32
