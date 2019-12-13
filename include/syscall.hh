@@ -70,15 +70,15 @@ struct pollfd {
 };
 
 extern "C" {
-	extern int errno;
+	extern long errno;
 	void exit(int res);
-	inline ssize_t set_errno(ssize_t err)
+	inline ssize_t set_errno(long err)
 		__attribute__ ((__always_inline__));
-	inline ssize_t set_errno(ssize_t err)
+	inline ssize_t set_errno(long err)
 	{
 		if(err>=0)
 			return err;
-		errno=err;
+		errno=-err;
 		return -1;
 	}
 
@@ -130,7 +130,7 @@ extern "C" {
 				: "0"(2), "D"(pathname),"S"(flags), "d"(mode)
 				: "rcx", "r11", "memory"
 				);
-		return fd;
+		return set_errno(fd);
 	};
 	// __NR_close=3
 	inline int close(fd_t fd)

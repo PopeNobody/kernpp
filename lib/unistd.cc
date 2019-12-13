@@ -7,5 +7,5 @@ namespace {
 	};
 };
 extern "C" {
-	int errno=init_errno();
+	long errno=init_errno();
 };

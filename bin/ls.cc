@@ -41,30 +41,75 @@ void handle_error(errno_t err, const char *call)
 	exit(1);
 
 };
-char buffer[4096];
-bool lsarg(const char *dirname){
-	int fd = open(dirname,o_directory|o_rdonly);
-	if(fd<0)
-		return false;
+template<typename int_t>
+void write_dec(fd_t fd, int_t val) {
+	char buf[sizeof(val)*5];
+	char *end=&buf[sizeof(buf)-1];
+	char *str=fmt::fmt_dec(val,buf,end);
+	while(str<end) {
+		int res=write(fd,str,end);
+		if(res<0)
+			handle_error(errno,"write");
+		str+=res;
+	};
+};
+template<typename type_t>
+struct free_ptr {
+	type_t *ptr;
+	free_ptr(type_t *ptr)
+		: ptr(ptr)
+	{
+	};
+	~free_ptr()
+	{
+		free(ptr);
+	};
+	operator type_t*() const
+	{
+		return ptr;
+	};
+};
+void lsdir(int fd) {
+	enum { size = 4096 };
+	free_ptr<char> buf = (char*)malloc(size);
 	for(;;){
-		int nread=getdents(fd,(linux_dirent*)buffer,sizeof(buffer)-4);
+		int nread=getdents(fd,(linux_dirent*)(char*)buf,size);
 		if(nread<0)
 			handle_error(errno_t(-nread), "getdents");
 		else if (nread==0)
-			return 0;
-		auto beg = reinterpret_cast<linux_dirent*>(&buffer[0]);
-		auto end = reinterpret_cast<linux_dirent*>(&buffer[nread]);
+			return;
+		auto beg = reinterpret_cast<linux_dirent*>(&buf[0]);
+		auto end = reinterpret_cast<linux_dirent*>(&buf[nread]);
 		while(beg!=end){
 			if(*beg->d_name != '.') {
 				write(1,beg->d_name);
-				write(1,"\n",1);
+				write(1,L("\n"));
 			};
 			beg=beg->next();
 		};
 	};
 };
-using namespace fmt;
-
+void lsarg(const char *path)
+{
+	int fd = open(path,o_directory|o_rdonly);
+	if(fd>=0)
+	{
+		lsdir(fd);
+	} else if ( errno == ENOTDIR ) {
+		write(1,path);
+		write(1,"\n",1);
+	} else {
+		write(2,"open: ");
+		write(2,path);
+		write(2," failed (");
+		char buf[32];
+		char *end=&buf[sizeof(buf)-1];
+		char *str=fmt::fmt_dec(errno,buf,end);
+		write(2,str,end);
+		write(2,")\n");
+	};
+	close(fd);
+};
 using namespace fmt;
 
 int main(int argc, char**argv) 
@@ -76,10 +121,12 @@ int main(int argc, char**argv)
 		write(1,&ch,1);
 		write(1,"\n");
 	};
-	for(int i=optind;i<argc;i++){
-		write(1,argv[i]);
-		write(1," ",1);
+	if(optind<argc) {
+		for(int i=optind;i<argc;i++){
+			lsarg(argv[i]);
+		};
+	} else {
+		lsarg(".");
 	};
-	write(1,"\n");
 	return 0;
 };

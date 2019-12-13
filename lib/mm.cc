@@ -1,15 +1,20 @@
 #include <syscall.hh>
+#include <fmt.hh>
 
+void write_hex(size_t val) {
+	char buf[128];
+	char *end=buf+sizeof(buf)-1;
+	char *pos=fmt::fmt_hex(val,buf,buf+sizeof(buf)-1);
+	write(2,pos,end);
+};
 void *malloc(size_t size)
 {
-	void *block;
-	block = sbrk(size);
+	char *block=(char*)sbrk(size);
 	if (block == (void*) -1)
 		return nullptr;
 	return block;
 }
 void free(void *vp) {
-	write(1,L("free\n"));
 };
 void *__curbrk;
 

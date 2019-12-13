@@ -25,7 +25,7 @@ lib/getopt.ii: lib/getopt.cc include/syscall.hh include/types.hh \
  include/errno.hh include/syscall_fwd.hh include/getopt.h
 lib/init_array.ii: lib/init_array.cc
 lib/mm.ii: lib/mm.cc include/syscall.hh include/types.hh include/errno.hh \
- include/syscall_fwd.hh
+ include/syscall_fwd.hh include/fmt.hh
 lib/rc.ii: lib/rc.cc include/rc.hh
 lib/stream.ii: lib/stream.cc include/stream.hh include/syscall.hh \
  include/types.hh include/errno.hh include/syscall_fwd.hh
