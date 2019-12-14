@@ -192,6 +192,17 @@ struct timespec
   time_t tv_sec;
   int64_t tv_nsec;
 };
+enum ftype_t {
+	DT_UNKNOWN = 0,
+	DT_FIFO = 1,
+	DT_CHR = 2,
+	DT_DIR = 4,
+	DT_BLK = 6,
+	DT_REG = 8,
+	DT_LNK = 10,
+	DT_SOCK = 12,
+	DT_WHT = 14
+};
 struct linux_dirent {
 	ino64_t        d_ino;    /* 64-bit inode number */
 	off64_t        d_off;    /* 64-bit offset to next structure */
