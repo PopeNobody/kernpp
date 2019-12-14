@@ -106,9 +106,9 @@ struct dirents_t {
 	{
 	};
 	int cmp(ent_t &lhs, ent_t&rhs) {
-		if(lhs.dir != rhs.dir) {
-			return lhs.dir?1:-1;
-		};
+		return _cmp(lhs,rhs);
+	};
+	int _cmp(ent_t &lhs, ent_t&rhs) {
 		return strcmp(rhs.name,lhs.name);
 	};
 	void sort() {
@@ -144,14 +144,6 @@ struct dirents_t {
 			cap+=16;
 		};
 		ent_t *new_ent=new ent_t(name,isdir);
-		if(isdir) {
-			for(int i=0;i<sizeof(new_ent->name);i++) {
-				if(!new_ent->name[i]){
-					new_ent->name[i]='/';
-					break;
-				};
-			};
-		};
 		lst[cnt++]=new_ent;
 	};
 	ent_t &get(size_t pos)
@@ -189,11 +181,16 @@ void lsdir(int fd) {
 	for(size_t i=0;i<ents.size();i++)
 	{
 		auto ent=ents.get(i);
-		if(!strcmp(ent.name,"./"))
-			continue;
-		if(!strcmp(ent.name,"../"))
-			continue;
-		write(1,ents.get(i).name);
+		if(ignore==dot_dot) {
+			if(!strcmp(ent.name,"."))
+				continue;
+			if(!strcmp(ent.name,".."))
+				continue;
+		} else if ( ignore != minimal ) {
+			if(ent.name[0]=='.')
+				continue;
+		};
+		write(1,ent.name);
 		write(1,L("\n"));
 	};
 };

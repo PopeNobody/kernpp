@@ -3,8 +3,9 @@
 
 namespace fmt
 {
+	inline char hex_dig(int val) AAI;
 	inline char hex_dig(int val) {
-		static char digs[]="0123456789abcdef";
+		char digs[]="0123456789abcdef";
 		return digs[val&0xf];
 	};
 	inline char *fmt_hex(unsigned long val, char *beg, char *end)

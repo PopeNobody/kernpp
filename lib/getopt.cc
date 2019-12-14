@@ -48,37 +48,6 @@ ssize_t write_dec(val_t val, int width=0)
 		*--pos=' ';
 	return write(1,pos,end);
 };
-size_t strcspn(const char *s, const char *reject)
-{
-	char rej[256];
-	memset(rej,0,sizeof(rej));
-	while(*reject)
-		rej[*reject++]=1;
-	rej[0]=1;
-	size_t i=0;
-	while(!rej[s[i]])
-		++i;
-	return i;
-};
-const char *strchr(const char *s, int c){
-	char ch;
-	while((ch=*s++)!=c) {
-		if(!ch)
-			return nullptr;
-	}
-	return s;
-};
-int strncmp(const char *lhs, const char *rhs, size_t n)
-{
-	for(int i=0;i<n;i++){
-		int res=lhs[i]-rhs[i];
-		if(res)
-			return res;
-		if(!lhs[i])
-			break;
-	};
-	return 0;
-};
 char* optarg;
 int optopt;
 /* The variable optind [...] shall be initialized to 1 by the system. */

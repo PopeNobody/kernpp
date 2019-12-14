@@ -70,20 +70,20 @@ class block_l {
 		list=0;
 	};
 	void *malloc(size_t size) {
-		write(2,L("malloc("));
-		write_dec(size);
-		write(2,L(")"));
+//   		write(2,L("malloc("));
+//   		write_dec(size);
+//   		write(2,L(")"));
 		void *res=find(size);
-		write(2,L(" => "));
-		write_ptr(res);
-		write(2,L("\n"));
+//   		write(2,L(" => "));
+//   		write_ptr(res);
+//   		write(2,L("\n"));
 		//show();
 		return res;
 	};
 	void free(void *ptr){
-		write(2,L("free("));
-		write_ptr(ptr);
-		write(2,L(")\n"));
+//   		write(2,L("free("));
+//   		write_ptr(ptr);
+//   		write(2,L(")\n"));
 		if(!ptr)
 			return;
 		block_t *blk=(block_t*)ptr;

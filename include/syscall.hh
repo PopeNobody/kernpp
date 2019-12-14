@@ -200,6 +200,7 @@ extern "C" {
 	};
 };
 
+inline int sign(int val) AAI;
 inline int sign(int val){
 	if(val<0)
 		return -1;
@@ -219,6 +220,37 @@ extern "C" {
 	inline char * strncpy(char *dst, const char *src, size_t n)AAI;
 	inline char * strncpy(char *dst, const char *src, size_t n)AAI;
 	inline size_t strlen(const char *s)AAI;
+};
+inline size_t strcspn(const char *s, const char *reject)
+{
+	char rej[256];
+	memset(rej,0,sizeof(rej));
+	while(*reject)
+		rej[*reject++]=1;
+	rej[0]=1;
+	size_t i=0;
+	while(!rej[s[i]])
+		++i;
+	return i;
+};
+inline const char *strchr(const char *s, int c){
+	char ch;
+	while((ch=*s++)!=c) {
+		if(!ch)
+			return nullptr;
+	}
+	return s;
+};
+inline int strncmp(const char *lhs, const char *rhs, size_t n)
+{
+	for(int i=0;i<n;i++){
+		int res=lhs[i]-rhs[i];
+		if(res)
+			return res;
+		if(!lhs[i])
+			break;
+	};
+	return 0;
 };
 inline size_t strlen(const char *s)
 {
@@ -269,6 +301,10 @@ inline char * strncpy(char *dst, const char *src, size_t n)
 
 	return dst;
 }
+
+inline ssize_t write(int fd, const char *buf, size_t len) AAI;
+inline ssize_t write(int fd, const char *buf, const char *end) AAI;
+inline ssize_t write(fd_t fd, const char *buf) AAI;
 
 inline ssize_t write(int fd, const char *buf, size_t len)
 {
