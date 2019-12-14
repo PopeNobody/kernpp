@@ -21,7 +21,8 @@ MAKEFLAGS:=-rR
 ARFLAGS = rvU
 
 CXX:= g++
-LD= ld -Map $@.map
+LD= ld 
+#-Map $@.map
 
 CPP_FLAGS= -MD -MF $@.d -MT $@
 CPP_FLAGS+= -Iinclude
