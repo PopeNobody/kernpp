@@ -92,8 +92,8 @@ struct dirents_t {
 			:dir(false)
 		{
 		};
-		ent_t(const char *_name)
-			:dir(false)
+		ent_t(const char *_name, bool _dir)
+			:dir(_dir)
 		{
 			strncpy(name,_name,sizeof(name));
 		};
@@ -109,7 +109,7 @@ struct dirents_t {
 		if(lhs.dir != rhs.dir) {
 			return lhs.dir?1:-1;
 		};
-		return strcmp(lhs.name,rhs.name);
+		return strcmp(rhs.name,lhs.name);
 	};
 	void sort() {
 		size_t n=size();
@@ -119,18 +119,18 @@ struct dirents_t {
 				if(cmp(*lst[m],*lst[j])<0){
 					m=j;
 				};
-				if(i!=m) {
-					ent_t *tmp=lst[i];
-					lst[i]=lst[m];
-					lst[m]=tmp;
-				};
+			};
+			if(i!=m) {
+				ent_t *tmp=lst[i];
+				lst[i]=lst[m];
+				lst[m]=tmp;
 			};
 		};
 	};
 	~dirents_t() {
 		delete[] lst;
 	};
-	void push_back(const char *name)
+	void push_back(const char *name, bool isdir)
 	{
 		if(cnt==cap) {
 			if(cap) {
@@ -143,7 +143,16 @@ struct dirents_t {
 			};
 			cap+=16;
 		};
-		lst[cnt++]=new ent_t(name);
+		ent_t *new_ent=new ent_t(name,isdir);
+		if(isdir) {
+			for(int i=0;i<sizeof(new_ent->name);i++) {
+				if(!new_ent->name[i]){
+					new_ent->name[i]='/';
+					break;
+				};
+			};
+		};
+		lst[cnt++]=new_ent;
 	};
 	ent_t &get(size_t pos)
 	{
@@ -172,13 +181,18 @@ void lsdir(int fd) {
 		auto beg = reinterpret_cast<linux_dirent*>(&buf[0]);
 		auto end = reinterpret_cast<linux_dirent*>(&buf[nread]);
 		while(beg!=end) {
-			ents.push_back(beg->d_name);
+			ents.push_back(beg->d_name,beg->d_type == DT_DIR);
 			beg=beg->next();
 		};
 	};
 	ents.sort();
 	for(size_t i=0;i<ents.size();i++)
 	{
+		auto ent=ents.get(i);
+		if(!strcmp(ent.name,"./"))
+			continue;
+		if(!strcmp(ent.name,"../"))
+			continue;
 		write(1,ents.get(i).name);
 		write(1,L("\n"));
 	};
