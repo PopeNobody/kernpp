@@ -85,46 +85,102 @@ struct free_ptr {
 	};
 };
 struct dirents_t {
-	struct list_t {
-		linux_dirent* beg;
-		linux_dirent* end;
-	};
-	size_t size;
-	list_t *lists;
-	dirents_t()
-		:size(0), lists(0)
-	{
-	};
-	void push_back(linux_dirent*beg, linux_dirent *end)
-	{
-		if(size) {
-			list_t *nlist=new list_t[size+1];
-			memcpy(nlist,lists,sizeof(list_t)*size);
-			nlist[size].beg=beg;
-			nlist[size].end=end;
-			delete[] lists;
-			lists=nlist;
-		} else {
-			lists=new list_t[1];
+	struct ent_t {
+		bool dir;
+		char name[256];
+		ent_t()
+			:dir(false)
+		{
+		};
+		ent_t(const char *_name)
+			:dir(false)
+		{
+			strncpy(name,_name,sizeof(name));
 		};
 	};
+	size_t cap;
+	size_t cnt;
+	ent_t **lst;
+	dirents_t()
+		: lst(0), cap(0), cnt(0)
+	{
+	};
+	int cmp(ent_t &lhs, ent_t&rhs) {
+		if(lhs.dir != rhs.dir) {
+			return lhs.dir?1:-1;
+		};
+		return strcmp(lhs.name,rhs.name);
+	};
+	void sort() {
+		size_t n=size();
+		for(int i=0;i<n-2;i++) {
+			int m=i;
+			for(int j=i+1;j<n;j++) {
+				if(cmp(*lst[m],*lst[j])<0){
+					m=j;
+				};
+				if(i!=m) {
+					ent_t *tmp=lst[i];
+					lst[i]=lst[m];
+					lst[m]=tmp;
+				};
+			};
+		};
+	};
+	~dirents_t() {
+		delete[] lst;
+	};
+	void push_back(const char *name)
+	{
+		if(cnt==cap) {
+			if(cap) {
+				ent_t **nlst = new ent_t*[cap+16];
+				memcpy(nlst,lst,sizeof(ent_t*)*cap);
+				delete[] lst;
+				lst=nlst;
+			} else {
+				lst = new ent_t*[16];
+			};
+			cap+=16;
+		};
+		lst[cnt++]=new ent_t(name);
+	};
+	ent_t &get(size_t pos)
+	{
+		return *lst[pos];
+	};
+	size_t size() const {
+		return cnt;
+	};
 };
-
+enum ignore_t {
+	normal,
+	minimal,
+	dot_dot,
+} ignore;
 void lsdir(int fd) {
 	enum { size = 4096 };
 	dirents_t ents;
+	char buf[size];
 	for(;;){
-		free_ptr<char> buf=(char*)malloc(size);
 		assert((void*)buf);
 		int nread=getdents(fd,(linux_dirent*)(char*)buf,size);
 		if(nread<0)
 			handle_error(errno_t(-nread), "getdents");
 		else if (nread==0)
-			return;
+			break;
 		auto beg = reinterpret_cast<linux_dirent*>(&buf[0]);
 		auto end = reinterpret_cast<linux_dirent*>(&buf[nread]);
-		ents.push_back(beg,end);
-		buf.drop();
+		while(beg!=end) {
+			ents.push_back(beg->d_name);
+			beg=beg->next();
+		};
+	};
+	ents.sort();
+	for(size_t i=0;i<ents.size();i++)
+	{
+		write(1,ents.get(i).name);
+		write(1,L("\n"));
 	};
 };
 void lsarg(const char *path)
@@ -150,14 +206,50 @@ void lsarg(const char *path)
 };
 using namespace fmt;
 
+static option longopts[]={
+	{ "version", 0, 0, 1 },
+	{ "help",    0, 0, 2 },
+	{ 0, 0, 0, 0}
+};
+const char help_msg[]=
+"Usage: /bin/ls [OPTION]... [FILE]...\n"
+"List information about the FILEs (the current directory by default).\n"
+"Sort entries alphabetically if none of -cftuvSUX nor --sort is specified.\n"
+"\n"
+"Mandatory arguments to long options are mandatory for short options too.\n"
+"  -a, --all                  do not ignore entries starting with .\n"
+"  -A, --almost-all           do not list implied . and ..\n"
+"  -b, --escape               print C-style escapes for nongraphic characters\n"
+"  -d, --directory            list directories themselves, not their contents\n"
+"      --help     display this help and exit\n"
+"      --version  output version information and exit\n"
+"\n"
+"Exit status:\n"
+" 0  if OK,\n"
+" 1  if minor problems (e.g., cannot access subdirectory),\n"
+" 2  if serious trouble (e.g., cannot access command-line argument).\n"
+;
+int help(int res)
+{
+	write((res?2:1),L(help_msg));
+};
+int version() {
+	write(1,L("ls (kernpp) 1.0\n"));
+	return 0;
+};
 int main(int argc, char**argv) 
 {
-	char ch;
-	while((ch=getopt(argc,argv,"s"))!=-1)
+	int ch;
+	int longidx=0;
+	while((ch=getopt_long(argc,argv,"aA",longopts,&longidx))!=-1)
 	{
-		write(1,"getopt()=>");
-		write(1,&ch,1);
-		write(1,"\n");
+		switch(ch) {
+			case 1: return version();
+			case 2: return help(0);
+			case 'a': ignore=minimal; break;
+			case 'A': ignore=dot_dot; break;
+			default: return help(1);
+		};
 	};
 	if(optind<argc) {
 		for(int i=optind;i<argc;i++){

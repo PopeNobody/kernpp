@@ -55,7 +55,7 @@ size_t strcspn(const char *s, const char *reject)
 	while(*reject)
 		rej[*reject++]=1;
 	rej[0]=1;
-	size_t i;
+	size_t i=0;
 	while(!rej[s[i]])
 		++i;
 	return i;
