@@ -198,6 +198,17 @@ extern "C" {
 				: "rcx", "r11", "memory");
 		return set_errno(res);
 	};
+	inline int getpid()
+	{
+		int res=-1;
+		asm (
+				"syscall\n"
+				: "=a"(res)
+				: "0"(39)
+				: "rcx", "r11", "memory"
+				);
+		return set_errno(res);
+	}
 };
 
 inline int sign(int val) AAI;

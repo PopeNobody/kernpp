@@ -1,4 +1,3 @@
- -fno-rtti
  -fno-exceptions
  -fno-chkp-instrument-calls
  -fomit-frame-pointer
@@ -17,3 +16,4 @@
  -fno-chkp-instrument-calls
  -fno-stack-protector
  -fverbose-asm
+-g

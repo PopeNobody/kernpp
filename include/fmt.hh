@@ -1,11 +1,14 @@
 #ifndef fmt_hh
 #define fmt_hh
 
+#ifdef NO_CONSTEXPR
+#define constexpr constexpr
+#endif
 namespace fmt
 {
 	inline char hex_dig(int val) AAI;
 	inline char hex_dig(int val) {
-		char digs[]="0123456789abcdef";
+		constexpr char digs[]="0123456789abcdef";
 		return digs[val&0xf];
 	};
 	inline char *fmt_hex(unsigned long val, char *beg, char *end)
@@ -16,7 +19,7 @@ namespace fmt
 		};
 		return end;
 	};
-	inline char *fmt_dec(unsigned long val, char *beg, char *end)
+	inline char *fmt_dec(unsigned long val, char *beg, char *end, int width=0)
 	{
 		if(val) {
 			while(val) {
@@ -29,5 +32,8 @@ namespace fmt
 		return end;
 	};
 };
+#ifdef NO_CONSTEXPR
+#undef constexpr
+#endif
 
 #endif

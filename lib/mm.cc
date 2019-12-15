@@ -1,10 +1,11 @@
 #include <syscall.hh>
 #include <fmt.hh>
 
-void write_dec(size_t val) {
+void write_dec(size_t val, int width=0)
+{
 	char buf[128];
 	char *end=buf+sizeof(buf)-1;
-	char *pos=fmt::fmt_dec(val,buf,buf+sizeof(buf)-1);
+	char *pos=fmt::fmt_dec(val,buf,end,width);
 	write(2,pos,end);
 };
 void write_ptr(void *val) {
@@ -21,13 +22,17 @@ void write_hex(size_t val) {
 	char *pos=fmt::fmt_hex(val,buf,buf+sizeof(buf)-1);
 	write(2,pos,end);
 };
-void assert_fail(const char *msg) {
-	write(2,L("assert("));
+void assert_fail(const char *file, size_t line, const char *msg) {
+	write(2,L("\n"));
+	write(2,file);
+	write(2,L(":"));
+	write_dec(line);
+	write(2,L(":assert("));
 	write(2,msg);
-	write(2,L(") failed"));
+	write(2,L(") failed\n"));
 	exit(1);
 };
-#define assert(x) do{if(!(x))assert_fail(#x);}while(0)
+#define assert(x) do{if(!(x))assert_fail(__FILE__,__LINE__,#x);}while(0)
 class block_l {
 	enum magic_t { magic = 0xdeadbeef };
 	struct block_t {
@@ -37,6 +42,16 @@ class block_l {
 		size_t size;
 		magic_t magic3;
 		bool used;
+		void combine() {
+			while(next){
+				if(next->used)
+					return;
+				if(char_p(next)!=char_p(this)+sizeof(*this)+size)
+					return;
+				size+=sizeof(*next)+next->size;
+				next=next->next;
+			};
+		};
 	};
 	block_t *list;
 	public:
@@ -44,7 +59,7 @@ class block_l {
 		:list(0)
 	{
 	};
-	block_t *find(size_t size)
+	void *malloc(size_t size)
 	{
 		block_t **pos=&list;
 		while(*pos) {
@@ -69,32 +84,31 @@ class block_l {
 		show();
 		list=0;
 	};
-	void *malloc(size_t size) {
-//   		write(2,L("malloc("));
-//   		write_dec(size);
-//   		write(2,L(")"));
-		void *res=find(size);
-//   		write(2,L(" => "));
-//   		write_ptr(res);
-//   		write(2,L("\n"));
-		//show();
-		return res;
-	};
+	typedef char* char_p;
 	void free(void *ptr){
-//   		write(2,L("free("));
-//   		write_ptr(ptr);
-//   		write(2,L(")\n"));
 		if(!ptr)
 			return;
 		block_t *blk=(block_t*)ptr;
 		--blk;
+		assert(blk->magic1 == magic);
+		assert(blk->magic2 == magic);
+		assert(blk->magic3 == magic);
+//   		write(2,L(__PRETTY_FUNCTION__));
+//   		write(2,L("\n  ptr="));
+//   		write_ptr(blk);
+//   		write(2,L("\n  nxt="));
+//   		write_ptr(blk->next);
+//   		write(2,L("\n  end="));
+//   		write_ptr(char_p(blk)+blk->size+sizeof(*blk));
+//   		write(2,L("\n"));
 		if(!blk->used) {
 			write(2,L("warning: double free of: "));
 			write_ptr(ptr);
 			write(2,L("\n"));
 		};
 		blk->used=false;
-		//show();
+		for(blk=list;blk;blk=blk->next)
+			blk->combine();
 	};
 	void show() {
 		write(2,L("(---BLOCK LIST----\n"));
@@ -108,6 +122,9 @@ class block_l {
 			write(2,L(" used: "));
 			write_dec(blk->used);
 			write(2,L("\n"));
+			write(2,L("       "));
+			write_ptr(char_p(blk)+blk->size+sizeof(*blk));
+			write(2,L("\n"));
 		};
 		write(2,L("----BLOCK LIST---}\n"));
 	};
@@ -119,41 +136,6 @@ void *malloc(size_t size) {
 void free(void *ptr) {
 	list.free(ptr);
 };
-//   void *_malloc(size_t size)
-//   {
-//   	block_t *block=(block_t*)sbrk(size+sizeof(block_t));
-//   	if (block == (block_t*) -1)
-//   		return nullptr;
-//   	return (void*)(block+1);
-//   }
-//   void _free(void *vp) {
-//   	block_t *block=(block_t*)vp;
-//   	block--;
-//   	block->next=free_list;
-//   	free_list=block;
-//   };
-//   void *malloc(size_t size) {
-//   	write(2,L("malloc("));
-//   	write_dec(size);
-//   	write(2,L(")\n"));
-//   	list.show();
-//   	block_t *block=find_block(size);
-//   	void *res=_malloc(size);
-//   	write(2,L("malloc("));
-//   	write_dec(size);
-//   	write(2,L(") => 0x"));
-//   	write_hex(size_t(res));
-//   	write(2,L("\n"));
-//   	list.show();
-//   	return res;
-//   };
-//   void free(void *ptr) {
-//   	write(2,L("free(0x"));
-//   	write_hex(size_t(ptr));
-//   	write(2,L(")\n"));
-//   	list.show();
-//   	list.show();
-//   };
 void *__curbrk;
 
 int brk (void *addr)

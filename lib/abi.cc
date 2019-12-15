@@ -18,14 +18,4 @@ extern "C" {
 	};
 	void * __dso_handle=(void*)&__dso_handle;
 
-	typedef void (*atexit_func_t) (void *); 
-	int atexit(atexit_func_t func);
-	int __cxa_atexit(
-			atexit_func_t func,
-			void * arg, 
-			void * dso_handle
-			)
-	{
-		atexit(func);
-	}
 }

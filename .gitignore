@@ -1,5 +1,6 @@
 #programs
 bin/new
+bin/fmt
 bin/rc
 bin/static
 bin/cat
@@ -12,6 +13,10 @@ bin/sc
 bin/vec
 bin/brk
 
+out
+output
+*.out
+*.orig
 *.map
 # Prerequisites
 *.d

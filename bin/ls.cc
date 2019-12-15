@@ -128,6 +128,8 @@ struct dirents_t {
 		};
 	};
 	~dirents_t() {
+		for(int i=0;i<cnt;i++)
+			delete lst[i];
 		delete[] lst;
 	};
 	void push_back(const char *name, bool isdir)
