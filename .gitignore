@@ -13,6 +13,8 @@ bin/sc
 bin/vec
 bin/brk
 
+tst
+
 out
 output
 *.out
