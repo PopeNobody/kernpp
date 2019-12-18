@@ -1084,7 +1084,7 @@
     ],
     'ret' => 'int'
   },
-  'clone' => {
+  'sys_clone' => {
     'code' => 56,
     'name' => 'clone',
     'impl' => 1,
@@ -2428,7 +2428,7 @@
     ],
     'ret' => 'int'
   },
-  'sched_setparam' => {
+  'sys_sched_setparam' => {
     'code' => 142,
     'name' => 'sched_setparam',
     'impl' => 1,
@@ -2438,7 +2438,7 @@
         'pid'
       ],
       [
-        'sched_param_p',
+        'const void *',
         'param'
       ]
     ],
@@ -2460,7 +2460,7 @@
     ],
     'ret' => 'int'
   },
-  'sched_setscheduler' => {
+  'sys_sched_setscheduler' => {
     'code' => 144,
     'name' => 'sched_setscheduler',
     'impl' => 1,
@@ -3382,7 +3382,7 @@
     ],
     'ret' => 'int'
   },
-  'sched_setaffinity' => {
+  'sys_sched_setaffinity' => {
     'code' => 203,
     'name' => 'sched_setaffinity',
     'impl' => 1,
@@ -3392,17 +3392,17 @@
         'pid'
       ],
       [
-        'unsigned',
+        'size_t',
         'len'
       ],
       [
-        'uint64_p',
+        'const void *',
         'user_mask_ptr'
       ]
     ],
     'ret' => 'int'
   },
-  'sched_getaffinity' => {
+  'sys_sched_getaffinity' => {
     'code' => 204,
     'name' => 'sched_getaffinity',
     'impl' => 1,
@@ -4739,7 +4739,7 @@
     'impl' => 1,
     'args' => [
       [
-        'uint64_t',
+        'int',
         'unshare_flags'
       ]
     ],
@@ -5550,10 +5550,6 @@
         'uint32_p',
         'nodep'
       ],
-      [
-        'uint64_t',
-        'unused'
-      ]
     ],
     'ret' => 'int'
   },
