@@ -19,6 +19,12 @@ namespace fmt
 		};
 		return end;
 	};
+	inline char *fmt_ptr(void *val, char *beg, char *end) {
+		end=fmt_hex(size_t(val),beg,end);
+		*--end='x';
+		*--end='0';
+		return end;
+	};
 	inline char *fmt_dec(unsigned long val, char *beg, char *end, int width=0)
 	{
 		if(val) {

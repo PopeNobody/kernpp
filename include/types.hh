@@ -152,7 +152,10 @@ typedef int64_t syscall_slong_t;
 typedef int32_t clockid_t;
 typedef int64_t time_t;
 typedef time_t* time_p;
-typedef uint64_t ptrdiff_t;
+namespace std {
+typedef int64_t ptrdiff_t;
+};
+using std::ptrdiff_t;
 typedef uint32_t mode_t;
 typedef uint64_t size_t;
 typedef uint64_t* size_p;
@@ -160,7 +163,7 @@ typedef int64_t ssize_t;
 typedef signed int __int32_t;
 typedef signed long int __int64_t;
 typedef signed short int __int16_t;
-typedef struct { int __val[2]; } __fsid_t;
+typedef uint64_t __fsid_t;
 typedef uint8_t __u_char;
 typedef uint32_t __gid_t;
 typedef uint32_t __id_t;
@@ -220,4 +223,9 @@ struct iovec {
 };
 
 typedef timespec* timespec_p;
+
+#define NULL nullptr
+//#define offsetof(type, field)	((long) &((type *)0)->field)
+#define offsetof(TYPE, MEMBER) __builtin_offsetof (TYPE, MEMBER)
+
 #endif

@@ -245,15 +245,23 @@ const char help_msg[]=
 int help(int res)
 {
 	write((res?2:1),L(help_msg));
+	return 0;
 };
 int version() {
 	write(1,L("ls (kernpp) 1.0\n"));
 	return 0;
 };
+void __gxx_abort() {
+	::abort();
+};
 int main(int argc, char**argv) 
 {
 	int ch;
 	int longidx=0;
+	char buf[25];
+	auto slen=&strlen;
+	fmt::fmt_ptr((void*)slen,buf,&buf[sizeof(buf)-1]);
+	//write_ptr(1,slen);
 	while((ch=getopt_long(argc,argv,"aA",longopts,&longidx))!=-1)
 	{
 		switch(ch) {

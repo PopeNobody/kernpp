@@ -1,19 +1,20 @@
- -fno-exceptions
- -fno-chkp-instrument-calls
- -fomit-frame-pointer
- -ffast-math
- -fno-PIC
- -fno-chkp-check-incomplete-type
- -fno-chkp-check-read
- -fno-chkp-check-write
- -fno-chkp-instrument-calls
- -fno-chkp-narrow-bounds
- -fno-chkp-optimize
- -fno-chkp-store-bounds
- -fno-chkp-use-static-bounds
- -fno-chkp-use-static-const-bounds
- -fno-chkp-use-wrappers
- -fno-chkp-instrument-calls
- -fno-stack-protector
- -fverbose-asm
--g
+-fno-use-linker-plugin
+-fno-chkp-instrument-calls
+-fomit-frame-pointer
+-ffast-math
+-fno-PIC
+-fno-chkp-check-incomplete-type
+-fno-chkp-check-read
+-fno-chkp-check-write
+-fno-chkp-instrument-calls
+-fno-chkp-narrow-bounds
+-fno-chkp-optimize
+-fno-chkp-store-bounds
+-fno-chkp-use-static-bounds
+-fno-chkp-use-static-const-bounds
+-fno-chkp-use-wrappers
+-fno-chkp-instrument-calls
+-fno-stack-protector
+-fverbose-asm
+-ffreestanding
+-fno-exceptions

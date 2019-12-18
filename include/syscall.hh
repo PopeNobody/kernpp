@@ -223,14 +223,36 @@ inline int sign(int val){
 extern "C" {
 	void *malloc(size_t);
 	void free(void *);
-	inline void *sbrk (intptr_t increment)AAI;
-	inline int strcmp(const char *s1, const char *s2)AAI;
-	inline void *memset(void *s, int c, size_t n)AAI;
-	inline void *memcpy(void *dest, const void *src, size_t n)AAI;
+	void *realloc(void *ptr, size_t size);
+	inline void* sbrk (intptr_t increment)AAI;
+	inline int   strcmp(const char *s1, const char *s2) AAI;
+	inline void* memset(void *s, int c, size_t n)AAI;
+	inline void* memcpy(void *dst, const void *src, size_t n)AAI;
+	inline int   memcmp(const void *dst, const void *src, size_t n)AAI;
+	inline void* memmove(void *dst, const void *src, size_t n)AAI;
+	inline void* memchr(const void *_mem, int c, size_t n)AAI;
 	inline char* strcpy(char *d, const char *s)AAI;
-	inline char * strncpy(char *dst, const char *src, size_t n)AAI;
-	inline char * strncpy(char *dst, const char *src, size_t n)AAI;
+	inline char* strncpy(char *dst, const char *src, size_t n)AAI;
+	inline char* strncpy(char *dst, const char *src, size_t n)AAI;
 	inline size_t strlen(const char *s)AAI;
+};
+inline void * memmove(void*_dst, const void *_src, size_t n)
+{
+	char *dst((char*)_dst);
+	const char *src((const char*)_src);
+	if(dst<src || dst>src+n)
+		return memcpy(dst,src,n);
+	while(n--)
+		dst[n]=src[n];
+	return dst;
+}
+inline void * memchr(const void *_mem, int c, size_t n)
+{
+	const char *mem=(const char*)_mem;
+	for(size_t i=0;i<n;i++)
+		if(mem[i]==c)
+			return (void*)&mem[i];
+	return nullptr;
 };
 inline size_t strcspn(const char *s, const char *reject)
 {
@@ -293,6 +315,17 @@ inline void *memcpy(void *dest, const void *src, size_t n){
 		d[i]=s[i];
 	return dest;
 };
+inline int memcmp(const void *_s1, const void *_s2, size_t n)
+{
+	int res=0;
+	const char *s1=(const char*)_s1;
+	const char *s2=(const char*)_s2;
+	for(size_t i=0;i<n;i++){
+		if(res=s1[i]-s2[i])
+			break;
+	};
+	return res;
+};
 inline char* strcpy(char *d, const char *s){
 	size_t p=0;
 	for(;;){
@@ -333,11 +366,6 @@ inline ssize_t write(fd_t fd, const char *buf){
 #define L(x) x,sizeof(x)-1
 
 extern "C" {
-	inline void abort(){
-		do {
-			asm("int3");
-		} while(true);
-	};
 //#define __NR_time 201
 	inline time_t time(time_t *buf) {
 		time_t res=-1;
@@ -348,6 +376,30 @@ extern "C" {
 				: "rcx", "r11", "memory"
 				);
 		return res;
+	};
+};
+
+namespace std {
+	void abort() __attribute__((__noreturn__));
+	inline void abort(){
+		do {
+			asm("int3");
+		} while(true);
+	};
+	void terminate() noexcept __attribute__((__noreturn__));
+	typedef ::size_t size_t;
+	using ::free;
+	using ::malloc;
+	using ::realloc;
+	using ::memset;
+};
+extern "C" {
+	void abort() __attribute__((__noreturn__));
+	inline void abort()
+	{
+		do {
+			asm("int3");
+		} while(true);
 	};
 };
 

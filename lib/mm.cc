@@ -133,6 +133,13 @@ block_l list;
 void *malloc(size_t size) {
 	return list.malloc(size);
 };
+void *realloc(void *ptr, size_t size) {
+	char *optr=(char*)ptr;
+	char *nptr=(char*)malloc(size);
+	memcpy(nptr,optr,size);
+	free(optr);
+	return nptr;
+};
 void free(void *ptr) {
 	list.free(ptr);
 };
