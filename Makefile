@@ -57,9 +57,6 @@ $(LIB_LIB): $(patsubst %, $(LIB_LIB)(%), $(LIB_OBJ))
 tags:
 	ctags -R .
 
-include/syscall_fwd.hh: script/genheaders.pl script/syscall.pl
-	perl script/genheaders.pl > $@
-
 $(ALL_SRC) $(ALL_SRC:=.d):;
 
 include /dev/null $(wildcard $(ALL_SRC:=.d))
