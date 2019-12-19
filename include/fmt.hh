@@ -1,9 +1,12 @@
 #ifndef fmt_hh
 #define fmt_hh
 
-#ifdef NO_CONSTEXPR
-#define constexpr constexpr
+#if 1
+#define AAI __attribute__ ((__always_inline__))
+#else
+#define AAI
 #endif
+
 namespace fmt
 {
 	inline char hex_dig(int val) AAI;
@@ -27,6 +30,7 @@ namespace fmt
 	};
 	inline char *fmt_dec(unsigned long val, char *beg, char *end, int width=0)
 	{
+		char *max=(width?end-width:0);
 		if(val) {
 			while(val) {
 				*--end=hex_dig(val%10);
@@ -35,11 +39,12 @@ namespace fmt
 		}else{
 			*--end='0';
 		};
+		if(max)
+			while(end>max)
+				*--end=' ';
 		return end;
 	};
 };
-#ifdef NO_CONSTEXPR
-#undef constexpr
-#endif
+#undef AAI
 
 #endif

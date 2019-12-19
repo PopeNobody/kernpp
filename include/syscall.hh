@@ -2,9 +2,12 @@
 #define syscall_hh syscall_hh
 
 #include <types.hh>
-#include <syscall_fwd.hh>
 
+#if 1
 #define AAI __attribute__ ((__always_inline__))
+#else
+#define AAI
+#endif
 
 #define O_ACCMODE	00000003
 #define O_RDONLY	00000000
@@ -334,6 +337,12 @@ inline char* strcpy(char *d, const char *s){
 		++p;
 	};
 };
+inline char * xstrdup(const char *s)
+{
+	register size_t len=strlen(s)+1;
+	register char *res=(char*)malloc(len);
+	return (char*)memcpy(res,s,len);
+};
 inline char * strncpy(char *dst, const char *src, size_t n)
 {
 	size_t i;
@@ -392,6 +401,12 @@ namespace std {
 	using ::malloc;
 	using ::realloc;
 	using ::memset;
+	enum nothrow_t {
+	};
+	extern const nothrow_t nothrow;
+	enum align_val_t {
+	};
+  typedef void (*new_handler)();
 };
 extern "C" {
 	void abort() __attribute__((__noreturn__));
@@ -403,4 +418,7 @@ extern "C" {
 	};
 };
 
+#undef AAI
+#define _GLIBCXX_NOEXCEPT noexcept
+#define _GLIBCXX_NOTHROW
 #endif

@@ -3,13 +3,13 @@ test:
 
 MAKEFLAGS:=-rR
 AR_FLAGS = rvU
-LD_FLAGS = -static -nostartfiles -nostdlib
-CPPFLAGS= @cpp_flags 
+LD_FLAGS = @ld_flags
+CPPFLAGS= @cppflags 
 DEPFLAGS= -MF $<.d -MT $@ -MD
-CXXFLAGS:= @cxx_flags
+CXXFLAGS:= @cxxflags
 
 CXX:= g++
-LD= ld 
+LD= ld.gold 
 
 
 BIN_SRC:=$(wildcard bin/*.cc bin/*.S)
@@ -30,17 +30,21 @@ ALL_SRC:=$(LIB_SRC) $(BIN_SRC)
 test: all
 
 all: $(BIN_EXE)
+	@echo sizes
+	@du -k $(BIN_EXE) | sort -n | xargs -n 8 | column -t
+	@du -k */*.o */*.a | sort -n | xargs -n 8 | column -t
+	@echo
 
-(%): %
-	flock $(LIB_LIB).lock ar $(AR_FLAGS) $@ $<
+$(LIB_LIB): $(LIB_OBJ)
+	ar $(AR_FLAGS) $@ $(LIB_OBJ)
 
 $(BIN_ASM): START:=
 
-$(BIN_EXE): %: %.o $(START) $(LIB_LIB) cxx_flags cpp_flags
-	$(CXX) $(START) $(LD_FLAGS) $(CXXFLAGS) $<  $(LIB_LIB) -o $@
+$(BIN_EXE): %: %.o $(START) $(LIB_LIB) cxxflags cppflags ld_flags
+	$(LD) -static $(START) $<  $(LIB_LIB) -o $@
 
-$(LIB_LIB): $(patsubst %, $(LIB_LIB)(%), $(LIB_OBJ))
-	touch $@
+#    $(LIB_LIB): $(patsubst %, $(LIB_LIB)(%), $(LIB_OBJ))
+#    	touch $@
 
 %.o: %.S
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
@@ -49,16 +53,13 @@ $(LIB_LIB): $(patsubst %, $(LIB_LIB)(%), $(LIB_OBJ))
 #    	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -S $<            -o $(<:.ii=.s)
 #    	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(<:.ii=.s)   -o $@
 
-%.o: %.cc cxx_flags cpp_flags
+%.o: %.cc cxxflags cppflags
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -E $< -o $(<:.cc=.ii) $(DEPFLAGS)
 	$(CXX) $(CXXFLAGS) -S $(<:.cc=.ii)  -o $(<:.cc=.s)
 	$(CXX) $(CXXFLAGS) -c $(<:.cc=.s)   -o $@
 
 tags:
 	ctags -R .
-
-include/syscall_fwd.hh: script/genheaders.pl script/syscall.pl
-	perl script/genheaders.pl > $@
 
 $(ALL_SRC) $(ALL_SRC:=.d):;
 
