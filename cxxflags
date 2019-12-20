@@ -18,3 +18,4 @@
 -fverbose-asm
 -ffreestanding
 -fno-exceptions
+-g

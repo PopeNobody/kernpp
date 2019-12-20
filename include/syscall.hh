@@ -99,6 +99,7 @@ extern "C" {
 	inline ssize_t sys_write( fd_t fd,  const char *buf,  size_t len) AAI;
 	inline time_t time(time_t *) AAI;
 	inline void _exit(int res) AAI;
+	inline int nanosleep(timespec_p rqtp, timespec_p rmtp) AAI;
 
 	// __NR_read=0
 	inline ssize_t read(fd_t fd, char *buf, size_t len)
@@ -147,6 +148,7 @@ extern "C" {
 				);
 		return res;
 	}
+	// __NR_stat=4
 	inline int stat(const char *pathname, struct stat *statbuf)
 	{
 		int res=-1;
@@ -158,6 +160,7 @@ extern "C" {
 				);
 		return set_errno(res);
 	};
+	// __NR_mmap=9
 	inline char *mmap(
 			void *addr, size_t length, int prot, int flags, fd_t fd, off_t off
 			)
@@ -166,11 +169,9 @@ extern "C" {
 		uint64_t ret;
 
 		__asm__ volatile (
-				"\tnop;\n"
 				"\tmovq %5,%%r10 ;\n"
 				"\tmovq %6,%%r8 ;\n"
 				"\tmovq %7, %%r9; \n"
-				"\tnop;\n"
 				"\tsyscall;\n"
 				: "=a" (ret)
 				: "0" (9), "D" (addr), "S" (length), "d" (prot),
@@ -178,6 +179,48 @@ extern "C" {
 				: "r11","rcx","memory", "r10", "r8", "r9" );
 
 		return (char*)set_errno(ret);
+	}
+	inline int rt_sigaction(
+			int sig,
+			sigaction_p act,
+			sigaction_p oact
+			)
+	{
+
+		uint64_t ret;
+
+		asm(
+				"\tmovq %5,%%r10 ;\n"
+				"\tsyscall;\n"
+				: "=a" (ret)
+				: "0" (13), "D" (sig), "S" (act), "d" (oact), "g"(sizeof(sigset_t))
+				: "r11","rcx","memory"
+				);
+
+		return (int)set_errno(ret);
+	};
+	inline int nanosleep(timespec_p rqtp, timespec_p rmtp) {
+		uint64_t ret=0xdeadbeef;
+		asm (
+				"\tsyscall;\n"
+				: "=a" (ret)
+				: "0" (35), "D" (rqtp), "S" (rmtp)
+				: "rcx", "r11", "memory"
+				);
+		for(int i=0;++i;i++)
+			;
+		return (int)set_errno(ret);
+	}
+	inline int alarm(unsigned long delay)
+	{
+		int res=-1;
+		asm (
+				"syscall\n"
+				: "=a"(res)
+				: "0"(37), "D"(delay)
+				: "rcx", "r11", "memory"
+				);
+		return set_errno(res);
 	}
 	inline void _exit(int res)
 	{
