@@ -255,10 +255,6 @@
       [
         'sigaction_p',
         'oact'
-      ],
-      [
-        'size_t',
-        'sigsetsize'
       ]
     ],
     'ret' => 'int'

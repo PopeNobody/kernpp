@@ -20,7 +20,12 @@ typedef void* void_p;
 struct iocb;
 struct fd_set;
 typedef fd_set* fd_set_p;
-struct sigaction_t;
+struct sigaction_t {
+	void (*sa_handler) (int);
+	unsigned long sa_flags;
+	void (*sa_restorer) (void);
+	unsigned long sa_mask;
+};
 typedef sigaction_t* sigaction_p;
 typedef uint64_t sigset_t;
 typedef sigset_t *sigset_p;

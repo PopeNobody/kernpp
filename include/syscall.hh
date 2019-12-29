@@ -199,6 +199,31 @@ extern "C" {
 
 		return (int)set_errno(ret);
 	};
+	inline int rt_sigprocmask(int how, sigset_p nset, sigset_p oset)
+	{
+		int ret=-1;
+		asm(
+				"\tmovq %5,%%r10 ;\n"
+				"\tsyscall;\n"
+				: "=a" (ret)
+				: "0" (13), "D" (how), "S" (nset), "d" (oset), "g"(sizeof(sigset_t))
+				: "r11","rcx","memory"
+				);
+
+		return set_errno(ret);
+	};
+	inline void rt_sigreturn()
+	{
+		int res=-1;
+		asm (
+				"syscall\n"
+				: "=a"(res)
+				: "0"(15)
+				: "rcx", "r11", "memory"
+				);
+		set_errno(res);
+	}
+
 	inline int nanosleep(timespec_p rqtp, timespec_p rmtp) {
 		uint64_t ret=0xdeadbeef;
 		asm (
@@ -207,9 +232,7 @@ extern "C" {
 				: "0" (35), "D" (rqtp), "S" (rmtp)
 				: "rcx", "r11", "memory"
 				);
-		for(int i=0;++i;i++)
-			;
-		return (int)set_errno(ret);
+		return set_errno(ret);
 	}
 	inline int alarm(unsigned long delay)
 	{

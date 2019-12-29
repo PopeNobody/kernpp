@@ -55,35 +55,6 @@ void write_dec(fd_t fd, int_t val) {
 		str+=res;
 	};
 };
-#if 0
-#define ENTER do { write(2,L(__PRETTY_FUNCTION__)); write(2,L("\n")); } while(0)
-#else
-#define ENTER do { ; } while(0)
-#endif
-template<typename type_t>
-struct free_ptr {
-	type_t *ptr;
-	free_ptr(type_t *ptr)
-		: ptr(ptr)
-	{
-		ENTER;
-	};
-	~free_ptr()
-	{
-		ENTER;
-		free(ptr);
-		ptr=0;
-	};
-	type_t *drop()
-	{
-		ptr=0;
-	};
-	operator type_t*() const
-	{
-		ENTER;
-		return ptr;
-	};
-};
 struct dirents_t {
 	struct ent_t {
 		bool dir;
