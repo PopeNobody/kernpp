@@ -12,6 +12,7 @@ bin/malloc_test
 bin/sc
 bin/vec
 bin/brk
+bin/usleep
 
 tst
 
@@ -61,4 +62,5 @@ output
 deps
 tags
 
-bin/usleep
+.gdb_history
+core
