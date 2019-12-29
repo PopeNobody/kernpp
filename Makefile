@@ -31,8 +31,10 @@ test: all
 
 all: $(BIN_EXE)
 	@echo sizes
-	@du -k $(BIN_EXE) | sort -n | xargs -n 8 | column -t
-	@du -k */*.o */*.a | sort -n | xargs -n 8 | column -t
+	@du -k $(BIN_EXE) | sort -n | xargs -n 6 | column -t
+	@echo
+	@du -k */*.o */*.a | sort -n | xargs -n 6 | column -t
+	@echo
 	@echo
 
 $(LIB_LIB): $(LIB_OBJ)
