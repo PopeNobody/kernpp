@@ -31,23 +31,6 @@
 //   #include <stddef.h>
 //   #include <string.h>
 
-template <typename val_t>
-ssize_t write_dec(val_t val, int width=0)
-{
-	bool neg=val<0;
-	if(neg)
-		val=-val;
-	char buf[sizeof(val)*4];
-	char *end=buf+sizeof(buf);
-	*--end=0;
-	char *pos=end;
-	pos=fmt_dec(val,buf,end);
-	if(neg)
-		*--pos='-';
-	while(end-pos<width)
-		*--pos=' ';
-	return write(1,pos,end);
-};
 char* optarg;
 int optopt;
 /* The variable optind [...] shall be initialized to 1 by the system. */

@@ -40,20 +40,13 @@ all: $(BIN_EXE)
 $(LIB_LIB): $(LIB_OBJ)
 	ar $(AR_FLAGS) $@ $(LIB_OBJ)
 
-$(BIN_ASM): START:=
+bin/false bin/true: START:=
 
 $(BIN_EXE): %: %.o $(START) $(LIB_LIB) cxxflags cppflags ld_flags
 	$(LD) -static $(START) $<  $(LIB_LIB) -o $@
 
-#    $(LIB_LIB): $(patsubst %, $(LIB_LIB)(%), $(LIB_OBJ))
-#    	touch $@
-
 %.o: %.S
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-#    bin/fmt.o: bin/fmt.ii
-#    	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -S $<            -o $(<:.ii=.s)
-#    	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(<:.ii=.s)   -o $@
+	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 %.o: %.cc cxxflags cppflags
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -E $< -o $(<:.cc=.ii) $(DEPFLAGS)

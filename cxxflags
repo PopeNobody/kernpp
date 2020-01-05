@@ -15,6 +15,7 @@
 -fno-chkp-use-wrappers
 -fno-chkp-instrument-calls
 -fno-stack-protector
+-fno-asynchronous-unwind-tables
 -fverbose-asm
 -ffreestanding
 -fno-exceptions

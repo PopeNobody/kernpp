@@ -1,7 +1,7 @@
 #ifndef fmt_hh
 #define fmt_hh
 
-#if 1
+#if 0
 #define AAI __attribute__ ((__always_inline__))
 #else
 #define AAI
@@ -10,8 +10,8 @@
 typedef unsigned fd_t;
 namespace fmt
 {
-	inline char hex_dig(int val) AAI;
-	inline char hex_dig(int val) {
+	//inline char hex_dig(int val) AAI;
+	static char hex_dig(int val) {
 		constexpr char digs[]="0123456789abcdef";
 		return digs[val&0xf];
 	};
@@ -24,9 +24,11 @@ namespace fmt
 		return end;
 	};
 	inline char *fmt_ptr(void *val, char *beg, char *end) {
+		*--end=']';
 		end=fmt_hex(size_t(val),beg,end);
 		*--end='x';
 		*--end='0';
+		*--end='[';
 		return end;
 	};
 	inline char *fmt_dec(unsigned long val, char *beg, char *end, int width=0)

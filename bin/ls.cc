@@ -1,30 +1,9 @@
 #include <syscall.hh>
 #include <new.hh>
 #include <fmt.hh>
-#include "getopt.h"
+#include <getopt.h>
+#include <array.hh>
 
-enum open_mode {
-	o_rdonly  =  0000,
-	o_wronly  =  0001,
-	o_rdwr    =  0002,
-	o_mask    =  0003,
-};
-enum open_flags {
-	o_creat      =  00000100,
-	o_excl       =  00000200,
-	o_noctty     =  00000400,
-	o_trunc      =  00001000,
-	o_append     =  00002000,
-	o_nonblock   =  00004000,
-	o_dsync      =  00010000,
-	o_fasync     =  00020000,
-	o_direct     =  00040000,
-	o_largefile  =  00100000,
-	o_directory  =  00200000,
-	o_nofollow   =  00400000,
-	o_noatime    =  01000000,
-	o_cloexec    =  02000000,
-};
 
 void handle_error(errno_t err, const char *call)
 {
@@ -77,9 +56,6 @@ struct dirents_t {
 	{
 	};
 	int cmp(ent_t &lhs, ent_t&rhs) {
-		return _cmp(lhs,rhs);
-	};
-	int _cmp(ent_t &lhs, ent_t&rhs) {
 		return strcmp(rhs.name,lhs.name);
 	};
 	void sort() {
@@ -132,6 +108,11 @@ enum ignore_t {
 	minimal,
 	dot_dot,
 } ignore;
+extern "C" {
+	void mm_show();
+};
+static array<void*,4096> ptrs;
+static size_t nptr=0;
 void lsdir(int fd) {
 	enum { size = 4096 };
 	dirents_t ents;
@@ -149,6 +130,7 @@ void lsdir(int fd) {
 			ents.push_back(beg->d_name,beg->d_type == DT_DIR);
 			beg=beg->next();
 		};
+		mm_show();
 	};
 	ents.sort();
 	for(size_t i=0;i<ents.size();i++)
@@ -169,7 +151,7 @@ void lsdir(int fd) {
 };
 void lsarg(const char *path)
 {
-	int fd = open(path,o_directory|o_rdonly);
+	int fd = open(path,open_flags(o_directory|o_rdonly));
 	if(fd>=0)
 	{
 		lsdir(fd);
@@ -225,14 +207,66 @@ int version() {
 void __gxx_abort() {
 	::abort();
 };
+template<size_t size>
+struct buf_t {
+	char pad1[128];
+	char buf[size];
+	char end[1];
+	char pad2[128];
+	~buf_t()
+	{
+		for(int i = 0; i<sizeof(pad1); i++) {
+			assert(pad1[i]=='p');
+		}
+		for(int i = 0; i<sizeof(pad2); i++) {
+			assert(pad2[i]=='P');
+		}
+
+	};
+	buf_t()
+	{
+		memset(this,0,sizeof(*this));
+		memset(pad1,'p',sizeof(pad1));
+		memset(pad2,'P',sizeof(pad2));
+	};
+};
+inline ssize_t write_grp(fd_t fd, size_t val) {
+	buf_t<sizeof(val)*8> buf;
+	char *pos=fmt_dec(val,buf.buf,buf.end);
+	char *beg=pos;
+	while(pos<buf.end) {
+		ssize_t res=write(fd,pos,buf.end);
+		if(res<0)
+			return res;
+		pos+=res;
+	};
+	return buf.end-beg;
+
+};
+inline char *fmt_bin(uint64_t val, char *beg, char *end)
+{
+	for(int i = 0; i < 64; i++) {
+		*--end='0'+(val&1);
+		val/=2;
+	};
+	assert(end>=beg);
+	return end;
+};
+inline ssize_t write_bin(fd_t fd, uint64_t val) {
+	buf_t<sizeof(val)*8> buf;
+	char *pos=fmt_bin(val,buf.buf,buf.end);
+	return full_write(fd,pos,buf.end);
+};
 int main(int argc, char**argv) 
 {
 	int ch;
 	int longidx=0;
-	char buf[25];
-	auto slen=&strlen;
-	fmt::fmt_ptr((void*)slen,buf,&buf[sizeof(buf)-1]);
-	//write_ptr(1,slen);
+	signed long u=1;
+	signed long lu=0;
+	if(dup2(1,2)<0) {
+		write(2,L("Failed to dup stderr.  You might not see this.\n"));
+		return 1;
+	};
 	while((ch=getopt_long(argc,argv,"aA",longopts,&longidx))!=-1)
 	{
 		switch(ch) {
@@ -249,6 +283,14 @@ int main(int argc, char**argv)
 		};
 	} else {
 		lsarg(".");
+	};
+	for(int i=0;i<nptr;i++) {
+		if(ptrs[i]){
+			write_ptr(2,ptrs[i]);
+			write(2,L("\n"));
+			free(ptrs[i]);
+			ptrs[i]=0;
+		};
 	};
 	return 0;
 };
