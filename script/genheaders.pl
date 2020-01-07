@@ -26,6 +26,7 @@ for my $name (sort {code_sort} keys %calls) {
 	};
 	@args=join(", ", @args);
 	my $rtype=$call{ret};
+        print "// __NR__", $call{name}, "=", $call{code}, "\n";
 	print "inline $rtype $name(@args)";
 	print "  __attribute__((__always_inline__));";
 };
