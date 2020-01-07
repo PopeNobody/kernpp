@@ -26,7 +26,7 @@
  *
  ******************************************************************************/
 #include <syscall.hh>
-#include "getopt.h"
+#include <getopt.hh>
 
 //   #include <stddef.h>
 //   #include <string.h>

@@ -1,4 +1,10 @@
-obj-m += lkm_example.o
+CONFIG_DEV_EX:=
+CONFIG_PROC_EX:=
+CONFIG_DEMO:=m
+
+obj-$(CONFIG_DEV_EX) += dev_ex.o
+obj-$(CONFIG_PROC_EX) += proc_ex.o
+obj-$(CONFIG_DEMO) += demo.o
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
@@ -8,8 +14,23 @@ clean:
 Makefile: ;
 
 
-test: all
-	-sudo rmmod lkm_example.ko
+test: demo-test
+
+dev-test: all
+	-sudo rmmod dev_ex.ko
 	sudo dmesg -c
-	sudo insmod lkm_example.ko
+	sudo insmod dev_ex.ko
 	dmesg
+
+demo-test: all
+	-sudo rmmod demo.ko
+	sudo dmesg -c
+	sudo insmod demo.ko
+	dmesg
+
+proc-test: all
+	-sudo rmmod proc_ex.ko
+	sudo dmesg -c
+	sudo insmod proc_ex.ko
+	dmesg
+	grep -n . /dev/null /proc/pstree

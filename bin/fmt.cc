@@ -144,15 +144,24 @@ int writeln_ptr(fd_t fd, const del_ptr<type> &ptr)
 extern "C" void __cxa_bad_typeid () {
 	write(2,L("bad typeid!\n"));
 }
+extern "C" void mm_show();
 int main(int, char**) {
 	writeln(1,typeid(base()).name());
 	writeln(1,typeid(derived1()).name());	
 	writeln(1,typeid(derived2()).name());	
 	writeln(1,typeid(derived12()).name());	
-	del_ptr<base> base_ptr=new base();
-	del_ptr<base> derived1_ptr=new derived1();
-	del_ptr<base> derived2_ptr=new derived2();
-	del_ptr<base> derived12_ptr=new derived12();
+        {
+          del_ptr<base> base_ptr=new base();
+          mm_show();
+          del_ptr<base> derived1_ptr=new derived1();
+          mm_show();
+          del_ptr<base> derived2_ptr=new derived2();
+          mm_show();
+          del_ptr<base> derived12_ptr=new derived12();
+          mm_show();
+          return 0;
+        }
+#if 0
 #define show_val(t,x) \
 	do { \
 		write(1,#x "                                                  ",50); \
@@ -207,4 +216,5 @@ int main(int, char**) {
 //   		write(1,ex);
 //   	};
 	return 0;
+#endif
 };

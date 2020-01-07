@@ -65,3 +65,4 @@ clean:
 
 check_env:
 	printenv
+include/getopt.h: ;

@@ -19,6 +19,7 @@ tst
 out
 output
 *.out
+*.cmd
 *.orig
 *.map
 # Prerequisites
@@ -64,3 +65,6 @@ tags
 
 .gdb_history
 core
+*.ko
+kmod_dev/Module.symvers
+kmod_dev/modules.order

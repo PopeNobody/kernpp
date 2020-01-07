@@ -1,7 +1,7 @@
 #include <syscall.hh>
 #include <new.hh>
 #include <fmt.hh>
-#include <getopt.h>
+#include <getopt.hh>
 #include <array.hh>
 
 
