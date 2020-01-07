@@ -79,11 +79,11 @@ int main(int argc, char**argv) {
         } else {
           write(2,L("-o given without another arg\n"));
         };
-        close(1);
+        sys_close(1);
         int fd=open(fname,open_flags(o_creat|o_append|o_wronly));
         if(fd!=1){
           dup2(fd,1);
-          close(fd);
+          sys_close(fd);
         };
       } else {
         int fd=-1;
@@ -97,7 +97,7 @@ int main(int argc, char**argv) {
           };
         };
         catfile(fd);
-        close(fd);
+        sys_close(fd);
         ++argv;
       } 
     }

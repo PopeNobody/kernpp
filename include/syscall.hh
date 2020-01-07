@@ -109,7 +109,7 @@ enum open_flags {
 };
 extern "C" {
 	inline fd_t open(const char *pathname, open_flags flags, open_mode mode) AAI;
-	inline int close(fd_t fd) AAI;
+        inline int sys_close(fd_t fd) AAI;
 	inline int stat(const char *pathname, struct stat *statbuf) AAI;
 	inline ssize_t getdents(fd_t fd, linux_dirent64 *buf, size_t len) AAI;
 	inline ssize_t read(fd_t fd, char *buf, size_t len) AAI;
@@ -156,7 +156,7 @@ extern "C" {
 		return set_errno(fd);
 	};
 	// __NR_close=3
-	inline int close(fd_t fd)
+        inline int sys_close(fd_t fd) 
 	{
 		int res=-1;
 		asm (

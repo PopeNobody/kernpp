@@ -1,4 +1,5 @@
 test:
+	./bin/usleep
 
 
 MAKEFLAGS:=-rR

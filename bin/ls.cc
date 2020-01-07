@@ -168,7 +168,7 @@ void lsarg(const char *path)
 		write(2,str,end);
 		write(2,")\n");
 	};
-	close(fd);
+	sys_close(fd);
 };
 using namespace fmt;
 
