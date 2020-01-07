@@ -3,6 +3,7 @@
 #include <fmt.hh>
 #include <getopt.hh>
 #include <array.hh>
+#include <assert.hh>
 
 
 void handle_error(errno_t err, const char *call)
@@ -20,7 +21,6 @@ void handle_error(errno_t err, const char *call)
 	exit(1);
 
 };
-#define assert(x) do{auto r=(x);if(!r){handle_error(-1,#x);};}while(0)
 
 template<typename int_t>
 void write_dec(fd_t fd, int_t val) {

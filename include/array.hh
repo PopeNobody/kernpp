@@ -254,7 +254,7 @@ struct array
 
 template<typename _Tp, size_t _Nm>
 inline typename enable_if<
-__array_traits<_Tp, _Nm>::_Is_swappable::value
+  __array_traits<_Tp, _Nm>::_Is_swappable::value
 >::type
 
 

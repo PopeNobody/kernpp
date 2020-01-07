@@ -108,226 +108,240 @@ enum open_flags {
   o_cloexec    =  02000000,
 };
 extern "C" {
-	inline fd_t open(const char *pathname, open_flags flags, open_mode mode) AAI;
-        inline int sys_close(fd_t fd) AAI;
-	inline int stat(const char *pathname, struct stat *statbuf) AAI;
-	inline ssize_t getdents(fd_t fd, linux_dirent64 *buf, size_t len) AAI;
-	inline ssize_t read(fd_t fd, char *buf, size_t len) AAI;
-	inline ssize_t sys_write( fd_t fd,  const char *buf,  size_t len) AAI;
-	inline time_t time(time_t *) AAI;
-	inline void _exit(int res) AAI;
-	inline int nanosleep(timespec_p rqtp, timespec_p rmtp) AAI;
-	
-#define chk_return(val) if(val<0)return set_errno(val) else return fal;
+  inline fd_t open(const char *pathname, open_flags flags, open_mode mode) AAI;
+  inline int sys_close(fd_t fd) AAI;
+  inline int stat(const char *pathname, struct stat *statbuf) AAI;
+  inline ssize_t getdents(fd_t fd, linux_dirent64 *buf, size_t len) AAI;
+  inline ssize_t read(fd_t fd, char *buf, size_t len) AAI;
+  inline ssize_t sys_write( fd_t fd,  const char *buf,  size_t len) AAI;
+  inline time_t time(time_t *) AAI;
+  inline void _exit(int res) AAI;
+  inline int nanosleep(timespec_p rqtp, timespec_p rmtp) AAI;
 
-	// __NR_read=0
-	inline ssize_t read(fd_t fd, char *buf, size_t len)
-	{
-		long res;
-		asm (
-				"syscall"
-				: "=a"(res)
-				: "a"(0), "D"(fd), "S"(buf),"d"(len)
-				: "rcx", "r11", "memory");
-                return res;
-	};
-	// __NR_write=1
-	inline ssize_t sys_write( fd_t fd,  const char *buf,  size_t len)
-	{
-		long res;
-		asm (
-				"syscall\n"
-				: "=a"(res)
-				: "a"(1), "D"(fd), "S"(buf),"d"(len)
-				: "rcx", "r11", "memory"
-				);
-		return set_errno(res);
-	};
-	// __NR_open=2
-	inline fd_t open(const char *pathname, open_flags flags, open_mode mode=o_default)
-	{
-		int fd=-1;
-		asm (
-				"syscall\n"
-				: "=a"(fd)
-				: "0"(2), "D"(pathname),"S"(flags), "d"(mode)
-				: "rcx", "r11", "memory"
-				);
-		return set_errno(fd);
-	};
-	// __NR_close=3
-        inline int sys_close(fd_t fd) 
-	{
-		int res=-1;
-		asm (
-				"syscall\n"
-				: "=a"(fd)
-				: "0"(3), "D"(fd)
-				: "rcx", "r11", "memory"
-				);
-		return res;
-	}
-	// __NR_stat=4
-	inline int stat(const char *pathname, struct stat *statbuf)
-	{
-		int res=-1;
-		asm (
-				"syscall\n"
-				: "=a"(res)
-				: "a"(4), "D"(pathname), "S"(statbuf)
-				: "rcx", "r11", "memory"
-				);
-		return set_errno(res);
-	};
-	// __NR_mmap=9
-	inline char *mmap(
-			void *addr, size_t length, int prot, int flags, fd_t fd, off_t off
-			)
-	{
+#define chk_return2(val,cast) return (cast)(val<0?set_errno(val):val)
+#define chk_return(val) return (val<0?set_errno(val):val)
 
-		uint64_t ret;
 
-		__asm__ volatile (
-				"\tmovq %5,%%r10 ;\n"
-				"\tmovq %6,%%r8 ;\n"
-				"\tmovq %7, %%r9; \n"
-				"\tsyscall;\n"
-				: "=a" (ret)
-				: "0" (9), "D" (addr), "S" (length), "d" (prot),
-				"g" (flags), "g" (fd), "g" (off)
-				: "r11","rcx","memory", "r10", "r8", "r9" );
+  // __NR_read=0
+  inline ssize_t read(fd_t fd, char *buf, size_t len)
+  {
+    long res;
+    asm (
+        "syscall"
+        : "=a"(res)
+        : "a"(0), "D"(fd), "S"(buf),"d"(len)
+        : "rcx", "r11", "memory");
+    chk_return(res);
+  };
+  // __NR_write=1
+  inline ssize_t sys_write( fd_t fd,  const char *buf,  size_t len)
+  {
+    long res;
+    asm (
+        "syscall\n"
+        : "=a"(res)
+        : "a"(1), "D"(fd), "S"(buf),"d"(len)
+        : "rcx", "r11", "memory"
+        );
+    chk_return(res);
+  };
+  // __NR_open=2
+  inline fd_t open(const char *pathname, open_flags flags, open_mode mode=o_default)
+  {
+    int fd=-1;
+    asm (
+        "syscall\n"
+        : "=a"(fd)
+        : "0"(2), "D"(pathname),"S"(flags), "d"(mode)
+        : "rcx", "r11", "memory"
+        );
+    chk_return(fd);
+  };
+  // __NR_close=3
+  inline int sys_close(fd_t fd) 
+  {
+    int res=-1;
+    asm (
+        "syscall\n"
+        : "=a"(fd)
+        : "0"(3), "D"(fd)
+        : "rcx", "r11", "memory"
+        );
+    chk_return(res);
+  }
+  // __NR_stat=4
+  inline int stat(const char *pathname, struct stat *statbuf)
+  {
+    int res=-1;
+    asm (
+        "syscall\n"
+        : "=a"(res)
+        : "a"(4), "D"(pathname), "S"(statbuf)
+        : "rcx", "r11", "memory"
+        );
+    chk_return(res);
+  };
+  // __NR_mmap=9
+  inline char *mmap(
+      void *addr, size_t length, int prot, int flags, fd_t fd, off_t off
+      )
+  {
 
-		return (char*)set_errno(ret);
-	}
-	// __NR_sigaction = 13
-	inline int rt_sigaction(
-			int sig,
-			sigaction_p act,
-			sigaction_p oact
-			)
-	{
+    uint64_t res;
 
-		uint64_t ret;
+    __asm__ volatile (
+        "\tmovq %5,%%r10 ;\n"
+        "\tmovq %6,%%r8 ;\n"
+        "\tmovq %7, %%r9; \n"
+        "\tsyscall;\n"
+        : "=a" (res)
+        : "0" (9), "D" (addr), "S" (length), "d" (prot),
+        "g" (flags), "g" (fd), "g" (off)
+        : "r11","rcx","memory", "r10", "r8", "r9" );
 
-		asm(
-				"\tmovq %5,%%r10 ;\n"
-				"\tsyscall;\n"
-				: "=a" (ret)
-				: "0" (13), "D" (sig), "S" (act), "d" (oact), "g"(sizeof(sigset_t))
-				: "r11","rcx","memory"
-				);
+    chk_return2(res,char*);
+  }
+  // __NR_sigaction = 13
+  inline int rt_sigaction(
+      int sig,
+      sigaction_p act,
+      sigaction_p oact
+      )
+  {
 
-		return (int)set_errno(ret);
-	};
-	// __NR_sigprocmask=14
-	inline int rt_sigprocmask(int how, sigset_p nset, sigset_p oset)
-	{
-		int ret=-1;
-		asm(
-				"\tmovq %5,%%r10 ;\n"
-				"\tsyscall;\n"
-				: "=a" (ret)
-				: "0" (14), "D" (how), "S" (nset), "d" (oset), "g"(sizeof(sigset_t))
-				: "r11","rcx","memory"
-				);
+    uint64_t res;
 
-		return set_errno(ret);
-	};
-	// __NR_sigreturn=15
-	inline void rt_sigreturn()
-	{
-		int res=-1;
-		asm (
-				"syscall\n"
-				: "=a"(res)
-				: "0"(15)
-				: "rcx", "r11", "memory"
-				);
-		set_errno(res);
-	}
+    asm(
+        "\tmovq %5,%%r10 ;\n"
+        "\tsyscall;\n"
+        : "=a" (res)
+        : "0" (13), "D" (sig), "S" (act), "d" (oact), "g"(sizeof(sigset_t))
+        : "r11","rcx","memory"
+       );
 
-	// __NR_dup = 32
-	inline int dup(fd_t fd) {
-		int res=-1;
-		asm (
-				"syscall\n"
-				: "=a"(fd)
-				: "0"(32), "D"(fd)
-				: "rcx", "r11", "memory"
-				);
-		return set_errno(res);
-	};
-	// __NR_dup = 33
-	inline int dup2(fd_t ofd, fd_t nfd)
-	{
-		int res=-1;
-		asm (
-				"syscall\n"
-				: "=a"(res)
-				: "a"(33), "D"(ofd), "S"(nfd)
-				: "rcx", "r11", "memory"
-				);
-		return set_errno(res);
-	};
-	// __NR_nanosleep = 35
-	inline int nanosleep(timespec_p rqtp, timespec_p rmtp) {
-		uint64_t ret=0xfeebdaed;
-		asm (
-				"\tsyscall;\n"
-				: "=a" (ret)
-				: "0" (35), "D" (rqtp), "S" (rmtp)
-				: "rcx", "r11", "memory"
-				);
-		return set_errno(ret);
-	}
-	// __NR_alarm = 37
-	inline int alarm(unsigned long delay)
-	{
-		int res=-1;
-		asm (
-				"syscall\n"
-				: "=a"(res)
-				: "0"(37), "D"(delay)
-				: "rcx", "r11", "memory"
-				);
-		return set_errno(res);
-	}
-	// __NR_getpid = 39
-	inline int getpid()
-	{
-		int res=-1;
-		asm (
-				"syscall\n"
-				: "=a"(res)
-				: "0"(39)
-				: "rcx", "r11", "memory"
-				);
-		return set_errno(res);
-	}
-	// __NR_exit = 60
-	inline void _exit(int res)
-	{
-		int exit_val;
-		exit_val=res&0xff;
-		asm (
-				"syscall\n"
-				: "=a"(res)
-				: "a"(60), "D"(exit_val)
-				: "rcx", "r11", "memory"
-				);
-		while(1);
-	}
-	// __NR_getdents = 217
-	inline ssize_t getdents(fd_t fd, linux_dirent64 *buf, size_t len)
-	{
-		long res;
-		asm (
-				"syscall"
-				: "=a"(res)
-				: "a"(217), "D"(fd), "S"(buf),"d"(len)
-				: "rcx", "r11", "memory");
-		return set_errno(res);
-	};
+    chk_return(res);
+  };
+  // __NR_sigprocmask=14
+  inline int rt_sigprocmask(int how, sigset_p nset, sigset_p oset)
+  {
+    int res=-1;
+    asm(
+        "\tmovq %5,%%r10 ;\n"
+        "\tsyscall;\n"
+        : "=a" (res)
+        : "0" (14), "D" (how), "S" (nset), "d" (oset), "g"(sizeof(sigset_t))
+        : "r11","rcx","memory"
+       );
+
+    chk_return(res);
+  };
+  // __NR_sigreturn=15
+  inline void rt_sigreturn()
+  {
+    int res=-1;
+    asm (
+        "syscall\n"
+        : "=a"(res)
+        : "0"(15)
+        : "rcx", "r11", "memory"
+        );
+    if(res<0)
+      set_errno(res);
+  }
+
+  // __NR_dup = 32
+  inline int dup(fd_t fd) {
+    int res=-1;
+    asm (
+        "syscall\n"
+        : "=a"(fd)
+        : "0"(32), "D"(fd)
+        : "rcx", "r11", "memory"
+        );
+    chk_return(res);
+  };
+  // __NR_dup = 33
+  inline int dup2(fd_t ofd, fd_t nfd)
+  {
+    int res=-1;
+    asm (
+        "syscall\n"
+        : "=a"(res)
+        : "a"(33), "D"(ofd), "S"(nfd)
+        : "rcx", "r11", "memory"
+        );
+    chk_return(res);
+  };
+  // __NR_nanosleep = 35
+  inline int nanosleep(timespec_p rqtp, timespec_p rmtp) {
+    uint64_t res=0xfeebdaed;
+    asm (
+        "\tsyscall;\n"
+        : "=a" (res)
+        : "0" (35), "D" (rqtp), "S" (rmtp)
+        : "rcx", "r11", "memory"
+        );
+    chk_return(res);
+  }
+  // __NR_alarm = 37
+  inline int alarm(unsigned long delay)
+  {
+    int res=-1;
+    asm (
+        "syscall\n"
+        : "=a"(res)
+        : "0"(37), "D"(delay)
+        : "rcx", "r11", "memory"
+        );
+    chk_return(res);
+  }
+  // __NR_getpid = 39
+  inline int getpid()
+  {
+    int res=-1;
+    asm (
+        "syscall\n"
+        : "=a"(res)
+        : "0"(39)
+        : "rcx", "r11", "memory"
+        );
+    chk_return(res);
+  }
+  // __NR_exit = 60
+  inline void _exit(int res)
+  {
+    int exit_val;
+    exit_val=res&0xff;
+    asm (
+        "syscall\n"
+        : "=a"(res)
+        : "a"(60), "D"(exit_val)
+        : "rcx", "r11", "memory"
+        );
+    while(1);
+  }
+  //#define __NR_time 201
+  inline time_t time(time_t *buf) {
+    time_t res=-1;
+    asm (
+        "syscall\n"
+        : "=a"(res)
+        : "a"(4), "D"(buf)
+        : "rcx", "r11", "memory"
+        );
+    chk_return(res);
+  };
+  // __NR_getdents = 217
+  inline ssize_t getdents(fd_t fd, linux_dirent64 *buf, size_t len)
+  {
+    long res;
+    asm (
+        "syscall"
+        : "=a"(res)
+        : "a"(217), "D"(fd), "S"(buf),"d"(len)
+        : "rcx", "r11", "memory");
+    chk_return(res);
+  };
 };
 
 inline int sign(int val) AAI;
@@ -496,19 +510,6 @@ inline ssize_t full_write(int fd, const char * const beg, const char *end){
 
 #define L(x) x,sizeof(x)-1
 
-extern "C" {
-//#define __NR_time 201
-	inline time_t time(time_t *buf) {
-		time_t res=-1;
-		asm (
-				"syscall\n"
-				: "=a"(res)
-				: "a"(4), "D"(buf)
-				: "rcx", "r11", "memory"
-				);
-		return res;
-	};
-};
 
 namespace std {
 	void abort() __attribute__((__noreturn__));

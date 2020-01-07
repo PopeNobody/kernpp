@@ -63,7 +63,6 @@ namespace fmt
 		char buf[(sizeof(tm.tv_sec)+sizeof(tm.tv_nsec))*4+16];
 		char * const end=&buf[sizeof(buf)-1];
 		char *pos=end;
-		*--pos='\n';
 		*--pos='}';
 		pos=fmt::fmt_dec(tm.tv_nsec,buf,pos);
 		*--pos=',';
@@ -71,6 +70,31 @@ namespace fmt
 		*--pos='{';
 		return write(fd,pos,end);
 	};
+
+        // This doesn't even format, it parses.  But here it is.
+        inline int atoi(const char *a) {
+          int i=0;
+          char ch;
+          while(ch=*a++) {
+            switch(ch) {
+              case '1': case '2': case '3': case '4': case '5':
+              case '6': case '7': case '8': case '9': case '0':
+                i*=10;
+                i+=(ch-'0');
+                break;
+              default:
+                write(2,"err!");
+                exit(1);
+            };
+          };
+          return i;
+        };
+
+#define show_val(x) do{ \
+  write(2,L(#x " => ")); \
+  write_dec(2,(x)); \
+  write(2,L("\n")); \
+}  while(false);
 };
 #undef AAI
 

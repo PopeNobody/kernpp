@@ -1,8 +1,34 @@
 #include <syscall.hh>
 #include <new.hh>
 #include <typeinfo.hh>
-#include <fmt.hh>
+#include <buffd.hh>
+#include <assert.hh>
+using namespace fmt;
 
+#if 1
+
+char *fmt_chr(char ch, char *beg, char *pos) {
+  assert(beg<pos);
+  *--pos=ch;
+  return pos;
+};
+int main(int argc, char**argv) {
+  bufferfd_t buf(1);
+  char bigbuf[1024];
+  char *endbuf=bigbuf+sizeof(bigbuf)-1;
+  char *pos=endbuf;
+  for(size_t i=1;i;i+=12345)
+  {
+    pos=fmt_chr('\n',bigbuf,pos);
+    pos=fmt_dec(i,bigbuf,pos);
+    pos=fmt_chr(' ',bigbuf,pos);
+    pos=fmt_hex(i,bigbuf,pos);
+    write(1,pos,endbuf-pos);
+    pos=endbuf;
+  };
+  return 0;
+};
+#else
 size_t writeln(fd_t fd, const char *ptr, size_t size = 0)
 {
 	if(!size)
@@ -161,7 +187,6 @@ int main(int, char**) {
           mm_show();
           return 0;
         }
-#if 0
 #define show_val(t,x) \
 	do { \
 		write(1,#x "                                                  ",50); \
@@ -216,5 +241,5 @@ int main(int, char**) {
 //   		write(1,ex);
 //   	};
 	return 0;
-#endif
 };
+#endif
