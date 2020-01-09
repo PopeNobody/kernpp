@@ -195,6 +195,11 @@ typedef uint64_t __u_quad_t;
 typedef uint64_t ino64_t;
 typedef unsigned short int __u_short;
 typedef void * __timer_t;
+struct timeval
+{
+  time_t tv_sec;
+  int64_t tv_nsec;
+};
 struct timespec
 {
   time_t tv_sec;

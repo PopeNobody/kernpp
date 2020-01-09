@@ -221,7 +221,7 @@ namespace sys
     inline time_t time(time_t *) AAI;
     inline ssize_t getdents(fd_t fd, linux_dirent64 *buf, size_t len) AAI;
     inline ssize_t read(fd_t fd, char *buf, size_t len) AAI;
-    inline ssize_t write( fd_t fd,  const char *buf,  size_t len) AAI;
+    inline ssize_t sys_write( fd_t fd,  const char *buf,  size_t len) AAI;
   }
 
   // __NR_read=0
@@ -236,7 +236,7 @@ namespace sys
     chk_return(res);
   };
   // __NR_write=1
-  inline ssize_t write( fd_t fd,  const char *buf,  size_t len)
+  inline ssize_t sys_write( fd_t fd,  const char *buf,  size_t len)
   {
     long res;
     asm (
@@ -372,13 +372,39 @@ namespace sys
     if(res<0)
       set_errno(res);
   }
+//     };
+//     inline char *mmap(
+//         void *addr, size_t length, int prot, int flags, fd_t fd, off_t off
+//         )
+//     {
+  // __NR__ select = 23 
+inline int select(
+    int        n,
+    fd_set_p   inp,
+    fd_set_p   outp,
+    fd_set_p   exp,
+    timeval_p  tvp=0
+    )
+  {
+
+    uint64_t res;
+
+    __asm__ volatile (
+        "\tsyscall;\n"
+        : "=a" (res)
+        : "0" (23), "D" (n), "S" (inp), "d" (outp), "g" (exp), "g" (tvp)
+        : "rcx","memory", "r8", "r9" 
+        );
+
+    chk_return(res);
+  }
 
   // __NR_dup = 32
   inline int dup(fd_t fd) {
     int res=-1;
     asm (
         "syscall\n"
-        : "=a"(fd)
+        : "=a"(res)
         : "0"(32), "D"(fd)
         : "rcx", "r11", "memory"
         );
@@ -485,25 +511,25 @@ namespace sys {
 
   inline ssize_t write(int fd, const char *buf, size_t len)
   {
-    return write(fd,buf,len);
+    return sys_write(fd,buf,len);
   };
   inline ssize_t write(int fd, const char *buf, const char *end)
   {
-    return write(fd,buf,end-buf);
+    return sys_write(fd,buf,end-buf);
   };
 
   inline ssize_t write(fd_t fd, const char *buf){
     const char *end=buf;
     while(*end)
       ++end;
-    return write(fd,buf,end);
+    return sys_write(fd,buf,end-buf);
   };
 
   inline const char*full_write(int fd, const char * const beg, const char *end)
   {
     const char*pos=beg;
     while(pos!=end){
-      ssize_t res=write(fd,pos,end-pos);
+      ssize_t res=sys_write(fd,pos,end-pos);
       if(res<0)
         return nullptr;
       pos+=res;
