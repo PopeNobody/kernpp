@@ -69,3 +69,4 @@ core
 kmod_dev/Module.symvers
 kmod_dev/modules.order
 powers
+strerror
