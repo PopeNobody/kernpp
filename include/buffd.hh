@@ -16,10 +16,10 @@ class bufferfd_t
   {
   }
   bufferfd_t(const bufferfd_t &rhs)
-    : fd(dup(rhs.fd)), writes(0)
+    : fd(sys::dup(rhs.fd)), writes(0)
   {
     if(fd<0)
-      sys_write(2,L("failed to dup!\n"));
+      sys::write(2,L("failed to dup!\n"));
   };
   ~bufferfd_t()
   {
@@ -28,7 +28,7 @@ class bufferfd_t
   };
   void close()
   {
-    sys_close(fd);
+    sys::close(fd);
   };
   void flush()
   {
@@ -36,7 +36,7 @@ class bufferfd_t
   ssize_t write(const char *buf, ssize_t size)
   {
     ++writes;
-    sys_write(fd, buf, size);
+    sys::write(fd, buf, size);
   };
   template<typename buf_t>
     size_t write( buf_t &&buf )
@@ -44,9 +44,9 @@ class bufferfd_t
       ++writes;
       const char *pos=buf.pos();
       size_t len=buf.len();
-      auto res = sys_write(fd, pos, len);
+      auto res = sys::write(fd, pos, len);
       if(res<0)
-        sys_write(2,L("write:<msg>\n"));
+        sys::write(2,L("write:<msg>\n"));
       return res;
     };
 };

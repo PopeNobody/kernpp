@@ -47,6 +47,7 @@ namespace fmt
 				*--end=' ';
 		return end;
 	};
+        using namespace sys;
 	inline int write_dec(fd_t fd, size_t val) {
 		char buf[sizeof(val)*4];
 		return write(fd, fmt::fmt_dec(val,buf,&buf[sizeof(buf)-1]));

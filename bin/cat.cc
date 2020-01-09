@@ -22,12 +22,6 @@ ssize_t min(ssize_t lhs, ssize_t rhs) {
   write(2,L("\n")); \
 }  while(false);
 #endif
-void sleepy(size_t secs, size_t nano){
-  timespec tm;
-  tm.tv_sec=secs;
-  tm.tv_nsec=nano;
-  nanosleep(&tm,0);
-}
 template<size_t size_>
 struct buf_t {
   enum { size=size_ };
@@ -37,30 +31,21 @@ struct buf_t {
 buf_t<1024*10> buf;
 bool catfile(int fd)
 {
-  ssize_t res=0;
   while(true)
   {
-    sleepy(0,1000000);
-    res=read(fd,buf.buf,sizeof(buf.buf));
-    if(res==0)
+    size_t rres=read(fd,buf.buf,sizeof(buf.buf));
+    if(rres==0)
       return true;
-    if(res<0){
-      write(2,L("error\n"));
+    if(rres<0){
+      write(2,L("read error\n"));
       return false;
     };
-    typedef char* char_p;
-    char_p beg=buf.buf;
-    char_p end=beg+res;
-    while(beg<end){
-      ssize_t tmp=write(1,beg,end-beg);
-      if(tmp<0)
-        return false;
-      beg+=tmp;
-    };
+    size_t wres=full_write(fd,buf.buf,rres);
+    if(wres>=0)
+      continue;
+    write(2,L("write error\n"));
+    return false;
   }
-  if(res<0)
-    write(2,L("read error\n"));
-  return !res;
 };
 inline open_mode operator|(open_mode lhs, open_mode rhs) {
   return open_mode(int(lhs)|int(rhs));
@@ -79,11 +64,11 @@ int main(int argc, char**argv) {
         } else {
           write(2,L("-o given without another arg\n"));
         };
-        sys_close(1);
+        sys::close(1);
         int fd=open(fname,open_flags(o_creat|o_append|o_wronly));
         if(fd!=1){
           dup2(fd,1);
-          sys_close(fd);
+          sys::close(fd);
         };
       } else {
         int fd=-1;
@@ -97,7 +82,7 @@ int main(int argc, char**argv) {
           };
         };
         catfile(fd);
-        sys_close(fd);
+        sys::close(fd);
         ++argv;
       } 
     }

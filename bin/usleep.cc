@@ -4,11 +4,6 @@
 #include <assert.hh>
 
 
-void err_exit(const char *message){
-  ssize_t res=write(2,message);
-  exit(1);
-};
-
 using namespace fmt;
 static void     handler(int val){
   write(2,L(__PRETTY_FUNCTION__));

@@ -24,7 +24,7 @@ inline int write_sphex(fd_t fd, size_t hex) {
 };
 using fmt::write_sphex;
 using fmt::fmt_sphex;
-
+using namespace sys;
 void assert_fail(const char *file, size_t line, const char *msg) {
   write(2,L("\n"));
   write(2,file);

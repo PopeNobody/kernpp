@@ -68,3 +68,4 @@ core
 *.ko
 kmod_dev/Module.symvers
 kmod_dev/modules.order
+powers
