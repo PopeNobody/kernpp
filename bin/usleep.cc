@@ -5,6 +5,7 @@
 
 
 using sys::write;
+using sys::nanosleep;
 using namespace fmt;
 
 void too_many() {

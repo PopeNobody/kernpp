@@ -3,7 +3,7 @@
 
 #include <types.hh>
 
-#if 0
+#if 1
 #define AAI __attribute__ ((__always_inline__))
 #else
 #define AAI
