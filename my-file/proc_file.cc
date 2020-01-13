@@ -1,5 +1,5 @@
-#include <syscall.hh>
-#include <fmt.hh>
+#include <iostream.h>
+#include <vector>
 
 using namespace sys;
 using namespace fmt;
@@ -7,6 +7,10 @@ using namespace fmt;
 struct c_str {
   char *beg;
   char *end;
+  c_str()
+    : beg(nullptr), end(nullptr)
+  {
+  };
   c_str(char *beg, char *end = 0)
     : beg(beg), end(end)
   {
@@ -52,7 +56,7 @@ int cmp(const c_str &lhs, const c_str &rhs) {
     char rchr=rhs[i];
     if(lchr==rchr)
       continue;
-    return lchr>rchr?-1:1;
+    return lchr<rchr?-1:1;
   };
   return cmp(lhs.len(),rhs.len());
 };
@@ -149,7 +153,57 @@ struct btree_t {
     write(1,L("}\n"));
   };
 };
-
+struct list_t {
+  c_str *beg;
+  size_t cap;
+  size_t cnt;
+  list_t()
+    :beg(new c_str[16]), cap(16), cnt(0)
+  {
+  };
+  size_t add(const c_str &str)
+  {
+    if(!cnt){
+      beg[cnt++]=str;
+      return cnt;
+    };
+    int cmp_res=cmp(beg[cnt-1],str);
+    if(cmp_res>0) {
+      write(2,"disorder\n  ");
+      write(2,beg[cnt-1]);
+      write(2,L("\n    >\n  "));
+      write(2,str);
+      write(2,L("\n\n"));
+      dump();
+      exit(1);
+    } 
+    if ( cmp_res ) {
+      if( cnt == cap ) {
+        size_t new_cap=cap*2;
+        c_str *new_beg=new c_str[new_cap];
+        for(int i = 0; i<cap; i++)
+          new_beg[i]=beg[i];
+        c_str *old_beg=beg;
+        beg=new_beg;
+        cap=new_cap;
+        delete old_beg;
+      } 
+      beg[cnt++]=str;
+    };
+    return cnt;
+  };
+  size_t size() const {
+    return cnt;
+  };
+  void dump() const {
+    for(size_t i=0;i<cnt;i++) {
+      write_dec(1,i);
+      write(1,L(" "));
+      write(1,beg[i]);
+      write(1,L("\n"));
+    };
+  };
+};
 struct isspace_t {
   char tab[256];
   isspace_t()
@@ -177,7 +231,6 @@ int main(int, char**)
     write(2,L("open failed\n"));
     exit(1);
   };
-  btree_t tree;
   write(2,L("opened: "));
   write_dec(2,fd);
   write(2,L("\n"));
@@ -191,6 +244,7 @@ int main(int, char**)
   write_ptr(2,data);
   write(2,L("\n"));
 
+  list_t list;
   char *beg=data;
   char *end=data+len;
   size_t lines=0;
@@ -214,16 +268,16 @@ int main(int, char**)
     *path.end=0;
     *name.end=0;
     *pkg.end=0;
-    tree.add(path);
+    list.add(path);
     if(!(++lines%10000)){
       write(1,L("lines: "));
       write_dec(1,lines);
       write(1,L(" nodes: "));
-      write_dec(1,tree.size());
+      write_dec(1,list.size());
       write(1,L("\n"));
     };
   };
-  tree.dump();
+  list.dump();
   return 0;
 };
 
