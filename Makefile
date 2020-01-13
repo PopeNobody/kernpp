@@ -31,6 +31,8 @@ ALL_SRC:=$(LIB_SRC) $(BIN_SRC)
 test: all
 
 all: $(BIN_EXE)
+
+sizes: all
 	@echo sizes
 	@du -k $(BIN_EXE) | sort -n | xargs -n 6 | column -t
 	@echo

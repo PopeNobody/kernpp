@@ -43,7 +43,7 @@ namespace sys {
   extern "C" {
   };
   enum open_mode {
-    o_default = 0
+    o_default = 0664
   };
   enum open_flags {
     o_rdonly  =  0000,

@@ -58,13 +58,15 @@ int main(int argc, char*argv[]) {
   timespec tm;
   if(optind<argc) {
     tm.tv_nsec=atoi(argv[optind++]);
-    write_tm(2,tm);write(2,L("\n"));
     if(tm.tv_nsec >= billion){
       tm.tv_sec=tm.tv_nsec/billion;
       tm.tv_nsec=tm.tv_nsec%billion;
-      write_tm(2,tm);write(2,L("\n"));
     };
+  } else {
+    tm.tv_sec=1;
+    tm.tv_nsec=0;
   };
+  write_tm(2,tm);write(2,L("\n"));
   nanosleep(&tm,0);
   return 0;
 };

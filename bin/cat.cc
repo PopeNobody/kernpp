@@ -2,6 +2,16 @@
 #include <syscall.hh>
 
 using namespace fmt;
+void fatal(const char *message, size_t len)
+{
+  if(len<0)
+    len=strlen(message);
+  write(2,message,len);
+  exit(1);
+}
+void fatal(const char *message){
+  fatal(message,strlen(message));
+}
 template <size_t size_> struct buf_t {
   enum { size = size_ };
   char buf[size - 1];
@@ -11,60 +21,60 @@ template <size_t size_> struct buf_t {
 };
 static buf_t<1024 * 10> buf;
 using namespace sys;
-bool catfile(int fd) {
+bool catfile(int ifd, int ofd)
+{
   while (true) {
-    size_t rres = read(fd, buf.buf, sizeof(buf.buf));
+    size_t rres = read(ifd, buf.buf, sizeof(buf.buf));
     if (rres == 0)
       return true;
-    if (rres < 0) {
-      write(2, L("read error\n"));
-      return false;
-    };
-    size_t wres = full_write(fd, buf.buf, rres);
-    if (wres >= 0)
-      continue;
-    write(2, L("write error\n"));
-    return false;
-  }
+    if (rres < 0)
+      fatal(L("read error\n"));
+    size_t wres=full_write(ofd, buf.buf, rres);
+    if (wres !=rres)
+      fatal(L("write error\n"));
+  };
 };
-inline open_mode operator|(open_mode lhs, open_mode rhs) {
-  return open_mode(int(lhs) | int(rhs));
-};
+
 int main(int argc, char **argv) {
+  const char *prog_name=*argv++;
   if (argc == 1)
-    ;
-  return catfile(0);
+    return catfile(0,1);
+  int ifd=-1;
+  int ofd=-1;
   while (*argv) {
-    if (argv[0][0] == '-' && argv[0][1] == 'o') {
-      char *fname;
-      if (argv[0][2]) {
-        fname = &argv[0][2];
-      } else if (*++argv) {
-        fname = *argv++;
-      } else {
-        write(2, L("-o given without another arg\n"));
-      };
-      sys::close(1);
-      int fd = open(fname, o_creat | o_append | o_wronly);
-      if (fd != 1) {
-        dup2(fd, 1);
-        sys::close(fd);
+    if (argv[0][0] == '-') {
+      if (argv[0][1] == 0) {
+        // We are catting stdin now.
+        ifd = 0;
+      } else if (argv[0][1] == 'o') {
+        // We have a specified output file.
+        char *fname=0;
+        if(argv[0][2]) {
+          // -ooutput.txt
+          fname=&argv[0][2];
+        } else if ( *++argv ) {
+          // -o output.txt
+          fname=*argv++;
+        } else {
+          fatal(L("'-o' given as last arg\n"));
+        };
+        sys::close(1);
+        ofd = open(fname, o_creat | o_append | o_wronly,o_default);
+        if(ofd<0)
+          fatal(L("failed to open output file"));
       };
     } else {
-      int fd = -1;
-      if (argv[0][0] == '-' && argv[0][1] == 0) {
-        fd = 0;
-      } else {
-        fd = open(*argv, o_rdonly);
-        if (fd < 0) {
-          write(2, L("open error\n"));
-          return 1;
-        };
+      ifd = open(*argv, o_rdonly);
+      if (ifd < 0) {
+        write(2, L("open error\n"));
+        return 1;
       };
-      catfile(fd);
-      sys::close(fd);
+      catfile(ifd,1);
+      if(ifd)
+        close(ifd);
       ++argv;
     }
-  }
+  };
+  close(ofd);
   return 0;
 }
