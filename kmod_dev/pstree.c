@@ -13,7 +13,7 @@ prtree_show(struct seq_file *m, void *v)
 
   //Loop over the tasks using the macro for_each_process
   for_each_process(task) {
-    seq_printf(m,"%9d %9d\n",task->pid,task->real_parent->pid);
+    seq_printf(m,"%9d %9d\n", task->real_parent->pid, task->pid);
   }
 
   return 0;

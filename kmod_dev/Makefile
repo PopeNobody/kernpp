@@ -1,6 +1,8 @@
 CONFIG_PROC_EX:=m
 
-obj-$(CONFIG_PROC_EX) += proc_tree.o
+test_pstree:
+
+obj-$(CONFIG_PROC_EX) += pstree.o
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
@@ -13,9 +15,9 @@ Makefile: ;
 test: demo-test
 	echo tested
 
-proc_tree: all
-	-sudo rmmod proc_tree.ko
+test_pstree: all
+	-sudo rmmod pstree.ko
 	sudo dmesg -c
-	sudo insmod proc_tree.ko
+	sudo insmod pstree.ko
 	dmesg
-	grep -n . /dev/null /proc/pstree
+	perl mktree.pl

@@ -59,3 +59,4 @@ vec
 wordexp_ex
 write_buf
 data
+*.mod.c
