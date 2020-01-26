@@ -1,6 +1,5 @@
 -fno-use-linker-plugin
 -fno-chkp-instrument-calls
--fomit-frame-pointer
 -ffast-math
 -fno-PIC
 -fno-chkp-check-incomplete-type

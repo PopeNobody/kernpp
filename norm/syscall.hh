@@ -353,20 +353,6 @@ namespace sys
 
     chk_return(res);
   };
-  // __NR_sigprocmask=14
-  inline int rt_sigprocmask(int how, sigset_p nset, sigset_p oset)
-  {
-    int res=-1;
-    asm(
-        "\tmovq %5,%%r10 ;\n"
-        "\tsyscall;\n"
-        : "=a" (res)
-        : "0" (14), "D" (how), "S" (nset), "d" (oset), "g"(sizeof(sigset_t))
-        : "r11","rcx","memory"
-       );
-
-    chk_return(res);
-  };
   // __NR_sigreturn=15
   inline void rt_sigreturn()
   {
@@ -385,27 +371,6 @@ namespace sys
 //         void *addr, size_t length, int prot, int flags, fd_t fd, off_t off
 //         )
   // __NR__ select = 23 
-inline int select(
-    int        n,
-    fd_set_p   inp,
-    fd_set_p   outp,
-    fd_set_p   exp,
-    timeval_p  tvp=0
-    )
-  {
-
-    uint64_t res;
-
-    __asm__ volatile (
-        "\tsyscall;\n"
-        : "=a" (res)
-        : "0" (23), "D" (n), "S" (inp), "d" (outp), "g" (exp), "g" (tvp)
-        : "rcx","memory", "r8", "r9" 
-        );
-
-    chk_return(res);
-  }
-
   // __NR_dup = 32
   inline int dup(fd_t fd) {
     int res=-1;
@@ -557,20 +522,12 @@ namespace sys {
 
 
 namespace std {
-  void abort() __attribute__((__noreturn__));
-  inline void abort(){
-    do {
-      asm("int3");
-    } while(true);
-  };
   void terminate() noexcept __attribute__((__noreturn__));
   using ::size_t;
   using ::free;
   using ::malloc;
   using ::realloc;
   using ::memset;
-  enum nothrow_t {
-  };
   extern const nothrow_t nothrow;
   enum align_val_t {
   };

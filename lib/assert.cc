@@ -27,4 +27,18 @@ void do_assert_fail(const char *file, unsigned line, const char *msg) {
   if(fatal)
     abort();
 };
+void do_warn_fail(
+    const char *file, unsigned line, const char *msg, bool getbetter
+    )
+{
+  write(2,file);
+  write(2,L(":"));
+  write_dec(2,line);
+  write(2,L(":"));
+  write(2,msg);
+  write(2,L("\n\n"));
+  if(!getbetter)
+    abort();
+};
+
 

@@ -1,41 +1,32 @@
 #include <syscall.hh>
 #include <fmt.hh>
+#include <write_buf.hh>
 
 using fmt::write_dec;
 using fmt::write_ptr;
 using fmt::write_hex;
+
 namespace fmt {
-inline char *fmt_sphex(unsigned long val, char *beg, char *end)
-{
-	int i=-2013;
-	for(i=0;i<2*sizeof(val);i++){
-		*--end=hex_dig(val);
-		if((val/=0x10)==0)
-			break;
-	};
-	for(;i<2*sizeof(val);i++)
-		*--end=' ';
-	return end;
-};
-inline int write_sphex(fd_t fd, size_t hex) {
-	char buf[sizeof(hex)*4];
-	return write(fd, fmt::fmt_sphex(hex,buf,&buf[sizeof(buf)-1]));
-};
+  inline char *fmt_sphex(unsigned long val, char *beg, char *end)
+  {
+    int i;
+    for(i=0;i<2*sizeof(val);i++){
+      *--end=hex_dig(val);
+      if((val/=0x10)==0)
+        break;
+    };
+    for(;i<2*sizeof(val);i++)
+      *--end=' ';
+    return end;
+  };
+  inline int write_sphex(fd_t fd, size_t hex) {
+    char buf[sizeof(hex)*4];
+    return write(fd, fmt::fmt_sphex(hex,buf,&buf[sizeof(buf)-1]));
+  };
 };
 using fmt::write_sphex;
 using fmt::fmt_sphex;
 using namespace sys;
-void assert_fail(const char *file, size_t line, const char *msg) {
-  write(2,L("\n"));
-  write(2,file);
-  write(2,L(":"));
-  write_dec(2,line);
-  write(2,L(":assert("));
-  write(2,msg);
-  write(2,L(") failed\n"));
-  exit(1);
-};
-#define assert(x) do{if(!(x))assert_fail(__FILE__,__LINE__,#x);}while(0)
 class block_l {
   enum magic_t { magic = 0xdeadbeef };
   struct block_t {
@@ -46,21 +37,14 @@ class block_l {
     magic_t magic3;
     bool used;
     void combine() {
-#if 0
-      write(2,L(__PRETTY_FUNCTION__));
-			write(2,L("\n  this="));
-			write_ptr(2,this);
-      write(2,L("\n"));
-#endif
-			if(!next)
-				return;
-			if(next->used)
-				return;
-			assert(char_p(next)==char_p(this)+sizeof(*this)+size);
-			size+=sizeof(*next)+next->size;
+      if(!next)
+        return;
+      if(next->used)
+        return;
+      warnif(char_p(next)!=char_p(this)+sizeof(*this)+size);
+      size+=sizeof(*next)+next->size;
       next=next->next;
     };
-
   };
   block_t *list;
   public:
@@ -70,11 +54,41 @@ class block_l {
   };
   void *malloc(size_t size)
   {
+    void *res=_malloc(size);
+    if(0){
+      write_buf<> msg(2);
+      msg.put("malloc(");
+      msg.fmt(size);
+      msg.put(") => ");
+      msg.fmtln(res);
+    };
+    return res;
+
+  };
+  void *_malloc(size_t size)
+  {
     block_t **pos=&list;
     while(*pos) {
-      assert((*pos)->magic1 == magic);
-      assert((*pos)->magic2 == magic);
-      assert((*pos)->magic3 == magic);
+      block_t *blk=*pos;
+      void *ptr = (void*)(blk+1);
+      if( blk->magic1 != magic || blk->magic2 != magic || blk->magic3 != magic ) 
+      {
+        write_buf<> msg(2);
+        msg.put(__FILE__);
+        msg.put(":");
+        msg.fmt(__LINE__);
+        msg.put(":");
+        msg.put("free: ");
+        msg.fmtln(ptr);
+        msg.put("blk: ");
+        msg.fmtln(blk);
+        msg.put("magic1: ");
+        msg.fmtln(hex_t((unsigned long)blk->magic1));
+        msg.put("magic2: ");
+        msg.fmtln(hex_t((unsigned long)blk->magic2));
+        msg.put("magic3: ");
+        msg.fmtln(hex_t((unsigned long)blk->magic3));
+      };
       if(!(*pos)->used && (*pos)->size>=size) {
         (*pos)->used=true;
         return *pos+1;
@@ -99,9 +113,28 @@ class block_l {
       return;
     block_t *blk=(block_t*)ptr;
     --blk;
-    assert(blk->magic1 == magic);
-    assert(blk->magic2 == magic);
-    assert(blk->magic3 == magic);
+    if( blk->magic1 != magic || blk->magic2 != magic || blk->magic3 != magic ) 
+    {
+      write_buf<> msg(2);
+      msg.put(__FILE__);
+      msg.put(":");
+      msg.fmt(__LINE__);
+      msg.put(":");
+      msg.put("free: ");
+      msg.fmtln(ptr);
+      msg.put("blk: ");
+      msg.fmtln(blk);
+      msg.put("magic1: ");
+      msg.fmtln(hex_t((unsigned long)blk->magic1));
+      msg.put("magic2: ");
+      msg.fmtln(hex_t((unsigned long)blk->magic2));
+      msg.put("magic3: ");
+      msg.fmtln(hex_t((unsigned long)blk->magic3));
+      msg.flush();
+    };
+    warnif(blk->magic1 != magic);
+    warnif(blk->magic2 != magic);
+    warnif(blk->magic3 != magic);
     if(!blk->used) {
       write(2,L("warning: double free of: "));
       write_ptr(2,ptr);
@@ -132,21 +165,21 @@ class block_l {
 };
 block_l list;
 extern "C" {
-	void mm_show() {
-		list.show();
-	};
+  void mm_show() {
+    list.show();
+  };
 };
 void *malloc(size_t size) {
 #if 1
-	return list.malloc(size);
+  return list.malloc(size);
 #else
-	write(2,L("malloc("));
-	write_dec(2,size);
-	write(2,L(") => "));
+  write(2,L("malloc("));
+  write_dec(2,size);
+  write(2,L(") => "));
   void *res=list.malloc(size);
-	write_ptr(2,res);
-	write(2,L("\n"));
-	return res;
+  write_ptr(2,res);
+  write(2,L("\n"));
+  return res;
 #endif
 };
 void *realloc(void *ptr, size_t size) {

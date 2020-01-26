@@ -8,7 +8,7 @@ int main(int argc, char **argv)
   char **w;
   int i;
 
-  wordexp("*.cc", &p, 0);
+  wordexp("*.*", &p, 0);
   w = p.we_wordv;
   for (i = 0; i < p.we_wordc; i++)
     printf("%s\n", w[i]);

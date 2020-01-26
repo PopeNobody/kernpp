@@ -59,6 +59,7 @@ namespace fmt {
     char buf[sizeof(ptr) * 4];
     return write(fd, fmt::fmt_ptr((void *)ptr, buf, &buf[sizeof(buf) - 1]));
   };
+#if 0
   inline int write_tm(fd_t fd, timeval &tm) {
     char buf[(sizeof(tm.tv_sec) + sizeof(tm.tv_nsec)) * 4 + 16];
     char *const end = &buf[sizeof(buf) - 1];
@@ -81,6 +82,7 @@ namespace fmt {
     *--pos = '{';
     return write(fd, pos, end);
   };
+#endif
   inline int atoi(const char *a) {
     int i = 0;
     char ch;

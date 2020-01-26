@@ -21,7 +21,7 @@ void handle_error(errno_t err, const char *call)
   write(2,buf,pos-buf);
   exit(1);
 };
-
+using sys::errno;
 template<typename int_t>
 void write_dec(fd_t fd, int_t val) {
   char buf[sizeof(val)*5];

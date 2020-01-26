@@ -1,5 +1,5 @@
+#include <debug.hh>
 typedef unsigned long size_t;
-typedef int fd_t;
 typedef long ssize_t;
 typedef unsigned char uint8_t;
 
@@ -59,7 +59,11 @@ extern "C" {
 
 		count = __fini_array_end - __fini_array_start;
 		for (i = count - 1; i >= 0; i--)
-			__fini_array_start[i]();
+                {
+                  debug(i);
+                  debug((void*)__fini_array_start[i]);
+                  __fini_array_start[i]();
+                };
 
 		//_fini();
 	}

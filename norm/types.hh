@@ -17,8 +17,6 @@ typedef unsigned short int uint16_t;
 typedef void* void_p;
 
 struct iocb;
-struct fd_set;
-typedef fd_set* fd_set_p;
 struct sigaction_t {
 	void (*sa_handler) (int);
 	unsigned long sa_flags;
@@ -26,8 +24,6 @@ struct sigaction_t {
 	unsigned long sa_mask;
 };
 typedef sigaction_t* sigaction_p;
-typedef uint64_t sigset_t;
-typedef sigset_t *sigset_p;
 struct iovec;
 typedef iovec* iovec_p;
 struct timeval;
@@ -58,10 +54,6 @@ struct linux_dirent64;
 typedef linux_dirent64* linux_dirent64_p;
 struct sigevent;
 typedef sigevent* sigevent_p;
-struct timer_t;
-typedef timer_t* timer_p;
-struct timezone;
-typedef timezone* timezone_p;
 struct rlimit;
 typedef rlimit* rlimit_p;
 struct rlimit64;
@@ -120,10 +112,6 @@ typedef int key_t;
 typedef key_t* key_p;
 typedef int sig_t;
 typedef sig_t* sig_p;
-typedef int uid_t;
-typedef uid_t* uid_p;
-typedef int gid_t;
-typedef gid_t* gid_p;
 typedef int umode_t;
 struct kexec_segment;
 typedef kexec_segment* kexec_segment_p;
@@ -167,7 +155,6 @@ typedef int64_t ssize_t;
 typedef signed int __int32_t;
 typedef signed long int __int64_t;
 typedef signed short int __int16_t;
-typedef uint64_t __fsid_t;
 typedef uint8_t __u_char;
 typedef uint32_t __gid_t;
 typedef uint32_t __id_t;
@@ -194,16 +181,6 @@ typedef uint64_t __u_quad_t;
 typedef uint64_t ino64_t;
 typedef unsigned short int __u_short;
 typedef void * __timer_t;
-struct timeval
-{
-  time_t tv_sec;
-  int64_t tv_nsec;
-};
-struct timespec
-{
-  time_t tv_sec;
-  int64_t tv_nsec;
-};
 enum ftype_t {
 	DT_UNKNOWN = 0,
 	DT_FIFO = 1,
@@ -233,9 +210,12 @@ struct iovec {
 
 typedef timespec* timespec_p;
 
+#ifndef NULL
 #define NULL nullptr
-//#define offsetof(type, field)	((long) &((type *)0)->field)
+#endif
+#ifndef offsetof
 #define offsetof(TYPE, MEMBER) __builtin_offsetof (TYPE, MEMBER)
+#endif
 struct hex_t {
   size_t val;
   size_t size;

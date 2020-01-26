@@ -51,48 +51,48 @@ if(grep({ /^--dump$/ } @ARGV ))
   print Dumper(\@idx);
   exit(0);
 };
-my $pat="bash";
-if(@ARGV) {
-  $pat=join("|",@ARGV);
-};
-my $sel = new IO::Select;
-my @lines;
 my $max_procs=4;
 sub do_one_index($$);
+my %proc;
+
 for(@idx) {
-  my $pipe = new IO::Pipe;
-  if(!fork) {
-    do_one_index($pipe->writer,$_->{FILENAME});
+  my ($fn) = $_->{FILENAME};
+  my ($of) = map { "data/$_" } map { m{^.*/(.*).lz4$} } $fn;
+  $_->{UC_FILENAME}=$of;
+  if(my $pid=fork) {
+    $proc{$pid}=$_;
+    debug("started child $pid");
+  } else {
+    do_one_index($fn,$of);
     die "do_one_index() returned!";
   }
-  my $r=$pipe->reader;
-  $sel->add($r);
 };
-debug("started @{[$sel->count]} children");
-while($sel->count){
-  process_some_lines();
+debug("started @{[scalar(keys %proc)]} children");
+while((my $pid=wait)!=-1){
+  print STDERR "pid $pid returned $?";
 };
 exit(0);
 sub do_one_index($$) 
 {
-  my ($fh,$fn) = (shift, shift);
-  # Send output to a pipe.
-  open(STDOUT,">&".fileno($fh));
-  close($fh);
+  my ($fn,$of) = (shift, shift);
+  mkpath("data") unless -d "data";
+  open(STDOUT,"> $of.new");
   my $stime = time;
-  open(STDIN,"< ".$_->{FILENAME});
-  open(STDIN,"lz4cat|");
-  my $match=0;
-  while(<STDIN>){
-    next unless /$pat/o;
-    ++$match;
-    print;
+  open(STDIN,"< $fn");
+  system("lz4cat");
+  if($?) {
+    warn("lz4cat returned $?");
+    unlink("$of.new");
+    exit(1);
+  } else {
+    rename("$of.new","$of");
+    exit(0);
   };
-  $stime = time-$stime;
-  debug("got $. lines in $stime seconds with $match matches");
-  exit(0);
+  die "exec:lz4cat:$!";
 };
 sub process_some_lines {
+  my $sel;
+  die;
   my @can=$sel->can_read();
   for my $fh (@can)
   {
@@ -108,86 +108,3 @@ sub process_some_lines {
     debug("processed $lines lines") if $lines;
   };
 };
-__DATA__
-sub decompress {
-  my $fn=shift;
-  my $cnt=0;
-  system("lz4cat $fn");
-  exit($?);
-};
-my $sel=new IO::Select;
-sub check {
-  my @can = $sel->can_read();
-  print STDERR scalar(@can), " handles ready\n";
-  for my $fh (@can) {
-    print STDERR "fh ", fileno($fh), "ready\n";
-    print STDERR "reading\n";
-    my $line=<$fh>;
-    print STDERR "read ", defined($line)?"line":"undef", "\n";
-  };
-};
-my (@fhs);
-for(@idx) {
-  my $pid;
-  my $pipe = new IO::Pipe;
-  if($pid=fork) {
-    my $fh=$pipe->reader();
-    print STDERR "$fh done\n";
-    push(@fhs, $fh);
-  } else {
-    my $fh=$pipe->writer();
-    open(STDOUT,">&".fileno($fh));
-    close($fh);
-    sleep(60);
-    decompress $_->{FILENAME};
-  };
-};
-{
-  my $flags;
-  sub nonblock($) {
-    for(@_) {
-      use Fcntl;
-      $flags = "";
-      fcntl($_, F_GETFL, $flags) or die "Couldn't get flags for HANDLE: $!\n";
-      $flags |= O_NONBLOCK;
-      fcntl($_, F_SETFL, $flags) or die "Couldn't set flags for HANDLE: $!\n";
-    };
-  };
-};
-my @lines;
-nonblock(@fhs);
-while(1) {
-  my @lines = map { <$_> } @fhs;
-  print Dumper(\@lines);
-  sleep(1);
-};
-print STDERR "setup done!\n";
-__DATA__
-
-use IO::File;
-use IO::Pipe;
-$0="MyFile!";
-for(@idx) {
-  my $fn=$_->{FILENAME};
-  print "$$:starting $fn\n";
-  decompress($fn);
-  print "$$:finished $fn\n";
-};
-debug("$$:all children started");
-
-while($s->count()){
-  while(@can=$s->can_read){
-    my $tot=0;
-    for(@can) {
-      my ($fh,$idx) = @$_;
-      my $l=<$fh>;
-      if(defined($l)){
-        ++$num;
-      } else {
-        $s->remove($fh);
-        ++$x;
-      };
-    };
-  };
-};
-my @cmd = ( qw(/usr/lib/apt/apt-helper), "cat-file");
