@@ -1,9 +1,9 @@
 test:
-	./bin/usleep
+	cd my-file && ./proc_file
 
 
 MAKEFLAGS:=-rR
-AR_FLAGS = rvU
+AR_FLAGS = rU
 LD_FLAGS = @ld_flags
 CPPFLAGS= @cppflags 
 DEPFLAGS= -MF $<.d -MT $@ -MD
@@ -15,6 +15,7 @@ LD= ld.gold
 
 BIN_SRC:=$(wildcard bin/*.cc bin/*.S)
 LIB_SRC:=$(wildcard lib/*.cc lib/*.S)
+MYF_SRC:=$(wildcard my-file/*.cc)
 
 
 BIN_ASM:=$(patsubst %.S,  %, $(filter %.S,  $(BIN_SRC)))
@@ -23,14 +24,29 @@ BIN_CXX:=$(patsubst %.cc, %, $(filter %.cc, $(BIN_SRC)))
 LIB_ASM:=$(patsubst %.S,  %, $(filter %.S,  $(LIB_SRC)))
 LIB_CXX:=$(patsubst %.cc, %, $(filter %.cc, $(LIB_SRC)))
 
+MYF_ASM:=$(patsubst %.S,  %, $(filter %.S,  $(MYF_SRC)))
+MYF_CXX:=$(patsubst %.cc, %, $(filter %.cc, $(MYF_SRC)))
+
+my-file/check_print:
+	@echo not making
+
+my-file/check_print.o:
+	@echo not making
+
+lib/strerror_list.cc: script/genstrerror.pl
+	vi_perl $<
+
 START:= lib/start.o
 BIN_EXE:=$(BIN_CXX) $(BIN_ASM)
+MYF_EXE:=$(MYF_CXX)
+
 LIB_LIB:=lib/libkernpp.a
 LIB_OBJ:=$(filter-out $(START), $(patsubst %,%.o,$(LIB_CXX) $(LIB_ASM)))
-ALL_SRC:=$(LIB_SRC) $(BIN_SRC)
+
+ALL_SRC:=$(LIB_SRC) $(BIN_SRC) $(MYF_SRC)
 test: all
 
-all: $(BIN_EXE)
+all: $(BIN_EXE) $(MYF_CXX)
 
 sizes: all
 	@echo sizes
@@ -41,11 +57,13 @@ sizes: all
 	@echo
 
 $(LIB_LIB): $(LIB_OBJ)
-	ar $(AR_FLAGS) $@ $(LIB_OBJ)
+	ar $(AR_FLAGS) $@.new $(LIB_OBJ)
+	mv $@.new $@
 
 bin/false bin/true: START:=
 
-$(BIN_EXE): %: %.o $(START) $(LIB_LIB) cxxflags cppflags ld_flags
+.PRECIOUS:
+%: %.o $(START) $(LIB_LIB) cxxflags cppflags ld_flags
 	$(LD) -static $(START) $<  $(LIB_LIB) -o $@
 
 %.o: %.S
@@ -58,8 +76,6 @@ $(BIN_EXE): %: %.o $(START) $(LIB_LIB) cxxflags cppflags ld_flags
 
 tags:
 	ctags -R .
-
-$(ALL_SRC) $(ALL_SRC:=.d):;
 
 include /dev/null $(wildcard $(ALL_SRC:=.d))
 
