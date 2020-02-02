@@ -18,8 +18,8 @@ sub code_sort {
 $\="\n";
 $,=" ";
 
-print q(#file script/genheaders.pl);
-print q(#line 1);
+print q(#file __FILE__);
+print q(#line __LINE__);
 print q(extern "C" {);
 for my $name (sort {code_sort} keys %calls) {
 	our(%call);
