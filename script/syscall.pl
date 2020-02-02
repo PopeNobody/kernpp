@@ -46,7 +46,7 @@
     'args' => [
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'int',
@@ -78,7 +78,7 @@
     'args' => [
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'stat_p',
@@ -110,7 +110,7 @@
     'args' => [
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'stat_p',
@@ -410,7 +410,7 @@
     'args' => [
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'int',
@@ -1501,7 +1501,7 @@
     'args' => [
       [
         'istr_t',
-        'filename'
+        'path'
       ]
     ],
     'ret' => 'int'
@@ -1525,11 +1525,11 @@
     'args' => [
       [
         'istr_t',
-        'oldname'
+        'opath'
       ],
       [
         'istr_t',
-        'newname'
+        'npath'
       ]
     ],
     'ret' => 'int'
@@ -1541,7 +1541,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'int',
@@ -1557,7 +1557,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ]
     ],
     'ret' => 'int'
@@ -1569,7 +1569,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'int',
@@ -1585,11 +1585,11 @@
     'args' => [
       [
         'istr_t',
-        'oldname'
+        'opath'
       ],
       [
         'istr_t',
-        'newname'
+        'npath'
       ]
     ],
     'ret' => 'int'
@@ -1601,7 +1601,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ]
     ],
     'ret' => 'int'
@@ -1613,11 +1613,11 @@
     'args' => [
       [
         'istr_t',
-        'oldname'
+        'opath'
       ],
       [
         'istr_t',
-        'newname'
+        'npath'
       ]
     ],
     'ret' => 'int'
@@ -1649,7 +1649,7 @@
     'args' => [
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'mode_t',
@@ -1681,7 +1681,7 @@
     'args' => [
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'uid_t',
@@ -1721,7 +1721,7 @@
     'args' => [
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'uid_t',
@@ -2274,7 +2274,7 @@
     'args' => [
       [
         'ostr_t',
-        'filename'
+        'path'
       ],
       [
         'utimbuf_p',
@@ -2290,7 +2290,7 @@
     'args' => [
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'umode_t',
@@ -2343,7 +2343,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'statfs_p',
@@ -2717,7 +2717,7 @@
     'args' => [
       [
         'istr_t',
-        'filename'
+        'path'
       ]
     ],
     'ret' => 'int'
@@ -3061,7 +3061,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'istr_t',
@@ -3089,7 +3089,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'istr_t',
@@ -3145,7 +3145,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'istr_t',
@@ -3169,7 +3169,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'istr_t',
@@ -3217,7 +3217,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'ostr_t',
@@ -3237,7 +3237,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'ostr_t',
@@ -3277,7 +3277,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'istr_t',
@@ -3293,7 +3293,7 @@
     'args' => [
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'istr_t',
@@ -3920,7 +3920,7 @@
     'args' => [
       [
         'ostr_t',
-        'filename'
+        'path'
       ],
       [
         'timeval_p',
@@ -4324,7 +4324,7 @@
       ],
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'uint32_t',
@@ -4384,7 +4384,7 @@
       ],
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'int',
@@ -4408,7 +4408,7 @@
       ],
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'int',
@@ -4428,7 +4428,7 @@
       ],
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'int',
@@ -4452,7 +4452,7 @@
       ],
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'uid_t',
@@ -4480,7 +4480,7 @@
       ],
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'timeval_p',
@@ -4500,7 +4500,7 @@
       ],
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'stat_p',
@@ -4524,7 +4524,7 @@
       ],
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'int',
@@ -4544,7 +4544,7 @@
       ],
       [
         'istr_t',
-        'oldname'
+        'opath'
       ],
       [
         'fd_t',
@@ -4552,7 +4552,7 @@
       ],
       [
         'istr_t',
-        'newname'
+        'npath'
       ]
     ],
     'ret' => 'int'
@@ -4568,7 +4568,7 @@
       ],
       [
         'istr_t',
-        'oldname'
+        'opath'
       ],
       [
         'fd_t',
@@ -4576,7 +4576,7 @@
       ],
       [
         'istr_t',
-        'newname'
+        'npath'
       ],
       [
         'int',
@@ -4592,7 +4592,7 @@
     'args' => [
       [
         'istr_t',
-        'oldname'
+        'opath'
       ],
       [
         'fd_t',
@@ -4600,7 +4600,7 @@
       ],
       [
         'istr_t',
-        'newname'
+        'npath'
       ]
     ],
     'ret' => 'int'
@@ -4616,7 +4616,7 @@
       ],
       [
         'istr_t',
-        'pathname'
+        'path'
       ],
       [
         'ostr_t',
@@ -4640,7 +4640,7 @@
       ],
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'mode_t',
@@ -4660,7 +4660,7 @@
       ],
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'int',
@@ -4924,7 +4924,7 @@
       ],
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'timespec_p',
@@ -5379,8 +5379,8 @@
         'dfd'
       ],
       [
-        'long',
-        'pathname'
+        'istr_t',
+        'path'
       ]
     ],
     'ret' => 'int'
@@ -5716,7 +5716,7 @@
       ],
       [
         'istr_t',
-        'oldname'
+        'opath'
       ],
       [
         'int',
@@ -5724,7 +5724,7 @@
       ],
       [
         'istr_t',
-        'newname'
+        'npath'
       ],
       [
         'unsigned',
@@ -5848,7 +5848,7 @@
       ],
       [
         'istr_t',
-        'filename'
+        'path'
       ],
       [
         'istr_v',

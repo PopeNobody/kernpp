@@ -5,11 +5,14 @@ int main(int, char**) {
   typedef long double xld;
   long double max_size_t = 0xffffffff;
 #define showl(x) fprintf(stderr, "%-40s %30.4LF\n", #x, (long double)x)
-
-  for(int i = 0; i < 81; i+=3){
-    showl(powl(2,i));
-    showl(powl(10,floorl(logl(powl(2,i))/logl(10))));
-  };
+  showl(powl(2,10));
+  showl(powl(10,10));
+  showl(logl(powl(10,10))/logl(2));
+  showl(powl(2,33.2192));
+//     for(int i = 0; i < 81; i+=3){
+//       showl(powl(2,i));
+//       showl(powl(10,floorl(logl(powl(2,i))/logl(10))));
+//     };
   return 0;
 };
 //     showl(logl(powl(2,63))/logl(1000));

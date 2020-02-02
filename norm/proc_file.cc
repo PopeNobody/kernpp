@@ -3,16 +3,20 @@
 #include <array>
 #include <map>
 #include <errno.h>
-#include <c_str.hh>
+#include "c_str.hh"
 namespace sys {
   void perror(const c_str &msg);
   void pexit(const c_str &msg);
   void pexit(const c_str &msg1, const c_str &msg2);
   void perror(const c_str &msg1, const c_str &msg2);
 };
-#include <write_buf.hh>
 #include <vector>
-#include <debug.hh>
+#include "write_buf.hh"
+#include "debug.hh"
+
+extern "C" {
+  char *strerror(int errnum);
+};
 
 using std::vector;
 using std::map;
@@ -448,10 +452,6 @@ void sys::pexit(const c_str &msg)
   perror(msg);
   exit(1);
 };
-const c_str &sys::strerror(errno_t err){
-  static c_str msg(L("Unknown Error"));
-  return msg;
-};
 void sys::perror(const c_str &msg1, const c_str &msg2)
 {
   write_buf<> buf(2);
@@ -463,7 +463,7 @@ void sys::perror(const c_str &msg1, const c_str &msg2)
     buf.put(msg2);
     buf.put(":");
   };
-  buf.putln(sys::strerror(*::__errno_location()));
+  buf.putln(strerror(*::__errno_location()));
 };
 void sys::pexit(const c_str &msg1, const c_str &msg2) {
   sys::perror(msg1,msg2);
@@ -555,16 +555,10 @@ int c_str::cmp(size_t lhs, size_t rhs) {
 };
 int c_str::cmp(const c_str &lhs, const c_str &rhs)
 {
-  lhs.check(); rhs.check();
   int res = cmp(lhs.len(),rhs.len());
   if(!res)
     res=strncmp(lhs.beg,rhs.beg,lhs.len());
   return res;
-};
-void c_str::check() const
-{
-  assert(end>=beg);
-  assert(end-beg<4097);
 };
 
 
