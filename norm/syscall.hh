@@ -1,8 +1,8 @@
 #ifndef syscall_hh
 #define syscall_hh syscall_hh
 
-#include <types.hh>
-#include <errno.hh>
+#include "types.hh"
+#include "errno.hh"
 
 #if 1
 #define AAI __attribute__ ((__always_inline__))
@@ -175,7 +175,7 @@ extern "C" {
     const char *s1=(const char*)_s1;
     const char *s2=(const char*)_s2;
     for(size_t i=0;i<n;i++){
-      if(res=s1[i]-s2[i])
+      if((res=s1[i]-s2[i]))
         break;
     };
     return res;
@@ -457,7 +457,7 @@ namespace sys
     chk_return(res);
   };
   //#define __NR_time 201
-  inline time_t time(time_t *buf) {
+  inline time_t time(time_t *buf) throw() {
     time_t res=-1;
     asm (
         "syscall\n"
@@ -529,8 +529,8 @@ namespace std {
   using ::realloc;
   using ::memset;
   extern const nothrow_t nothrow;
-  enum align_val_t {
-  };
+//     enum align_val_t {
+//     };
   typedef void (*new_handler)();
 };
 extern "C" {

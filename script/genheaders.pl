@@ -2,11 +2,14 @@
 
 use strict;
 use warnings;
+use autodie qw(:all);
 use Data::Dumper;
 $|++;
-our(%calls);
 use FindBin;
 use lib "$FindBin::Bin";
+
+
+our(%calls);
 require "syscall.pl" or die "$@";
 
 sub code_sort {

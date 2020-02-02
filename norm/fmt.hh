@@ -1,8 +1,8 @@
 #ifndef fmt_hh
 #define fmt_hh
 
-#include <syscall.hh>
-#include <c_str.hh>
+#include "syscall.hh"
+#include "c_str.hh"
 #if 1
 #define AAI __attribute__((__always_inline__))
 #else
@@ -83,31 +83,6 @@ namespace fmt {
     return write(fd, pos, end);
   };
 #endif
-  inline int atoi(const char *a) {
-    int i = 0;
-    char ch;
-    while (ch = *a++) {
-      switch (ch) {
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case '0':
-          i *= 10;
-          i += (ch - '0');
-          break;
-        default:
-          write(2, "err!");
-          exit(1);
-      };
-    };
-    return i;
-  };
 #define show_val(x) do_show_val(L(#x),(x))
 #define show_dec(x)                                                            \
   do {                                                                         \

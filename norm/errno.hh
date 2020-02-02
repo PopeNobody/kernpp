@@ -1,7 +1,7 @@
 #ifndef errno_hh
 #define errno_hh errno_hh
 
-#include <types.hh>
+#include "types.hh"
 
 #define	EPERM		 1	/* Operation not permitted */
 #define	ENOENT		 2	/* No such file or directory */
@@ -44,7 +44,6 @@ namespace sys {
   typedef long errno_t;
   extern errno_t errno;
   ssize_t set_errno(errno_t err);
-  const c_str &strerror(errno_t err=errno);
   void perror(const c_str &msg1, const c_str &msg2);
   void pexit(const c_str &msg1, const c_str &msg2);
   void perror(const c_str &msg1);

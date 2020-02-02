@@ -1,11 +1,10 @@
 #include <syscall.hh>
 #include <new.hh>
 #include <typeinfo.hh>
-#include <buffd.hh>
 #include <assert.hh>
-using namespace fmt;
-
+using namespace sys;
 #if 0
+using namespace fmt;
 
 char *fmt_chr(char ch, char *beg, char *pos) {
   assert(beg<pos);

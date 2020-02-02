@@ -3,7 +3,8 @@
 #include <write_buf.hh>
 
 using fmt::fmt_t;
-void _debug(const char *file, unsigned line, const char *name, c_str val) 
+template<>
+void _debug<c_str>(const char *file, unsigned line, const char *name, c_str val) 
 {
   write_buf<> buf(2);
   buf.put(file);
@@ -15,7 +16,8 @@ void _debug(const char *file, unsigned line, const char *name, c_str val)
   buf.put(val);
   buf.putln("\"");
 };
-void _debug(const char *file, unsigned line, const char *name, const char * val) 
+template<>
+void _debug<const char*>(const char *file, unsigned line, const char *name, const char * val) 
 {
   fmt_t linefmt(line);
   write_buf<> buf(2);
@@ -28,7 +30,8 @@ void _debug(const char *file, unsigned line, const char *name, const char * val)
   buf.put(val);
   buf.putln("\"");
 };
-void _debug(const char *file, unsigned line, const char *name, void *val) 
+template<>
+void _debug<void*>(const char *file, unsigned line, const char *name, void *val) 
 {
   fmt_t linefmt(line);
   write_buf<> buf(2);
@@ -40,7 +43,8 @@ void _debug(const char *file, unsigned line, const char *name, void *val)
   buf.put("=");
   buf.putln(fmt_t(val));
 };
-void _debug(const char *file, unsigned line, const char *name, int val) 
+template<>
+void _debug<int>(const char *file, unsigned line, const char *name, int val) 
 {
   fmt_t linefmt(line);
   write_buf<> buf(2);
@@ -52,7 +56,8 @@ void _debug(const char *file, unsigned line, const char *name, int val)
   buf.put("=");
   buf.putln(fmt_t(val));
 };
-void _debug(const char *file, unsigned line, const char *name, size_t val) 
+template<>
+void _debug<size_t>(const char *file, unsigned line, const char *name, size_t val) 
 {
   fmt_t linefmt(line);
   write_buf<> buf(2);
@@ -66,7 +71,8 @@ void _debug(const char *file, unsigned line, const char *name, size_t val)
 };
 static time_t first=sys::time(0);
 static time_t last=first;
-void _debug(const char *file, unsigned line, const char *name, time_t val) 
+template<>
+void _debug<time_t>(const char *file, unsigned line, const char *name, time_t val) 
 {
   fmt_t linefmt(line);
   write_buf<> buf(2);

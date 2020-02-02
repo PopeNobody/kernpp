@@ -236,14 +236,5 @@ typedef timespec* timespec_p;
 #define NULL nullptr
 //#define offsetof(type, field)	((long) &((type *)0)->field)
 #define offsetof(TYPE, MEMBER) __builtin_offsetof (TYPE, MEMBER)
-struct hex_t {
-  size_t val;
-  size_t size;
-  template<typename val_t>
-  hex_t(val_t val)
-    : val(val), size(sizeof(val))
-  {
-  };
-};
 
 #endif

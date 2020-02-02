@@ -26,24 +26,15 @@ struct write_buf
   {
     flush();
   };
+  void flush();
   size_t room() const {
     return size-pos;
-  };
-  void flush()
-  {
-    if(!pos)
-      return;
-    tot+=pos;
-    call_write(fd,c_str(buf,pos));
-    pos=0;
-    memset(&buf,0,end-buf);
   };
   bool between(char min, char val, char max) {
     return min<=val && val<=max;
   };
   void put(c_str str)
   {
-    check_print(str);
     // this while will repeat if there are zeroes in the str.
     while(str) {
       size_t room=this->room();
@@ -66,7 +57,6 @@ struct write_buf
   };
   void putln(c_str str)
   {
-    check_print(str);
     put(str);
     switch(room()) {
       case 0:

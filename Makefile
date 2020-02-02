@@ -1,7 +1,4 @@
-test:
-	cd my-file && ./proc_file
-
-
+all:
 MAKEFLAGS:=-rR
 AR_FLAGS = rU
 LD_FLAGS = @ld_flags
@@ -10,12 +7,11 @@ DEPFLAGS= -MF $<.d -MT $@ -MD
 CXXFLAGS:= @cxxflags
 
 CXX:= g++
-LD= ld.gold 
+LD= ld
 
 
 BIN_SRC:=$(wildcard bin/*.cc bin/*.S)
 LIB_SRC:=$(wildcard lib/*.cc lib/*.S)
-MYF_SRC:=$(wildcard my-file/*.cc)
 
 
 BIN_ASM:=$(patsubst %.S,  %, $(filter %.S,  $(BIN_SRC)))
@@ -24,8 +20,9 @@ BIN_CXX:=$(patsubst %.cc, %, $(filter %.cc, $(BIN_SRC)))
 LIB_ASM:=$(patsubst %.S,  %, $(filter %.S,  $(LIB_SRC)))
 LIB_CXX:=$(patsubst %.cc, %, $(filter %.cc, $(LIB_SRC)))
 
-MYF_ASM:=$(patsubst %.S,  %, $(filter %.S,  $(MYF_SRC)))
-MYF_CXX:=$(patsubst %.cc, %, $(filter %.cc, $(MYF_SRC)))
+#    MYF_SRC:=$(wildcard my-file/*.cc)
+#    MYF_ASM:=$(patsubst %.S,  %, $(filter %.S,  $(MYF_SRC)))
+#    MYF_CXX:=$(patsubst %.cc, %, $(filter %.cc, $(MYF_SRC)))
 
 my-file/check_print:
 	@echo not making
@@ -38,15 +35,18 @@ lib/strerror_list.cc: script/genstrerror.pl
 
 START:= lib/start.o
 BIN_EXE:=$(BIN_CXX) $(BIN_ASM)
-MYF_EXE:=$(MYF_CXX)
+#    MYF_EXE:=$(MYF_CXX)
 
 LIB_LIB:=lib/libkernpp.a
 LIB_OBJ:=$(filter-out $(START), $(patsubst %,%.o,$(LIB_CXX) $(LIB_ASM)))
 
-ALL_SRC:=$(LIB_SRC) $(BIN_SRC) $(MYF_SRC)
+ALL_SRC:=$(LIB_SRC) $(BIN_SRC) 
+# $(MYF_SRC)
 test: all
 
-all: $(BIN_EXE) $(MYF_CXX)
+all: $(BIN_EXE) 
+	
+# $(MYF_CXX)
 
 sizes: all
 	@echo sizes

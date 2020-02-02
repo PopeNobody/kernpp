@@ -23,24 +23,18 @@ class isprint_t
   };
 };
 const isprint_t isprint;
-void check_print(const c_str &str)
-{
-//     bool err=false;
-//     for(auto b(str.beg), e(str.end); b!=e; b++)
-//     {
-//       if(isprint(*b))
-//         continue;
-//       write_buf<> buf(2);
-//       buf.put("you have unprintable shit in your text: ");
-//       buf.fmt(int(*b));
-//       buf.flush();
-//       err=true;
-//     };
-//     if(err)
-//       abort();
-};
-void call_write(fd_t fd, const c_str &str) {
-  check_print(str);
-  sys::write(fd,str.beg,str.len());
-};
 
+template<size_t pages, size_t page_size>
+void write_buf<pages,page_size>::flush()
+{
+  if(!pos)
+    return;
+  tot+=pos;
+  write(fd,c_str(buf,pos));
+  pos=0;
+  memset(&buf,0,end-buf);
+};
+static write_buf<1,4096>*buf;
+void doit() {
+  buf->flush();
+};

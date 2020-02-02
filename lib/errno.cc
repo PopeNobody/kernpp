@@ -27,10 +27,6 @@ namespace sys {
     perror(msg);
     exit(1);
   };
-  const c_str &strerror(errno_t err){
-    static c_str msg(L("Unknown Error"));
-    return msg;
-  };
   void perror(const c_str &msg1, const c_str &msg2)
   {
     write_buf<> buf(2);

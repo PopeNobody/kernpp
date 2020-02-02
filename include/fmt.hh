@@ -12,6 +12,15 @@
 
 typedef unsigned fd_t;
 namespace fmt {
+  struct hex_t {
+    size_t val;
+    size_t size;
+    template<typename val_t>
+      hex_t(val_t val)
+      : val(val), size(sizeof(val))
+      {
+      };
+  };
   static inline char hex_dig(int val) {
     constexpr char digs[] = "0123456789abcdef";
     return digs[val & 0xf];
@@ -175,6 +184,10 @@ namespace fmt {
     {
       return pos=fmt_ptr(vp, buf, buf+pos)-buf;
     };
+    int fmt(const hex_t &val)
+    {
+      return pos=fmt_hex(val.val, buf, buf+pos)-buf;
+    };
     template<typename val_t>
       explicit fmt_t( val_t val )
       : pos(end-buf)
@@ -182,12 +195,6 @@ namespace fmt {
         buf[pos--]=0;
         fmt(val);
       };
-    explicit fmt_t( hex_t val )
-      : pos(end-buf)
-    {
-      buf[pos--]=0;
-      pos=fmt_hex(val.val,buf,buf+pos)-buf;
-    };
     c_str get() const {
       static size_t maxlen=0;
       c_str res(&buf[pos], &end[0]);

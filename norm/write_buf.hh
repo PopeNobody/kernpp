@@ -1,8 +1,8 @@
 #ifndef write_buf_hh
 #define write_buf_hh write_buf_ff
 
-#include <fmt.hh>
-#include <c_str.hh>
+#include "fmt.hh"
+#include "c_str.hh"
 
 void call_write(fd_t fd, const c_str &str);
 template<size_t pages=1, size_t page_size=4096>
@@ -56,12 +56,12 @@ struct write_buf
       } else if ( str.len() > room ) {
         char ch;
         while(str && room--)
-          if(ch=*str++)
+          if((ch=*str++))
             buf[pos++]=ch;
       } else {
         char ch;
         while(str)
-          if(ch=*str++)
+          if((ch=*str++))
             buf[pos++]=ch;
       };
     };

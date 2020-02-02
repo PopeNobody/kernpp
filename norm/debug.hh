@@ -1,9 +1,9 @@
 #ifndef debug_hh
 #define debug_hh debug_hh
 
-#include <types.hh>
+#include "types.hh"
 
-#include <c_str.hh>
+#include "c_str.hh"
 
 void _debug(const char *file, unsigned line, const char *name, hex_t val);
 void _debug(const char *file, unsigned line, const char *name, size_t val );

@@ -2,7 +2,11 @@ MAKEFLAGS= -rR
 
 all:
 
-cxx_exe:= wordexp_ex powers strerror proc_file
+CXX:=clang++
+
+cxx_exe:= wordexp_ex powers strerror proc_file regex forward xtest
+cxx_exe+= auto_ex
+
 cxx_src:= $(wildcard *.cc)
 cxx_lib:= # $(filter-out $(patsubst %,%.cc,$(cxx_exe)), $(cxx_src))
 
@@ -11,9 +15,9 @@ cxx_lib:= # $(filter-out $(patsubst %,%.cc,$(cxx_exe)), $(cxx_src))
 all: $(cxx_exe)
 
 $(cxx_exe): %: %.cc cxxflags
-	g++ @cxxflags -static -I. -g -E $@.cc -o $@.i -fPIC -dD
-	g++ @cxxflags -static -I. -g -S $@.i  -o $@.s -fPIC
-	g++ @cxxflags -static -I. -g    $@.s  -o $@   -fPIC
+	$(CXX) @cxxflags -static  -g -E $@.cc -o $@.i -fPIC -dD
+	$(CXX) @cxxflags -static  -g -S $@.i  -o $@.s -fPIC
+	$(CXX) @cxxflags -static  -g    $@.s  -o $@   -fPIC
 
 clean:
 	rm -f $(cxx_exe)

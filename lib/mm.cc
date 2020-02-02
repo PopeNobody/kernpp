@@ -73,6 +73,7 @@ class block_l {
       void *ptr = (void*)(blk+1);
       if( blk->magic1 != magic || blk->magic2 != magic || blk->magic3 != magic ) 
       {
+        using fmt::hex_t;
         write_buf<> msg(2);
         msg.put(__FILE__);
         msg.put(":");
@@ -115,6 +116,7 @@ class block_l {
     --blk;
     if( blk->magic1 != magic || blk->magic2 != magic || blk->magic3 != magic ) 
     {
+        using fmt::hex_t;
       write_buf<> msg(2);
       msg.put(__FILE__);
       msg.put(":");
