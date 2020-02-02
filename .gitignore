@@ -60,3 +60,6 @@ wordexp_ex
 write_buf
 data
 *.mod.c
+mvit
+auto_ex
+norm/forward
