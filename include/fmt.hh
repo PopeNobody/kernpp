@@ -93,7 +93,7 @@ namespace fmt {
   inline int atoi(const char *a) {
     int i = 0;
     char ch;
-    while (ch = *a++) {
+    while ((ch = *a++)) {
       switch (ch) {
         case '1':
         case '2':

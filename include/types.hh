@@ -17,13 +17,39 @@ typedef unsigned short int uint16_t;
 typedef void* void_p;
 
 struct iocb;
-struct fd_set;
+typedef long int __fd_mask;
+struct fd_set
+{
+  __fd_mask fds_bits[1024 / (8 * (int) sizeof (__fd_mask))];
+};
 typedef fd_set* fd_set_p;
 struct sigaction_t {
 	void (*sa_handler) (int);
 	unsigned long sa_flags;
 	void (*sa_restorer) (void);
 	unsigned long sa_mask;
+};
+struct stat_t {
+  uint64_t  st_dev;
+  uint64_t  st_ino;
+  uint32_t  st_mode;
+  uint32_t  st_nlink;
+  uint32_t  st_uid;
+  uint32_t  st_gid;
+  uint64_t  st_rdev;
+  uint64_t  __pad1;
+  int64_t   st_size;
+  int32_t   st_blksize;
+  int32_t   __pad2;
+  int64_t   st_blocks;
+  int64_t   st_atime;
+  uint64_t  st_atime_nsec;
+  int64_t   st_mtime;
+  uint64_t  st_mtime_nsec;
+  int64_t   st_ctime;
+  uint64_t  st_ctime_nsec;
+  uint32_t  __unused4;
+  uint32_t  __unused5;
 };
 typedef sigaction_t* sigaction_p;
 typedef uint64_t sigset_t;
@@ -43,6 +69,15 @@ typedef msghdr* msghdr_p;
 struct rusage;
 typedef rusage* rusage_p;
 struct utsname;
+struct utsname
+{
+  char sysname[65];
+  char nodename[65];
+  char release[65];
+  char version[65];
+  char machine[65];
+  char domainname[65];
+};
 typedef utsname* utsname_p;
 struct sembuf;
 typedef sembuf* sembuf_p;
@@ -146,6 +181,11 @@ typedef uint64_t uintptr_t;
 typedef int64_t off64_t;
 typedef uint32_t fd_t;
 typedef fd_t* fd_p;
+struct pollfd_t {
+  fd_t   fd;
+  short events;
+  short revents;
+};
 typedef int64_t clock_t;
 typedef int64_t off_t;
 typedef off_t* off_p;
@@ -204,6 +244,7 @@ struct timespec
   time_t tv_sec;
   int64_t tv_nsec;
 };
+typedef timespec timespec_t;
 enum ftype_t {
 	DT_UNKNOWN = 0,
 	DT_FIFO = 1,

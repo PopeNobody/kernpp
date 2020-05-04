@@ -205,7 +205,6 @@ extern "C" {
 namespace sys 
 {
   extern "C" {
-    inline int nanosleep(timespec_p rqtp, timespec_p rmtp) AAI;
     inline int close(fd_t fd) AAI;
     inline int stat(const char *pathname, struct stat *statbuf) AAI;
     inline fd_t open(const char *pathname, open_flags flags, open_mode mode) AAI;

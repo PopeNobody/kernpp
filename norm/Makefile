@@ -14,12 +14,12 @@ cxx_lib:= # $(filter-out $(patsubst %,%.cc,$(cxx_exe)), $(cxx_src))
 
 all: $(cxx_exe)
 
-$(cxx_exe): %: %.cc cxxflags
-	$(CXX) @cxxflags -static  -g -E $@.cc -o $@.i -fPIC -dD
-	$(CXX) @cxxflags -static  -g -S $@.i  -o $@.s -fPIC
-	$(CXX) @cxxflags -static  -g    $@.s  -o $@   -fPIC
+$(cxx_exe): %: %.cc cxxflags cppflags asmflags
+	$(CXX) @cppflags -static  -g -E $@.cc -o $@.ii -fPIC -dD
+	$(CXX) @cxxflags -static  -g -S $@.ii -o $@.sx -fPIC
+	$(CXX) @asmflags -static  -g    $@.ss -o $@    -fPIC
 
 clean:
 	rm -f $(cxx_exe)
-	rm -f *.[isoa]
+	rm -f *.[isoa] *.[isoa][isoa]
 

@@ -24,17 +24,8 @@ class isprint_t
 };
 const isprint_t isprint;
 
-template<size_t pages, size_t page_size>
-void write_buf<pages,page_size>::flush()
-{
-  if(!pos)
-    return;
-  tot+=pos;
-  write(fd,c_str(buf,pos));
-  pos=0;
-  memset(&buf,0,end-buf);
-};
-static write_buf<1,4096>*buf;
 void doit() {
-  buf->flush();
+  write_buf<1,4096>buf(88);
+  buf.close();
+  buf.flush();
 };

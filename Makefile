@@ -1,12 +1,17 @@
+
+fuck: bin/markout
+	./bin/markout /bin/ls */fuck */cat.cc
+
 all:
-MAKEFLAGS:=-rR
+MAKEFLAGS:=-rR -j8
 AR_FLAGS = rU
 LD_FLAGS = @ld_flags
 CPPFLAGS= @cppflags 
 DEPFLAGS= -MF $<.d -MT $@ -MD
 CXXFLAGS:= @cxxflags
+ASMFLAGS:= @asmflags
 
-CXX:= g++
+CXX:= clang++
 LD= ld
 
 
@@ -62,19 +67,19 @@ $(LIB_LIB): $(LIB_OBJ)
 
 bin/false bin/true: START:=
 
-.PRECIOUS:
-%: %.o $(START) $(LIB_LIB) cxxflags cppflags ld_flags
+.PRECIOUS: lib/start.o
+%: %.o $(START) $(LIB_LIB) ld_flags
 	$(LD) -static $(START) $<  $(LIB_LIB) -o $@
 
 %.o: %.S
 	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-%.o: %.cc cxxflags cppflags
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -E $< -o $(<:.cc=.ii) $(DEPFLAGS)
+%.o: %.cc cxxflags cppflags asmflags
+	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.ii) $(DEPFLAGS)
 	$(CXX) $(CXXFLAGS) -S $(<:.cc=.ii)  -o $(<:.cc=.s)
-	$(CXX) $(CXXFLAGS) -c $(<:.cc=.s)   -o $@
+	$(CXX) $(ASMFLAGS) -c $(<:.cc=.s)   -o $@
 
-tags:
+tags: $(wildcard */*.{cc,hh}) $(wildcard */*.{cc.hh}) Makefile
 	ctags -R .
 
 include /dev/null $(wildcard $(ALL_SRC:=.d))

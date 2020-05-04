@@ -1,10 +1,10 @@
-#if 0
 #include <syscall.hh>
 using sys::write;
-#endif
 
-int main(int argc, char*argv[]) {
-#if 0
+extern "C" {
+  int main(int argc, char**argv);
+};
+int main(int argc, char**argv) {
   ++argv;
   if(*argv)
     write(1, *argv++);
@@ -13,6 +13,5 @@ int main(int argc, char*argv[]) {
     write(1, *argv++);
   };
   write(1, L("\n"));
-#endif
   return 0;
 };

@@ -10,7 +10,9 @@ extern void (*__init_array_end []) (void) __attribute__((weak));
 extern void (*__fini_array_start []) (void) __attribute__((weak));
 extern void (*__fini_array_end []) (void) __attribute__((weak));
 
+#ifndef L
 #define L(x) x,sizeof(x)-1
+#endif
 inline ssize_t write( fd_t fd,  const char *buf,  size_t len)
 {
 	long res;
@@ -26,19 +28,6 @@ extern "C" {
 	void _init();
 	void _fini();
 	void _exit(int return_code) __attribute__((noreturn));
-	inline void _exit(int res)
-	{
-		int exit_val;
-		exit_val=res&0xff;
-		asm (
-				"syscall\n" 
-				: "=a"(res) 
-				: "a"(60), "D"(exit_val)
-				: "rcx", "r11", "memory"
-				);
-		while(1);
-	}
-
 
 	static void __libc_init_array() {
 		size_t count, i;

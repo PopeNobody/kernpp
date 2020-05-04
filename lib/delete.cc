@@ -6,7 +6,6 @@ namespace std
   extern "C" void free(void*);
 }
 
-#pragma GCC diagnostic ignored "-Wsized-deallocation"
 using std::align_val_t;
 using std::nothrow_t;
 

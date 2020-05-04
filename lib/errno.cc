@@ -10,10 +10,9 @@ namespace sys {
       return err;
     {
       write_buf<> buf(2);
-      buf.put("errno=");
-      buf.fmtln(err);
+      if(err!=11)
+        buf.put("errno=").fmtln(err);
     };
-    abort();
     errno=-err;
     return -1;
   }
