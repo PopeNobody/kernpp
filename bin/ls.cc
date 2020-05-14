@@ -4,33 +4,14 @@
 #include <getopt.hh>
 
 using sys::write;
-
-void handle_error(errno_t err, const char *call)
-{
-  char buf[1024];
-  char *pos=buf;
-  char *end=buf+sizeof(buf);
-  while(*call)
-    *pos++=*call++;
-  *pos++=':';
-  call = " error\n";
-  while(*call)
-    *pos++=*call++;
-  write(2,buf,pos-buf);
-  exit(1);
-};
 using sys::errno;
-template<typename int_t>
-void write_dec(fd_t fd, int_t val) {
-  char buf[sizeof(val)*5];
-  char *end=&buf[sizeof(buf)-1];
-  char *str=fmt::fmt_dec(val,buf,end);
-  while(str<end) {
-    int res=write(fd,str,end);
-    if(res<0)
-      handle_error(errno,"write");
-    str+=res;
-  };
+
+template<typename obj_t>
+void swap(obj_t &lhs, obj_t rhs)
+{
+  obj_t tmp(lhs);
+  lhs=rhs;
+  rhs=tmp;
 };
 struct dirents_t {
   struct ent_t {
@@ -61,15 +42,11 @@ struct dirents_t {
     for(int i=0;i<n-2;i++) {
       int m=i;
       for(int j=i+1;j<n;j++) {
-        if(cmp(*lst[m],*lst[j])<0){
+        if(cmp(*lst[m],*lst[j])<0)
           m=j;
-        };
       };
-      if(i!=m) {
-        ent_t *tmp=lst[i];
-        lst[i]=lst[m];
-        lst[m]=tmp;
-      };
+      if(i!=m)
+        swap(lst[i],lst[m]);
     };
   };
   ~dirents_t() {
@@ -119,7 +96,7 @@ void lsdir(int fd) {
   for(;;){
     int nread=getdents(fd,(linux_dirent*)(char*)buf,size);
     if(nread<0)
-      handle_error(errno_t(-nread), "getdents");
+      pexit("getdents");
     else if (nread==0)
       break;
     auto beg = reinterpret_cast<linux_dirent*>(&buf[0]);
@@ -168,7 +145,6 @@ void lsarg(const char *path)
   };
   close(fd);
 };
-using namespace fmt;
 
 static option longopts[]={
   { "version", 0, 0, 1 },
@@ -202,60 +178,19 @@ int version() {
   write(1,L("ls (kernpp) 1.0\n"));
   return 0;
 };
-void __gxx_abort() {
-  ::abort();
-};
-template<size_t size>
-struct buf_t {
-  char buf[size];
-  char end[1];
-  ~buf_t()
-  {
-  };
-  buf_t()
-  {
-    memset(this,0,sizeof(*this));
-  };
-};
-inline ssize_t write_grp(fd_t fd, size_t val) {
-  buf_t<sizeof(val)*8> buf;
-  char *pos=fmt_dec(val,buf.buf,buf.end);
-  char *beg=pos;
-  while(pos<buf.end) {
-    ssize_t res=write(fd,pos,buf.end);
-    if(res<0)
-      return res;
-    pos+=res;
-  };
-  return buf.end-beg;
-
-};
-inline char *fmt_bin(uint64_t val, char *beg, char *end)
-{
-  for(int i = 0; i < 64; i++) {
-    *--end='0'+(val&1);
-    val/=2;
-  };
-  return end;
-};
-inline ssize_t write_bin(fd_t fd, uint64_t val) {
-  buf_t<sizeof(val)*8> buf;
-  char *pos=fmt_bin(val,buf.buf,buf.end);
-  return full_write(fd,pos,buf.end)-pos;
-};
 extern "C" {
-  int main(int argc, char**argv) ;
+  int main(int argc, char**argv, char**envp) ;
 };
-int main(int argc, char**argv) 
+int main(int argc, char**argv,char**envp) 
 {
   int ch;
   int longidx=0;
   signed long u=1;
   signed long lu=0;
-  if(dup2(1,2)<0) {
-    write(2,L("Failed to dup stderr.  You might not see this.\n"));
-    return 1;
-  };
+  // show directory contents
+  bool dir_cont=true;
+  if(dup2(1,2)<0)
+    pexit("dup2");
   while((ch=getopt_long(argc,argv,"aA",longopts,&longidx))!=-1)
   {
     switch(ch) {
@@ -263,6 +198,7 @@ int main(int argc, char**argv)
       case 2: return help(0);
       case 'a': ignore=minimal; break;
       case 'A': ignore=dot_dot; break;
+      case 'd': dir_cont=false; break;
       default: return help(1);
     };
   };
@@ -275,7 +211,7 @@ int main(int argc, char**argv)
   };
   for(int i=0;i<nptr;i++) {
     if(ptrs[i]){
-      write_ptr(2,ptrs[i]);
+      fmt::write_ptr(2,ptrs[i]);
       write(2,L("\n"));
       free(ptrs[i]);
       ptrs[i]=0;
