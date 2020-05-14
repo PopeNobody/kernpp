@@ -24,7 +24,6 @@
 
 #include <syscall.hh>
 #include <typeinfo.hh>
-#define NULL nullptr
 //#include <cstddef>
 
 // Class declarations shared between the typeinfo implementation files.
@@ -131,9 +130,9 @@ struct __class_type_info::__upcast_result
   const __class_type_info *base_type; // where we found the target,
                               // if in vbase the __class_type_info of vbase
                               // if a non-virtual base then 1
-                              // else NULL
+                              // else nullptr
   __upcast_result (int d)
-    :dst_ptr (NULL), part2dst (__unknown), src_details (d), base_type (NULL)
+    :dst_ptr (nullptr), part2dst (__unknown), src_details (d), base_type (nullptr)
     {}
 };
 
@@ -141,14 +140,14 @@ struct __class_type_info::__upcast_result
 // hierarchy when dynamic casting.
 struct __class_type_info::__dyncast_result
 {
-  const void *dst_ptr;        // pointer to target object or NULL
+  const void *dst_ptr;        // pointer to target object or nullptr
   __sub_kind whole2dst;       // path from most derived object to target
   __sub_kind whole2src;       // path from most derived object to sub object
   __sub_kind dst2src;         // path from target to sub object
   int whole_details;          // details of the whole class hierarchy
   
   __dyncast_result (int details_ = __vmi_class_type_info::__flags_unknown_mask)
-    :dst_ptr (NULL), whole2dst (__unknown),
+    :dst_ptr (nullptr), whole2dst (__unknown),
      whole2src (__unknown), dst2src (__unknown),
      whole_details (details_)
     {}
