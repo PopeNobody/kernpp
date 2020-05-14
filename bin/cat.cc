@@ -51,7 +51,7 @@ bool catfile(int ifd, int ofd)
 extern "C" {
   int main(int argc, char**argv,char **envp);
 };
-int main(int argc, char** argv)
+int main(int argc, char** argv,char**envp)
 {
   const char* prog_name= *argv;
 

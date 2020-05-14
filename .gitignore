@@ -1,1 +1,4 @@
 bin/markout
+**.d
+**.[os]
+**.ii

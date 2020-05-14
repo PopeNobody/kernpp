@@ -77,7 +77,9 @@ class del_ptr
 	del_ptr &operator=(del_ptr &rhs);
 };
 
-int main(int, char**) {
-	return 0;
-};
+extern "C" {
+  int main(int, char**) {
+    return 0;
+  };
+}
 #endif

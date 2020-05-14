@@ -1,4 +1,0 @@
--fno-PIC
--g
--static
--std=c++17

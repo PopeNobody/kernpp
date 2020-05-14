@@ -258,6 +258,9 @@ inline ssize_t write_bin(fd_t fd, uint64_t val) {
   char *pos=fmt_bin(val,buf.buf,buf.end);
   return full_write(fd,pos,buf.end)-pos;
 };
+extern "C" {
+  int main(int argc, char**argv) ;
+};
 int main(int argc, char**argv) 
 {
   int ch;

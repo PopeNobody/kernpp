@@ -14,7 +14,11 @@ void too_many() {
 };
 const static int million=1000000;
 const static int billion=1000*million;
-int main(int argc, char*argv[]) {
+extern "C" {
+  int main(int argc, char**argv, char **envp);
+};
+int main(int argc, char**argv, char **envp)
+{
   int opt;
   ++argv;
   --argv; 
