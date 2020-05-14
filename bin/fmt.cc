@@ -6,7 +6,6 @@ using namespace sys;
 using namespace fmt;
 
 char *fmt_chr(char ch, char *beg, char *pos) {
-  assert(beg<pos);
   *--pos=ch;
   return pos;
 };

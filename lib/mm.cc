@@ -41,7 +41,6 @@ class block_l {
         return;
       if(next->used)
         return;
-      warnif(char_p(next)!=char_p(this)+sizeof(*this)+size);
       size+=sizeof(*next)+next->size;
       next=next->next;
     };
@@ -134,9 +133,6 @@ class block_l {
       msg.fmtln(hex_t((unsigned long)blk->magic3));
       msg.flush();
     };
-    warnif(blk->magic1 != magic);
-    warnif(blk->magic2 != magic);
-    warnif(blk->magic3 != magic);
     if(!blk->used) {
       write(2,L("warning: double free of: "));
       write_ptr(2,ptr);

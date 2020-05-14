@@ -236,7 +236,6 @@ inline char *fmt_bin(uint64_t val, char *beg, char *end)
     *--end='0'+(val&1);
     val/=2;
   };
-  assert(end>=beg);
   return end;
 };
 inline ssize_t write_bin(fd_t fd, uint64_t val) {

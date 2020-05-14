@@ -2,7 +2,6 @@
 #define c_str_hh c_str_hh
 
 #include <syscall.hh>
-#include <assert.hh>
 
 struct c_str {
   char *beg;

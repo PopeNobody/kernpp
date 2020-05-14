@@ -1,7 +1,6 @@
 #include <syscall.hh>
 #include <fmt.hh>
 #include <getopt.hh>
-#include <assert.hh>
 
 
 using sys::write;
