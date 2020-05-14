@@ -1,0 +1,9 @@
+.pstree.ko.cmd
+.pstree.mod.cmd
+.pstree.mod.o.cmd
+.pstree.o.cmd
+Module.symvers
+modules.order
+pstree.ko
+pstree.mod
+pstree.mod.c
