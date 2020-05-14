@@ -1,8 +1,9 @@
 
+all:
+
 fuck: bin/markout
 	./bin/markout /bin/ls */fuck */cat.cc
 
-all:
 MAKEFLAGS:=-rR -j8
 AR_FLAGS = rU
 LD_FLAGS = @ld_flags

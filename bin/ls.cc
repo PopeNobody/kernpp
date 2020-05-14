@@ -2,7 +2,6 @@
 #include <new.hh>
 #include <fmt.hh>
 #include <getopt.hh>
-#include <array.hh>
 #include <assert.hh>
 
 using sys::write;
@@ -111,7 +110,7 @@ enum ignore_t {
 extern "C" {
   void mm_show();
 };
-static array<void*,4096> ptrs;
+static void *ptrs[4096];
 static size_t nptr=0;
 using namespace sys;
 void lsdir(int fd) {
