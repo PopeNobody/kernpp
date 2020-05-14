@@ -2,3 +2,4 @@ bin/markout
 **.d
 **.[os]
 **.ii
+**.a
