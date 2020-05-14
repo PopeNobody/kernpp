@@ -128,7 +128,7 @@ void lsdir(int fd) {
       ents.push_back(beg->d_name,beg->d_type == DT_DIR);
       beg=beg->next();
     };
-    mm_show();
+    //mm_show();
   };
   ents.sort();
   for(size_t i=0;i<ents.size();i++)

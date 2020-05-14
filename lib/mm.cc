@@ -104,7 +104,7 @@ class block_l {
     return blk+1;
   };
   ~block_l() {
-    show();
+    //show();
     list=0;
   };
   typedef char* char_p;
@@ -163,9 +163,9 @@ class block_l {
 };
 block_l list;
 extern "C" {
-  void mm_show() {
-    list.show();
-  };
+//     void mm_show() {
+//       list.show();
+//     };
 };
 void *malloc(size_t size) {
 #if 1
