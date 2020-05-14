@@ -4,7 +4,7 @@ all:
 fuck: bin/markout
 	./bin/markout /bin/ls */fuck */cat.cc
 
-MAKEFLAGS:=-rR -j8
+MAKEFLAGS:=-rR -j1
 AR_FLAGS = rU
 LD_FLAGS = @ld_flags
 CPPFLAGS= @cppflags 
