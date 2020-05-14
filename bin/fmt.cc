@@ -1,7 +1,6 @@
 #include <syscall.hh>
 #include <new.hh>
 #include <typeinfo.hh>
-#include <assert.hh>
 using namespace sys;
 #if 0
 using namespace fmt;

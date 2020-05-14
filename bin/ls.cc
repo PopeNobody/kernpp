@@ -2,7 +2,6 @@
 #include <new.hh>
 #include <fmt.hh>
 #include <getopt.hh>
-#include <assert.hh>
 
 using sys::write;
 
@@ -118,7 +117,6 @@ void lsdir(int fd) {
   dirents_t ents;
   char buf[size];
   for(;;){
-    assert((void*)buf);
     int nread=getdents(fd,(linux_dirent*)(char*)buf,size);
     if(nread<0)
       handle_error(errno_t(-nread), "getdents");
@@ -209,25 +207,14 @@ void __gxx_abort() {
 };
 template<size_t size>
 struct buf_t {
-  char pad1[128];
   char buf[size];
   char end[1];
-  char pad2[128];
   ~buf_t()
   {
-    for(int i = 0; i<sizeof(pad1); i++) {
-      assert(pad1[i]=='p');
-    }
-    for(int i = 0; i<sizeof(pad2); i++) {
-      assert(pad2[i]=='P');
-    }
-
   };
   buf_t()
   {
     memset(this,0,sizeof(*this));
-    memset(pad1,'p',sizeof(pad1));
-    memset(pad2,'P',sizeof(pad2));
   };
 };
 inline ssize_t write_grp(fd_t fd, size_t val) {
