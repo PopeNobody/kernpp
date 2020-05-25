@@ -12,7 +12,8 @@ DEPFLAGS= -MF $<.d -MT $@ -MD
 CXXFLAGS:= @cxxflags
 ASMFLAGS:= @asmflags
 
-CXX:= clang++
+CXX:= /usr/stow/llvm-10a/bin/clang++
+
 LD= ld
 
 

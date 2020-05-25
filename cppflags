@@ -1,2 +1,4 @@
--nostdinc
+-nostdinc++
+-nobuiltininc
+
 -Iinclude
