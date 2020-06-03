@@ -195,13 +195,17 @@ namespace fmt {
         buf[pos--]=0;
         fmt(val);
       };
-    c_str get() const {
+    c_str get() const
+    {
       static size_t maxlen=0;
       c_str res(&buf[pos], &end[0]);
       if( maxlen < res.len() )
         maxlen=res.len();
       return res;
     };
+  };
+  struct buf_t
+  {
   };
 }; // namespace fmt
 #endif

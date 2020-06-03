@@ -11,6 +11,6 @@ int c_str::cmp(const c_str &lhs, const c_str &rhs)
 {
   int res = cmp(lhs.len(),rhs.len());
   if(!res)
-    res=strncmp(lhs.beg,rhs.beg,lhs.len());
+    res=strncmp(lhs.begin(),rhs.begin(),lhs.size());
   return res;
 };

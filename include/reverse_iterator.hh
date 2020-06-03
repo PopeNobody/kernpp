@@ -62,7 +62,7 @@ namespace std
     typedef typename traits_type::difference_type difference_type;
     typedef typename traits_type::pointer         pointer;
     typedef typename traits_type::reference       reference;
-# 126 "/usr/include/c++/7/bits/stl_iterator.h" 3
+
     constexpr reverse_iterator()
         : current()
     {
@@ -92,13 +92,13 @@ namespace std
     {
       return current;
     }
-# 168 "/usr/include/c++/7/bits/stl_iterator.h" 3
+
     constexpr reference operator*() const
     {
       _Iterator __tmp= current;
       return *--__tmp;
     }
-# 182 "/usr/include/c++/7/bits/stl_iterator.h" 3
+
     constexpr pointer operator->() const
     {
       return std::__addressof(operator*());
@@ -166,7 +166,7 @@ namespace std
       return *(*this + __n);
     }
   };
-# 300 "/usr/include/c++/7/bits/stl_iterator.h" 3
+
   template <typename _Iterator>
   inline constexpr bool operator==(const reverse_iterator<_Iterator>& __x,
                                    const reverse_iterator<_Iterator>& __y)
@@ -251,7 +251,7 @@ namespace std
   {
     return !(__x < __y);
   }
-# 390 "/usr/include/c++/7/bits/stl_iterator.h" 3
+
   template <typename _IteratorL, typename _IteratorR>
   inline constexpr auto operator-(const reverse_iterator<_IteratorL>& __x,
                                   const reverse_iterator<_IteratorR>& __y)
@@ -260,7 +260,7 @@ namespace std
     return __y.base() - __x.base();
   }
 
-
+#if 0
   template <typename _Iterator>
   inline constexpr reverse_iterator<_Iterator> operator+(
            typename reverse_iterator<_Iterator>::difference_type __n,
@@ -305,5 +305,6 @@ namespace std
   {
     return __make_reverse_iterator(__miter_base(__it.base()));
   }
+#endif
 }; // namespace std
 #endif

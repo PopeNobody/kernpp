@@ -3,3 +3,5 @@ bin/markout
 **.[os]
 **.ii
 **.a
+log/
+*.out

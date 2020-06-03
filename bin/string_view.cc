@@ -2,9 +2,11 @@
 
 extern "C" int main(int, char**);
 
-using std::string_view;
+using str::string_view;
+
 int main(int argc, char**argv)
 {
-  string_view str;
+  string_view str("test");
+  
   return 0;
 };

@@ -19,7 +19,7 @@ LD= ld
 
 BIN_SRC:=$(wildcard bin/*.cc bin/*.S)
 LIB_SRC:=$(wildcard lib/*.cc lib/*.S)
-
+LIB_SRC+=lib/strerror_list.cc
 
 BIN_ASM:=$(patsubst %.S,  %, $(filter %.S,  $(BIN_SRC)))
 BIN_CXX:=$(patsubst %.cc, %, $(filter %.cc, $(BIN_SRC)))
@@ -38,6 +38,7 @@ my-file/check_print.o:
 	@echo not making
 
 lib/strerror_list.cc: script/genstrerror.pl
+	rm -f lib/strerror_list*
 	vi_perl $<
 
 START:= lib/start.o
@@ -76,10 +77,15 @@ bin/false bin/true: START:=
 %.o: %.S
 	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
+ifeq (0,1)
 %.o: %.cc cxxflags cppflags asmflags
 	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.ii) $(DEPFLAGS)
 	$(CXX) $(CXXFLAGS) -S $(<:.cc=.ii)  -o $(<:.cc=.s)
 	$(CXX) $(ASMFLAGS) -c $(<:.cc=.s)   -o $@
+else
+%.o: %.cc cxxflags cppflags asmflags
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(DEPFLAGS)
+endif
 
 tags: $(wildcard */*.{cc,hh}) $(wildcard */*.{cc.hh}) Makefile
 	ctags -R .
