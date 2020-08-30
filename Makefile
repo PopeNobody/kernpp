@@ -27,11 +27,11 @@ all:
 
 MAKEFLAGS:=-rR -j1
 AR_FLAGS = rU
-LD_FLAGS = @ld_flags
-CPPFLAGS= @cppflags 
+LD_FLAGS = @etc/ld_flags
+CPPFLAGS= @etc/cppflags 
 DEPFLAGS= -MF $<.d -MT $@ -MD
-CXXFLAGS:= @cxxflags
-ASMFLAGS:= @asmflags
+CXXFLAGS:= @etc/cxxflags
+ASMFLAGS:= @etc/asmflags
 
 CXX:= g++
 
