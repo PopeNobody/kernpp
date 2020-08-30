@@ -5,3 +5,9 @@ bin/markout
 **.a
 log/
 *.out
+bin/report
+bin/string_view
+output
+tags
+trace
+.gdb_history
