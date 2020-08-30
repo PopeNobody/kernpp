@@ -62,12 +62,12 @@ namespace sys
     inline fd_t    open(const char* pathname,
                         open_flags  flags,
                         open_mode   mode) AAI;
-    inline void    _exit(int res) AAI;
     inline time_t  time(time_t*) AAI;
     inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len) AAI;
     inline ssize_t read(fd_t fd, char* buf, size_t len) AAI;
     inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AAI;
   }
+  inline void    exit(int res) AAI;
 
   // __NR_read=0
   inline ssize_t read(fd_t fd, char* buf, size_t len)
@@ -83,6 +83,10 @@ namespace sys
   inline ssize_t sys_write(fd_t fd, const char* buf, size_t len)
   {
     long res;
+    if(!buf) {
+      buf="<null>";
+      len=6;
+    };
     asm("syscall\n"
         : "=a"(res)
         : "a"(1), "D"(fd), "S"(buf), "d"(len)
@@ -343,7 +347,7 @@ namespace sys
   }
 // __NR__ exit = 60 
   // __NR_exit = 60
-  inline void _exit(int res)
+  inline void exit(int res)
   {
     int exit_val;
     exit_val= res & 0xff;

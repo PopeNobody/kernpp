@@ -1,3 +1,4 @@
+#include <errno.hh>
 #include <fmt.hh>
 #include <syscall.hh>
 #include <getopt.hh>
@@ -6,6 +7,7 @@ using namespace fmt;
 extern "C" {
   int main(int argc, char**argv, char**envp);
 };
+
 // int execve(const char * fn, char *const * argv, char *const * envp)
 pid_t xfork()
 {
@@ -17,10 +19,14 @@ pid_t xfork()
   };
   return pid;
 };
-const char *defs[] = { "/bin/sh", 0};
+char def1[]="/bin/echo";
+char def2[]="/bin/sh";
+char *defs[] = { 
+  def1, def2, 0
+};
 #define wifexited(res) (wtermsig(res)==0)
 #define wtermsig(res) (res&0x7f)
-#define wexitstatus(res) ((res&0xff)>>8)
+#define wexitstatus(res) ((res&0xff00)>>8)
 
 void __xassert(const char *cont, bool val)
 {
@@ -35,11 +41,19 @@ void __xassert(const char *cont, bool val)
 #define xassert(x) __xassert(#x,(x))
 
 #define __ent() \
+  1
+
+#if 0
   do{\
     const char *cp=__PRETTY_FUNCTION__; \
     write(2,cp,strlen(cp)); \
     write(2,"\n",1); \
   } while(0)
+#endif
+static char to_char(int num)
+{
+  return num+'0';
+};
 struct buf_t {
   char text[8*1024];
   size_t len;
@@ -55,6 +69,8 @@ struct buf_t {
   };
   ssize_t write(const char *arg)
   {
+    if(arg==0)
+      arg="(null)";
     return __write(arg,strlen(arg));
   };
   ssize_t write(char &arg)
@@ -68,26 +84,34 @@ struct buf_t {
     else
       return write(false,arg);
   };
+  ssize_t write(void *ptr)
+  {
+    struct {
+      char buf[1023];
+      char end[1];
+    } dat;
+    char *pos=fmt_ptr(ptr,dat.buf,dat.end);
+    write(pos);
+    return pos-dat.buf;
+  };
   ssize_t write(bool neg, unsigned long val)
   {
-    char buf[128];
-    char *end=buf+sizeof(buf);
-    *--end='\n';
-    char *pos=end;
-    *--pos=0;
-    for(int i=0;i<sizeof(val);i++)
-      *--pos=val%10, val/=10;
+    struct {
+      char buf[1023];
+      char end[1];
+    } dat;
+    char *pos=fmt_dec(neg,val,dat.buf,dat.end);
     write(pos);
-    return end-pos;
+    return pos-dat.buf;
   };
   ssize_t println()
   {
-    return 0;
+    return write("\n");
   };
   template<typename arg0_t, typename ...argn_t>
     ssize_t println(arg0_t arg, argn_t... tail)
     {
-      return write(arg)+print(tail...,"\n");
+      return print(arg,tail...,"\n");
     };
   ssize_t print()
   {
@@ -99,40 +123,109 @@ struct buf_t {
       return write(arg)+print(tail...);
     };
 } buf;
-int main(int argc, char** argv, char **envp)
+char env1[]="TEST1=test1";
+char env2[]="TEST2=test2";
+char env3[]="TEST3=test3";
+char *env[]
 {
+  env1, env2, env3, 0
+};
+char **clone(char **in)
+{
+  //__ent(); 
+  //buf.println((void*)in);
+
+  int c=0;
+  while(in[c])
+    ++c;
+  char **res=new char*[c+1];
+  for(int i=0;i<c;i++)
+  {
+    //buf.println(in[i]);
+    res[i]=in[i];
+  };
+  res[c]=0;
+  //buf.println((void*)res);
+  return res;
+};
+int count(char**arr) 
+{
+  //__ent(); 
+  //buf.println("arr: ",(void*)arr);
+  int c=0;
+  while(arr[c])
+    ++c;
+  return c;
+};
+int dump(char**arr) 
+{
+  __ent(); 
+  buf.println("\narr: ",(void*)arr);
+  int c=0;
+  buf.println();
+  while(arr[c])
+    ++c;
+  buf.println("arr.size()=",c);
+  for(int i=0;i<=c;i++) {
+    buf.println("arr[",i,"]=",arr[i]?arr[i]:"<null>  &=",(void*)arr[i]);
+  };
+  buf.println();
+  return c;
+};
+char **d_and_c(char**arr)
+{
+  //__ent();
+  ///int c=dump(arr);
+  int c=count(arr);
+  //buf.println("dump returned ", c);
+  auto clo=clone(arr);
+  //dump(clo);
+  return clo;
+};
+static char **argv;
+static char **envp;
+int main(int argc, char** _argv, char **_envp)
+{
+  argv=_argv;
+  envp=_envp;
+  int res=0;
+#if 0
   int fd=open("/dev/pts/7", sys::o_wronly);
-  sys::dup2(fd,1);
   sys::dup2(fd,2);
   if(fd>2)
     sys::close(fd);
-    
-  buf_t buf;
-  pid_t pid=xfork();
-  buf.println("pid: ",pid);
-  timespec_t dur = { 0, 10000 };
-  timespec_t rem = { -1, -1 };
-  if(pid) {
-    asm("int3");
-    buf.println("waiting");
-    int res=-1;
-    pid_t pid2=sys::wait(&res);
-    buf_t buf;
-    if( wifexited(res) ) {
-      int stat=wexitstatus(res);
-      buf.println("code: ", stat);
-      res=stat;
-    } else {
-      buf.println("sig: ", wtermsig(res));
-    };
-    exit(res);
-  } else {
-    if(argc>=1) {
-      ++argv; --argc;
-      sys::execve(argv[0],argv,envp);
-    } else {
-      sys::execve(defs[0],(char*const*)defs, envp);
-    };
+  __ent();
+#endif
+
+  if(argc<2) {
+    buf.println("argc=",argc," need 2");
+    return 2;
   };
-  return 0;
+  argv=d_and_c(argv+1);
+  timespec_t dur = { 0, 100000 };
+  timespec_t rem = { -1, -1 };
+  envp=d_and_c(env);
+  pid_t opid=sys::getpid();
+  pid_t npid=xfork();
+  if(npid) {
+    if(sys::wait(&res)<0){
+      buf.println(sys::errno,"wait:",sys::strerror(sys::errno));
+      return 1;
+    };
+    
+    if( wifexited(res) ) {
+      res=wexitstatus(res);
+    } else {
+      buf.println("sig: ", wtermsig(res), "\n\n");
+    };
+    auto pos=argv;
+    while(*pos){
+      buf.print(*pos++," ");
+    };
+    buf.println("returned ",res);
+  } else {
+    sys::execve(argv[0],argv, envp);
+    return 0;
+  };
+  return res;
 };

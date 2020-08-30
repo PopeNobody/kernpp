@@ -139,7 +139,9 @@ void lsarg(const char *path)
     write(2," failed (");
     char buf[32];
     char *end=&buf[sizeof(buf)-1];
-    char *str=fmt::fmt_dec(errno,buf,end);
+    bool neg = (errno<0);
+    unsigned long num=(neg?-1:1)*errno; 
+    char *str=fmt::fmt_dec(neg,num,buf,end);
     write(2,str,end);
     write(2,")\n");
   };

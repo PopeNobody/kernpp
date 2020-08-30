@@ -1,7 +1,7 @@
 
 shit: all
-	./bin/report ./bin/false
-	./bin/report ./bin/true
+	./bin/report ./bin/false || ./bin/report ./bin/true
+	./bin/report ./bin/false || ./bin/report ./bin/true
 
 all:
 
@@ -97,7 +97,7 @@ endif
 tags: $(wildcard */*.{cc,hh}) $(wildcard */*.{cc.hh}) Makefile
 	ctags -R .
 
-include /dev/null $(wildcard $(ALL_SRC:=.d))
+include depends.mk
 
 clean:
 	rm -f */*.o */*.ii */*.s */*.d $(BIN_EXE) $(LIB_LIB)

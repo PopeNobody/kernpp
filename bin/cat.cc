@@ -170,7 +170,7 @@ int main(int argc, char** argv,char**envp)
         chs[1]=0;
         write(2,c_str(chs,chs+1));
         write(2,"'\n");
-        exit(1);
+        sys::exit(1);
     };
     if(optind==argc)
       break;

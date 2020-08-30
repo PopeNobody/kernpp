@@ -40,7 +40,7 @@ namespace fmt {
     *--end = '[';
     return end;
   };
-  inline char *fmt_dec(unsigned long val, char *beg, char *end, int width = 0) {
+  inline char *fmt_dec(bool neg, unsigned long val, char *beg, char *end, int width = 0) {
     char *max = (width ? end - width : 0);
     if (val) {
       while (val) {
@@ -58,7 +58,7 @@ namespace fmt {
   using sys::write;
   inline int write_dec(fd_t fd, size_t val) {
     char buf[sizeof(val) * 4];
-    return write(fd, fmt::fmt_dec(val, buf, &buf[sizeof(buf) - 1]));
+    return write(fd, fmt::fmt_dec(false,val, buf, &buf[sizeof(buf) - 1]));
   };
   inline int write_hex(fd_t fd, size_t hex) {
     char buf[sizeof(hex) * 4];
@@ -73,9 +73,9 @@ namespace fmt {
     char *const end = &buf[sizeof(buf) - 1];
     char *pos = end;
     *--pos = '}';
-    pos = fmt::fmt_dec(tm.tv_nsec, buf, pos);
+    pos = fmt::fmt_dec(false,tm.tv_nsec, buf, pos);
     *--pos = ',';
-    pos = fmt::fmt_dec(tm.tv_sec, buf, pos);
+    pos = fmt::fmt_dec(false,tm.tv_sec, buf, pos);
     *--pos = '{';
     return write(fd, pos, end);
   };
@@ -84,9 +84,9 @@ namespace fmt {
     char *const end = &buf[sizeof(buf) - 1];
     char *pos = end;
     *--pos = '}';
-    pos = fmt::fmt_dec(tm.tv_nsec, buf, pos);
+    pos = fmt::fmt_dec(false,tm.tv_nsec, buf, pos);
     *--pos = ',';
-    pos = fmt::fmt_dec(tm.tv_sec, buf, pos);
+    pos = fmt::fmt_dec(false,tm.tv_sec, buf, pos);
     *--pos = '{';
     return write(fd, pos, end);
   };
@@ -146,36 +146,36 @@ namespace fmt {
     void fmt(int val) {
       char old_pos=pos;
       if(val<0) {
-        pos=fmt_dec(-val, buf, buf+pos)-buf;
+        pos=fmt_dec(false,-val, buf, buf+pos)-buf;
         buf[--pos]='-';
       } else {
-        pos=fmt_dec(val,buf,buf+pos)-buf;
+        pos=fmt_dec(false,val,buf,buf+pos)-buf;
       };
     };
     void fmt(long val){
       if(val<0) {
-        pos=fmt_dec(-val, buf, buf+pos)-buf;
+        pos=fmt_dec(false,-val, buf, buf+pos)-buf;
         buf[--pos]='-';
       } else {
-        pos=fmt_dec(val,buf,buf+pos)-buf;
+        pos=fmt_dec(false,val,buf,buf+pos)-buf;
       };
     };
     void fmt(long long val){
       if(val<0) {
-        pos=fmt_dec(-val, buf, buf+pos)-buf;
+        pos=fmt_dec(false,-val, buf, buf+pos)-buf;
         buf[--pos]='-';
       } else {
-        pos=fmt_dec(val,buf,buf+pos)-buf;
+        pos=fmt_dec(false,val,buf,buf+pos)-buf;
       };
     };
     int fmt(unsigned long val){
-      return pos=fmt_dec(val, buf, buf+pos)-buf;
+      return pos=fmt_dec(false,val, buf, buf+pos)-buf;
     };
     int fmt(unsigned long long val){
-      return pos=fmt_dec(val, buf, buf+pos)-buf;
+      return pos=fmt_dec(false,val, buf, buf+pos)-buf;
     };
     int fmt(unsigned val){
-      return pos=fmt_dec(val, buf, buf+pos)-buf;
+      return pos=fmt_dec(false,val, buf, buf+pos)-buf;
     };
     int fmt(float val);
     int fmt(double val);

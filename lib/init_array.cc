@@ -28,7 +28,7 @@ inline ssize_t write( fd_t fd,  const char *buf,  size_t len)
 extern "C" {
 	void _init();
 	void _fini();
-	void _exit(int return_code) __attribute__((noreturn));
+	void exit(int return_code) __attribute__((noreturn));
 
 	static void __libc_init_array() {
 		size_t count, i;
@@ -120,7 +120,7 @@ extern "C" {
 	{
 		if(nfunc>=MAX_ATEXIT){
 			write(2,L("Too many atexit funcs\n"));
-			_exit(1);
+			exit(1);
 		};
 		funcs[nfunc++]=exit_func(func,arg);
 		return 0;
@@ -137,7 +137,7 @@ extern "C" {
 			funcs[--i].call();	
 
 		__libc_fini_array();
-		_exit(return_code);
+    sys::exit(return_code);
 	}
 
 	void libc_init() {
