@@ -204,8 +204,5 @@ namespace fmt {
       return res;
     };
   };
-  struct buf_t
-  {
-  };
 }; // namespace fmt
 #endif

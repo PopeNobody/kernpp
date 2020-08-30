@@ -1,3 +1,4 @@
 -ffreestanding
 -fno-exceptions
--ggdb3 -Os
+-ggdb3 -O0
+-fno-stack-protector

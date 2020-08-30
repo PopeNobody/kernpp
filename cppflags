@@ -1,5 +1,4 @@
 -nostdinc++
--nobuiltininc
 
 -Iinclude
 -g

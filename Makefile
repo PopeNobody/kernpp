@@ -1,4 +1,8 @@
 
+shit: all
+	./bin/report ./bin/false
+	./bin/report ./bin/true
+
 all:
 
 fuck: bin/markout
@@ -12,7 +16,7 @@ DEPFLAGS= -MF $<.d -MT $@ -MD
 CXXFLAGS:= @cxxflags
 ASMFLAGS:= @asmflags
 
-CXX:= /usr/stow/llvm-10a/bin/clang++
+CXX:= g++
 
 LD= ld
 
@@ -77,13 +81,16 @@ bin/false bin/true: START:=
 %.o: %.S
 	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-ifeq (0,1)
+ifeq (1,1)
 %.o: %.cc cxxflags cppflags asmflags
 	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.ii) $(DEPFLAGS)
 	$(CXX) $(CXXFLAGS) -S $(<:.cc=.ii)  -o $(<:.cc=.s)
 	$(CXX) $(ASMFLAGS) -c $(<:.cc=.s)   -o $@
 else
-%.o: %.cc cxxflags cppflags asmflags
+%.cc.i: %.cc cxxflags cppflags asmflags
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -E $< -o $@ $(DEPFLAGS)
+
+%.cc.o: %.cc cxxflags cppflags asmflags
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(DEPFLAGS)
 endif
 
