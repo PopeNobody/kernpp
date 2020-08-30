@@ -9,7 +9,7 @@ extern "C" {
   int main(int argc, char**argv, char**envp);
 };
 
-buf_t buf;
+buf_ns::buf_t buf;
 // int execve(const char * fn, char *const * argv, char *const * envp)
 pid_t xfork()
 {

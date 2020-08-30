@@ -6,6 +6,7 @@
 
 #if 1
 #define AAI __attribute__((__always_inline__))
+#define NOR  __attribute__((__noreturn__))
 #else
 #define AAI
 #endif
@@ -67,7 +68,7 @@ namespace sys
     inline ssize_t read(fd_t fd, char* buf, size_t len) AAI;
     inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AAI;
   }
-  inline void    exit(int res) AAI;
+  inline void    exit(int res) NOR;
 
   // __NR_read=0
   inline ssize_t read(fd_t fd, char* buf, size_t len)

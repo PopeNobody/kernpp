@@ -1,12 +1,29 @@
 
-shit: all
-	./bin/report ./bin/false || ./bin/report ./bin/true
-	./bin/report ./bin/false || ./bin/report ./bin/true
+
+whatever: bin/report
+
+rep_src:= 
+rep_src+= lib/mm.cc
+rep_src+= lib/dbg.cc
+rep_src+= lib/abi.cc
+rep_src+= lib/new.cc
+rep_src+= lib/c_str.cc
+rep_src+= lib/errno.cc
+rep_src+= lib/init_array.cc
+rep_src+= lib/strerror_list.cc
+rep_obj:= $(patsubst %,%.o,$(rep_src))
+
+bin/report: bin/report.cc.o $(rep_obj)
+	$(LD) -static $(START) $^   -o $@
+
+#    shit: all
+#    	./bin/report ./bin/false || ./bin/report ./bin/true
+#    	./bin/report ./bin/false || ./bin/report ./bin/true
 
 all:
 
-fuck: bin/markout
-	./bin/markout /bin/ls */fuck */cat.cc
+#    fuck: bin/markout
+#    	./bin/markout /bin/ls */fuck */cat.cc
 
 MAKEFLAGS:=-rR -j1
 AR_FLAGS = rU
@@ -75,14 +92,14 @@ $(LIB_LIB): $(LIB_OBJ)
 bin/false bin/true: START:=
 
 .PRECIOUS: lib/start.o
-%: %.o $(START) $(LIB_LIB) ld_flags
+$(filter-out bin/report,$(BIN_EXE)): %: %.cc.o $(START) $(LIB_LIB) ld_flags
 	$(LD) -static $(START) $<  $(LIB_LIB) -o $@
 
 %.o: %.S
 	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 ifeq (1,1)
-%.o: %.cc cxxflags cppflags asmflags
+%.cc.o: %.cc cxxflags cppflags asmflags
 	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.cc.ii) $(DEPFLAGS)
 	$(CXX) $(CXXFLAGS) -S $(<:.cc=.cc.ii)  -o $(<:.cc=.cc.s)
 	$(CXX) $(ASMFLAGS) -c $(<:.cc=.cc.s)   -o $@

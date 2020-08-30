@@ -14,11 +14,14 @@
 //ostream &operator(ostream &lhs, const exception &rhs);
 //ostream &operator(ostream &lhs, const type_info &rhs);
 
-struct runtime_error
-{
+namespace dbg {
+  struct runtime_error
+  {
+  };
+  template<typename ...arg_t>
+    void __xthrow(arg_t ... args);
+  void __xassert(const char *cond);
 };
-template<typename ...arg_t>
-void __xthrow(arg_t ... args);
 
 #define nop()
 #define macwrap(x,y)  do{ x; y; }while(0)
@@ -32,10 +35,10 @@ void __xthrow(arg_t ... args);
 #define xconfess(x)   xtrace2(  "confess:             "        x,  dump(true)   )
 #define xcluck(x)     xtrace2(  "cluck:               "        x,  dump(false)  )
 #define xcheckin()    xtrace2(  __PRETTY_FUNCTION__,  nop()  )
-#define xassert(x)    if(!(x)) { xthrowre( "assertion failed: '"  #x ); }
+#define xassert(x)    if(!(x)) { dbg::__xassert( #x ); }
 #define xnv(x) #x   " => "  (x)
 #define dbg() __FILE__  ":"  __LINE__  ":"
-#define  xthrow(x,y) do{ __xthrow(x,y); }while(false)
+#define  xthrow(x,y) do{ dbg::__xthrow(x,y); }while(false)
 //#define  xthrowre(y) xthrow(runtime_error,y)
 #define  xthrowre(y) xthrow(runtime_error,y)
 

@@ -3,7 +3,9 @@
 
 #include <dbg.hh>
 
-namespace {
+namespace buf_ns
+{
+  using namespace fmt;
   struct buf_t {
     buf_t()
     {
