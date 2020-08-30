@@ -26,9 +26,18 @@ bin/ls.o: include/stdlib.hh
 bin/ls.o: include/syscall.hh
 bin/ls.o: include/types.hh
 
+bin/report.o: /usr/include/assert.h
+bin/report.o: /usr/include/bits/long-double.h
+bin/report.o: /usr/include/bits/wordsize.h
+bin/report.o: /usr/include/features.h
+bin/report.o: /usr/include/gnu/stubs-64.h
+bin/report.o: /usr/include/gnu/stubs.h
 bin/report.o: /usr/include/stdc-predef.h
+bin/report.o: /usr/include/sys/cdefs.h
 bin/report.o: bin/report.cc
+bin/report.o: include/buf.hh
 bin/report.o: include/c_str.hh
+bin/report.o: include/dbg.hh
 bin/report.o: include/errno.hh
 bin/report.o: include/fmt.hh
 bin/report.o: include/getopt.hh

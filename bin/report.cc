@@ -2,12 +2,14 @@
 #include <fmt.hh>
 #include <syscall.hh>
 #include <getopt.hh>
+#include <buf.hh>
 
 using namespace fmt;
 extern "C" {
   int main(int argc, char**argv, char**envp);
 };
 
+buf_t buf;
 // int execve(const char * fn, char *const * argv, char *const * envp)
 pid_t xfork()
 {
@@ -28,101 +30,11 @@ char *defs[] = {
 #define wtermsig(res) (res&0x7f)
 #define wexitstatus(res) ((res&0xff00)>>8)
 
-void __xassert(const char *cont, bool val)
-{
-  if(val)
-    return;
-  write(2,"assert fail:\n'");
-  write(2,cont);
-  write(2,"'\n");
-  asm("int3");
-};
 
-#define xassert(x) __xassert(#x,(x))
-
-#define __ent() \
-  1
-
-#if 0
-  do{\
-    const char *cp=__PRETTY_FUNCTION__; \
-    write(2,cp,strlen(cp)); \
-    write(2,"\n",1); \
-  } while(0)
-#endif
 static char to_char(int num)
 {
   return num+'0';
 };
-struct buf_t {
-  char text[8*1024];
-  size_t len;
-  buf_t()
-    : text(""), len(0)
-  {
-  };
-  ssize_t __write(const char *text, ssize_t len)
-  {
-    xassert(len>=0);
-    sys::write(1,text,len);
-    return 0;
-  };
-  ssize_t write(const char *arg)
-  {
-    if(arg==0)
-      arg="(null)";
-    return __write(arg,strlen(arg));
-  };
-  ssize_t write(char &arg)
-  {
-    return __write(&arg,1);
-  };
-  ssize_t write(int arg)
-  {
-    if(arg<0)
-      return write(true,arg);
-    else
-      return write(false,arg);
-  };
-  ssize_t write(void *ptr)
-  {
-    struct {
-      char buf[1023];
-      char end[1];
-    } dat;
-    char *pos=fmt_ptr(ptr,dat.buf,dat.end);
-    write(pos);
-    return pos-dat.buf;
-  };
-  ssize_t write(bool neg, unsigned long val)
-  {
-    struct {
-      char buf[1023];
-      char end[1];
-    } dat;
-    char *pos=fmt_dec(neg,val,dat.buf,dat.end);
-    write(pos);
-    return pos-dat.buf;
-  };
-  ssize_t println()
-  {
-    return write("\n");
-  };
-  template<typename arg0_t, typename ...argn_t>
-    ssize_t println(arg0_t arg, argn_t... tail)
-    {
-      return print(arg,tail...,"\n");
-    };
-  ssize_t print()
-  {
-    return 0;
-  };
-  template<typename arg0_t, typename ...argn_t>
-    ssize_t print(arg0_t arg, argn_t... tail)
-    {
-      return write(arg)+print(tail...);
-    };
-} buf;
 char env1[]="TEST1=test1";
 char env2[]="TEST2=test2";
 char env3[]="TEST3=test3";
@@ -132,7 +44,6 @@ char *env[]
 };
 char **clone(char **in)
 {
-  //__ent(); 
   //buf.println((void*)in);
 
   int c=0;
@@ -150,7 +61,6 @@ char **clone(char **in)
 };
 int count(char**arr) 
 {
-  //__ent(); 
   //buf.println("arr: ",(void*)arr);
   int c=0;
   while(arr[c])
@@ -159,7 +69,6 @@ int count(char**arr)
 };
 int dump(char**arr) 
 {
-  __ent(); 
   buf.println("\narr: ",(void*)arr);
   int c=0;
   buf.println();
@@ -174,7 +83,6 @@ int dump(char**arr)
 };
 char **d_and_c(char**arr)
 {
-  //__ent();
   ///int c=dump(arr);
   int c=count(arr);
   //buf.println("dump returned ", c);
@@ -184,17 +92,130 @@ char **d_and_c(char**arr)
 };
 static char **argv;
 static char **envp;
+
+template<typename itr_t, typename pred_t>
+itr_t find( itr_t &beg, pred_t pred )
+{
+  while(true)
+  {
+    if(pred(*beg))
+      return beg;
+    ++beg;
+  };
+};
+
+typedef char * str_t;
+typedef const char *str_c;
+
+template<size_t _n>
+struct str_list
+{
+  typedef str_t value_type;
+  typedef str_t *iterator;
+  typedef str_t &reference;
+  typedef str_t *pointer;
+  typedef const str_t *const_pointer;
+
+  static constexpr size_t n = _n;
+
+  struct data_t {
+    str_t list[n];
+    size_t i;
+    data_t()
+    {
+      memset(this,0,sizeof(*this));
+
+    };
+    template<typename itr_t>
+    void push_back(itr_t beg, itr_t end)
+    {
+      while(beg!=end)
+        list[i++]=*beg++;
+    };
+  }data;
+
+  str_list(char **beg, char**end)
+    :data(beg,end)
+  {
+    xassert(end-beg<=n);
+    
+    auto i=data.i;
+    while(beg!=end)
+      data.list[i++]=*beg++;
+
+    size_t p(data.i);
+    while(p<n)
+      data.list[p++]=0;
+    data.i=i;
+  };
+  str_list(char **beg)
+    :data(beg)
+  {
+  };
+  str_list()
+  {
+  };
+  const_pointer end() const
+  {
+    return &data.list[data.i];
+  };
+  const_pointer begin() const
+  {
+    return &data.list[0];
+  };
+  iterator begin() {
+    return &data.list[0];
+  };
+  iterator end() {
+    return &data.list[data.i];
+  };
+  void push_back(const str_c str)
+  {
+    push_back((str_t)str);
+  }; 
+  void push_back(const str_t str)
+  {
+    data.push_back(&str,1+&str);
+  };
+  template<typename itr_t>
+  void push_back(itr_t beg, itr_t end)
+  {
+    while(beg!=end)
+      push_back(*beg);
+  };
+  size_t size() const
+  {
+    return data.i;
+  };
+};
+
 int main(int argc, char** _argv, char **_envp)
 {
-  argv=_argv;
-  envp=_envp;
   int res=0;
+  str_list<20> strs;
+  strs.push_back("testing");
+  strs.push_back("testing");
+  strs.push_back("1");
+  strs.push_back("2");
+  strs.push_back("3");
+  for( auto str : strs )
+    buf.println(str);
+  strs.push_back(strs.begin(),strs.end());
+#if 0
+  str_list<1024> argv(_argv,_argv+argc);
+  str_list<1024> envp(_envp);
+
+  argv.push_back(".");
+  for( auto str : argv )
+    buf.println(str);
+
+  buf.println(argv.size()," items");
+  envp=_envp;
 #if 0
   int fd=open("/dev/pts/7", sys::o_wronly);
   sys::dup2(fd,2);
   if(fd>2)
     sys::close(fd);
-  __ent();
 #endif
 
   if(argc<2) {
@@ -227,5 +248,6 @@ int main(int argc, char** _argv, char **_envp)
     sys::execve(argv[0],argv, envp);
     return 0;
   };
+#endif
   return res;
 };

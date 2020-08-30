@@ -83,9 +83,9 @@ bin/false bin/true: START:=
 
 ifeq (1,1)
 %.o: %.cc cxxflags cppflags asmflags
-	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.ii) $(DEPFLAGS)
-	$(CXX) $(CXXFLAGS) -S $(<:.cc=.ii)  -o $(<:.cc=.s)
-	$(CXX) $(ASMFLAGS) -c $(<:.cc=.s)   -o $@
+	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.cc.ii) $(DEPFLAGS)
+	$(CXX) $(CXXFLAGS) -S $(<:.cc=.cc.ii)  -o $(<:.cc=.cc.s)
+	$(CXX) $(ASMFLAGS) -c $(<:.cc=.cc.s)   -o $@
 else
 %.cc.i: %.cc cxxflags cppflags asmflags
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -E $< -o $@ $(DEPFLAGS)
