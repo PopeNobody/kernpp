@@ -96,6 +96,10 @@ endif
 
 tags: $(wildcard */*.{cc,hh}) $(wildcard */*.{cc.hh}) Makefile
 	ctags -R .
+deps=$(wildcard */*.d)
+
+depends.mk: $(deps)
+	perl depends.pl $(deps) > $@
 
 include depends.mk
 
