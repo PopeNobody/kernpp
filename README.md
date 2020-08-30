@@ -8,7 +8,3 @@ some different things, and I figure I might as well do it publicly.
 I appreciate suggestions, but this is my project to fuck around.
 I might not do it the right way because I am interested in discovering
 the characteristics of the wrongness produced by doing it the wrong way.
-
-
-
-
