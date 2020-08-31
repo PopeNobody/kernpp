@@ -11,3 +11,7 @@ output
 tags
 trace
 .gdb_history
+core.*
+out
+fuck
+

@@ -134,24 +134,24 @@ struct str_list
     };
   }data;
 
-  str_list(char **beg, char**end)
-    :data(beg,end)
-  {
-    xassert(end-beg<=n);
-    
-    auto i=data.i;
-    while(beg!=end)
-      data.list[i++]=*beg++;
-
-    size_t p(data.i);
-    while(p<n)
-      data.list[p++]=0;
-    data.i=i;
-  };
-  str_list(char **beg)
-    :data(beg)
-  {
-  };
+//     str_list(char **beg, char**end)
+//       :data(beg,end)
+//     {
+//       xassert(end-beg<=n);
+//       
+//       auto i=data.i;
+//       while(beg!=end)
+//         data.list[i++]=*beg++;
+//   
+//       size_t p(data.i);
+//       while(p<n)
+//         data.list[p++]=0;
+//       data.i=i;
+//     };
+//     str_list(char **beg)
+//       :data(beg)
+//     {
+//     };
   str_list()
   {
   };
@@ -180,8 +180,11 @@ struct str_list
   template<typename itr_t>
   void push_back(itr_t beg, itr_t end)
   {
+    auto osize=size();
     while(beg!=end)
       push_back(*beg);
+    auto nsize=size();
+    buf.println("added ", (nsize-osize), "messags");
   };
   size_t size() const
   {
@@ -198,9 +201,9 @@ int main(int argc, char** _argv, char **_envp)
   strs.push_back("1");
   strs.push_back("2");
   strs.push_back("3");
+  strs.push_back(strs.begin(),strs.end());
   for( auto str : strs )
     buf.println(str);
-  strs.push_back(strs.begin(),strs.end());
 #if 0
   str_list<1024> argv(_argv,_argv+argc);
   str_list<1024> envp(_envp);
