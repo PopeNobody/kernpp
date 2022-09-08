@@ -117,6 +117,19 @@ static struct option long_options[] = {
 };
 int main(int argc, char** argv,char**envp)
 {
+  write(1,L("argc="));
+  write_dec(1,argc);
+  write(1,L("\nargv=\n"));
+  for(int i=0;i<argc;i++) {
+    write_dec(1,i);
+    write(1,L(": "));
+    write(1,argv[i]);
+    write(1,L("\n"));
+  };
+  return 0;
+};
+int xmain(int argc, char** argv,char**envp)
+{
   int c;
   c_str names[argc];
   int nnames=0;

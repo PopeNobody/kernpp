@@ -86,8 +86,6 @@ enum ignore_t {
 extern "C" {
   void mm_show();
 };
-static void *ptrs[4096];
-static size_t nptr=0;
 using namespace sys;
 void lsdir(int fd) {
   enum { size = 4096 };
@@ -210,14 +208,6 @@ int main(int argc, char**argv,char**envp)
     };
   } else {
     lsarg(".");
-  };
-  for(int i=0;i<nptr;i++) {
-    if(ptrs[i]){
-      fmt::write_ptr(2,ptrs[i]);
-      write(2,L("\n"));
-      free(ptrs[i]);
-      ptrs[i]=0;
-    };
   };
   return 0;
 };

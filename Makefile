@@ -1,20 +1,4 @@
-bin/cat.cc.o:
-
-rep_src:= 
-rep_src+= lib/mm.cc
-rep_src+= lib/dbg.cc
-rep_src+= lib/abi.cc
-rep_src+= lib/new.cc
-rep_src+= lib/c_str.cc
-rep_src+= lib/errno.cc
-rep_src+= lib/init_array.cc
-rep_src+= lib/strerror_list.cc
-rep_obj:= $(patsubst %,%.o,$(rep_src))
-
-bin/report: bin/report.cc.o $(rep_obj)
-	$(LD) -static $(START) $^   -o $@
-
-all:
+test:
 
 MAKEFLAGS+= -rR -j1
 AR_FLAGS= rU
@@ -33,6 +17,9 @@ BIN_ASM:=$(wildcard bin/*.S)
 BIN_CXX:=$(wildcard bin/*.cc)
 BIN_OBJ:=$(patsubst %.cc,%.cc.o,$(BIN_CXX))
 BIN_OBJ+=$(patsubst %.S,%.S.o,$(BIN_ASM))
+CXX_BIN:=$(patsubst %.cc,%,$(BIN_CXX))
+ASM_BIN:=$(patsubst %.S,%,$(BIN_ASM))
+BIN_BIN:=$(CXX_BIN) $(ASM_BIN)
 
 LIB_ASM:=$(wildcard lib/*.S)
 LIB_CXX:=$(wildcard lib/*.cc)
@@ -43,39 +30,33 @@ lib/strerror_list.cc: script/genstrerror.pl
 	rm -f lib/strerror_list*
 	vi_perl $<
 
-START:= lib/start.o
+START:= lib/start.S.o
 LIB_LIB:=lib/libkernpp.a
-
-LO1:=$(patsubst %.cc,%.cc.o,$(LIB_CXX))
-LO2:=$(filter-out $(START),$(LO1)) 
-LO3:=$(sort $(LO2))
-LIB_OBJ:=$(LO3)
-
-BIN_EXE:=$(patsubst %.cc,%,$(BIN_CXX))
-BIN_EXE+=$(patsubst %.S,%,$(BIN_ASM))
-
-all: $(BIN_EXE) 
-
 
 $(LIB_LIB): $(LIB_OBJ)
 	ar $(AR_FLAGS) $@.new $(LIB_OBJ)
 	mv $@.new $@
 
-bin/false bin/true: START:=
+.PRECIOUS: lib/start.S.o
 
-.PRECIOUS: lib/start.o
-$(filter-out bin/report,$(BIN_EXE)): %: %.cc.o $(START) $(LIB_LIB)
+$(ASM_BIN): %: %.S.o 
+	$(LD) -static $< -o $@
+
+$(CXX_BIN): %: %.cc.o $(START) $(LIB_LIB)
 	$(LD) -static $(START) $<  $(LIB_LIB) -o $@
 
-%.S.o: %.S
-	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+$(filter %.S.o,$(LIB_OBJ)): %.S.o: %.S
+	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) $(ASMFLAGS) -c $< -o $@
 
-$(warning $(LIB_OBJ))
-$(LIB_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags fakefile
-	@echo $@
-#    	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.cc.ii) $(DEPFLAGS)
-#    	$(CXX) $(CXXFLAGS) -S $(<:.cc=.cc.ii)  -o $(<:.cc=.cc.s)
-#    	$(CXX) $(ASMFLAGS) -c $(<:.cc=.cc.s)   -o $@
+$(filter %.cc.o,$(LIB_OBJ)): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
+	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) $(ASMFLAGS) -c $< -o $@
+
+$(filter %.cc.o, $(BIN_OBJ)): %.cc.o: %.cc etc/asmflags etc/cppflags etc/cxxflags
+	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) $(ASMFLAGS) -c $< -o $@
+
+$(filter %.S.o,$(BIN_OBJ)): %.S.o: %.S etc/asmflags etc/cppflags etc/cxxflags
+	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) $(ASMFLAGS) -c $< -o $@
+
 
 deps=$(wildcard */*.d)
 
@@ -86,3 +67,10 @@ include depends.mk
 
 clean:
 	rm -f */*.cc.o */*.cc.ii */*.cc.s */*.cc.d $(BIN_EXE) $(LIB_LIB)
+
+test: $(BIN_BIN)
+	perl test.pl $(BIN_BIN)
+
+$(patsubst %,%_test,$(BIN_BIN)): %_test: %
+	perl test.pl $<
+

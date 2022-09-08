@@ -7,8 +7,8 @@ _start:
    lea 8(%rsp),%rsi
    call main
 	 movq %rax,%rdi
-		call exit
-		int3
+   call exit
+	 int3
 #   movq %rax,%rdi
 #   movl $60,%eax
 #   syscall

@@ -5,6 +5,19 @@
 using fmt::write_dec;
 using fmt::write_ptr;
 using fmt::write_hex;
+void _write_pos(const char *file, unsigned line)
+{
+  write(1,file);
+  write(1,":");
+  write_dec(1,line);
+  write(1,":");
+};
+#define write_pos() _write_pos(__FILE__,__LINE__);
+#define write_func() \
+  write_pos(); \
+  write(1,L("Entering ")); \
+  write(1,__PRETTY_FUNCTION__); \
+  write(1,L("\n"));
 
 namespace fmt {
   inline char *fmt_sphex(unsigned long val, char *beg, char *end)
@@ -53,21 +66,21 @@ class block_l {
   };
   void *malloc(size_t size)
   {
+    write_func();
     void *res=_malloc(size);
-    if(0){
-      write_buf<> msg(2);
-      msg.put("malloc(");
-      msg.fmt(size);
-      msg.put(") => ");
-      msg.fmtln(res);
-    };
     return res;
 
   };
   void *_malloc(size_t size)
   {
+    write_func();
     block_t **pos=&list;
-    while(*pos) {
+    while(true) {
+      write(1,L("pos: "));
+      write_ptr(1,*pos);
+      write(1,L("\n"));
+      if(!*pos)
+         break;
       block_t *blk=*pos;
       void *ptr = (void*)(blk+1);
       if( blk->magic1 != magic || blk->magic2 != magic || blk->magic3 != magic ) 
@@ -168,6 +181,11 @@ extern "C" {
 //     };
 };
 void *malloc(size_t size) {
+    write_func();
+    write(1,"  size=");
+    write_dec(1,size);
+    write(1,"\n");
+
 #if 1
   return list.malloc(size);
 #else

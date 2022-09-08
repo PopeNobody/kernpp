@@ -16,6 +16,8 @@ const static int billion=1000*million;
 extern "C" {
   int main(int argc, char**argv, char **envp);
 };
+
+
 int main(int argc, char**argv, char **envp)
 {
   int opt;
@@ -58,16 +60,16 @@ int main(int argc, char**argv, char **envp)
 
     };
   };
-  timespec tm;
+  if(!mul)
+    mul=1;
+  timespec tm = { 0, 0 };
   if(optind<argc) {
     tm.tv_nsec=atoi(argv[optind++]);
+    tm.tv_nsec*=mul;
     if(tm.tv_nsec >= billion){
       tm.tv_sec=tm.tv_nsec/billion;
       tm.tv_nsec=tm.tv_nsec%billion;
     };
-  } else {
-    tm.tv_sec=1;
-    tm.tv_nsec=0;
   };
   write_tm(2,tm);write(2,L("\n"));
   nanosleep(&tm,0);
