@@ -81,7 +81,7 @@ $(CXX_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
 deps=$(patsubst %,%.d,$(ALL_CXX))
 
 depends.mk: $(deps) Makefile depends.pl
-	vi_perl depends.pl $(deps) > $@.new && mv $@.new $@
+	>depends.mk; #vi_perl depends.pl $(deps) > $@.new && mv $@.new $@
 
 include depends.mk
 
