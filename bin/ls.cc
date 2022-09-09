@@ -53,6 +53,19 @@ void sort(linux_dirent **beg, linux_dirent**end)
     beg=pos;
   }
 };
+bool skip(const char *name){
+  if(name[0]!='.')
+    return false;
+  if(ignore==normal)
+    return true;
+  if(ignore==minimal)
+    return false;
+  if(name[1]==0)
+    return true;
+  if(name[1]=='.' && name[2]==0)
+    return true;
+  return false;
+};
 void lsdir(int fd) {
   int n=0;
   linux_dirent*ents[8192];
@@ -67,7 +80,7 @@ void lsdir(int fd) {
     auto beg = reinterpret_cast<linux_dirent*>(&buf[0]);
     auto end = reinterpret_cast<linux_dirent*>(&buf[nread]);
     while(beg!=end){
-      if(dotfiles || beg->d_name[0] != '.') {
+      if(!skip(beg->d_name)){
         ents[n++]=beg;
       };
       beg=beg->next();
