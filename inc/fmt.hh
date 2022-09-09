@@ -50,15 +50,17 @@ namespace fmt {
     } else {
       *--end = '0';
     };
+    if(neg)
+      *--end = '-';
     if (max)
       while (end > max)
         *--end = ' ';
     return end;
   };
   using sys::write;
-  inline int write_dec(fd_t fd, size_t val) {
+  inline int write_dec(fd_t fd, int val) {
     char buf[sizeof(val) * 4];
-    return write(fd, fmt::fmt_dec(false,val, buf, &buf[sizeof(buf) - 1]));
+    return write(fd, fmt::fmt_dec(val<0,val<0?-val:val, buf, &buf[sizeof(buf) - 1]));
   };
   inline int write_hex(fd_t fd, size_t hex) {
     char buf[sizeof(hex) * 4];
@@ -115,26 +117,6 @@ namespace fmt {
     };
     return i;
   };
-#define show_val(x) do_show_val(L(#x),(x))
-#define show_dec(x)                                                            \
-  do {                                                                         \
-    write(2, L(#x " => "));                                                    \
-    write_dec(2, (x));                                                         \
-    write(2, L("\n"));                                                         \
-  } while (false);
-#define show_ptr(x)                                                            \
-  do {                                                                         \
-    write(2, L(#x " => "));                                                    \
-    write_ptr(2, (x));                                                         \
-    write(2, L("\n"));                                                         \
-  } while (false);
-#define show_hex(x)                                                            \
-  do {                                                                         \
-    write(2, L(#x " => "));                                                    \
-    write_hex(2, (x));                                                         \
-    write(2, L("\n"));                                                         \
-  } while (false);
-#undef AAI
 
   struct fmt_t
   {

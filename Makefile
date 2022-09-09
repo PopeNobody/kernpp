@@ -57,11 +57,11 @@ $(LIB_LIB): $(LIB_OBJ)
 bin/false bin/true: START:=
 
 .PRECIOUS: lib/start.S.o
-$(BIN_CXX_EXE): %: %.cc.o $(START) $(LIB_LIB)
-	$(LD) -static $(START) $<  $(LIB_LIB) -o $@
+$(BIN_CXX_EXE): %: %.cc.o $(START) $(LIB_LIB) etc/ld_flags
+	$(LD) @etc/ld_flags $(START) $<  $(LIB_LIB) -o $@
 
-$(BIN_ASM_EXE): %: %.S.o
-	$(LD) -static $< -o $@
+$(BIN_ASM_EXE): %: %.S.o etc/ld_flags
+	$(LD) @etc/ld_flags $< -o $@
 
 %.S.o: %.S
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
@@ -74,19 +74,19 @@ $(BIN_ASM_EXE): %: %.S.o
 
 $(CXX_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(DEPFLAGS)
-
-#    $(LIB_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
-#    	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(DEPFLAGS)
-#    	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.cc.ii) $(DEPFLAGS)
-#    	$(CXX) $(CXXFLAGS) -S $(<:.cc=.cc.ii)  -o $(<:.cc=.cc.s)
-#    	$(CXX) $(ASMFLAGS) -c $(<:.cc=.cc.s)   -o $@
+	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.cc.ii) $(DEPFLAGS)
+	$(CXX) $(CXXFLAGS) -S $(<:.cc=.cc.ii)  -o $(<:.cc=.cc.s)
+	$(CXX) $(ASMFLAGS) -c $(<:.cc=.cc.s)   -o $@
 
 deps=$(patsubst %,%.d,$(ALL_CXX))
 
-depends.mk: $(deps) Makefile
-	perl depends.pl $(deps) > $@.new && mv $@.new $@
+depends.mk: $(deps) Makefile depends.pl
+	vi_perl depends.pl $(deps) > $@.new && mv $@.new $@
 
 include depends.mk
+
+tags: alldeps
+	ctags $(cat alldeps)
 
 clean:
 	rm -f */*.cc.o */*.cc.ii */*.cc.s */*.cc.d $(BIN_EXE) $(LIB_LIB)

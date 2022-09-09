@@ -49,48 +49,6 @@ bool catfile(int ifd, int ofd)
   };
 };
 
-extern "C" {
-  int main(int argc, char**argv,char **envp);
-};
-template<typename val_t>
-struct vector
-{
-  val_t *arr;
-  size_t len;
-  vector()
-    : arr(nullptr), len(0)
-  {
-  };
-  vector(val_t *beg, val_t *end)
-    : arr(beg), len(end-beg)
-  {
-  };
-  val_t &operator[](size_t n)
-  {
-    assert(n<size());
-    return arr[n];
-  };
-  const val_t &operator[](size_t n) const
-  {
-    assert(n<size());
-    return arr[n];
-  };
-  size_t size() const {
-    return  len;
-  };
-  const val_t *begin() const {
-    return arr;
-  };
-  const val_t *end() const {
-    return arr+len;
-  };
-  val_t *begin() {
-    return arr;
-  };
-  val_t *end() {
-    return arr+len;
-  };
-};
 const char *program_name=nullptr;
 struct opts_t
 {
@@ -178,7 +136,7 @@ int main(int argc, char** argv,char**envp)
     else {
       int fd=open(name.begin(),o_rdonly);
       if(fd<0) {
-        write(2,"open:",5);
+        write(2,"open:");
         write(2,name.begin());
         write(2,":",1);
         write_dec(2,errno);

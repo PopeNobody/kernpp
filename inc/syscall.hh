@@ -546,4 +546,9 @@ extern "C"
 #ifndef _GLIBCXX_NOTHROW
 #define _GLIBCXX_NOTHROW
 #endif
+
+extern "C" {
+  int main(int argc, char**argv, char**envp);
+};
+
 #endif

@@ -1,10 +1,7 @@
 #include <syscall.hh>
 using sys::write;
 
-extern "C" {
-  int main(int argc, char**argv);
-};
-int main(int argc, char**argv) {
+int main(int argc, char**argv,char **envp) {
   ++argv;
   if(*argv)
     write(1, *argv++);
