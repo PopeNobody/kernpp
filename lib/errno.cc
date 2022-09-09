@@ -8,11 +8,6 @@ namespace sys {
   {
     if(err>=0)
       return err;
-    {
-      write_buf<> buf(2);
-      if(err!=11)
-        buf.put("errno=").fmtln(err);
-    };
     errno=-err;
     return -1;
   }
