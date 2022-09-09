@@ -125,13 +125,6 @@ int main(int argc, char** argv,char**envp)
     int this_option_intind = optind ? optind: 1;
     int option_index=0;
     c=getopt_long(argc,argv,"nbvteA",long_options,&option_index);
-    write(1,"c=");
-    write_dec(1,c);
-    write(1," argc=");
-    write_dec(1,argc);
-    write(1," optind=");
-    write_dec(1,optind);
-    write(1,"\n");
     switch(c) {
       case -1:
         names[nnames++]=argv[optind++];
