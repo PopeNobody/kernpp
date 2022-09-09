@@ -31,7 +31,7 @@ LIB_OBJ:=$(LIB_CXX_OBJ) $(LIB_ASM_OBJ)
 
 CXX_OBJ:=$(LIB_CXX_OBJ) $(BIN_CXX_OBJ)
 ASM_OBJ:=$(LIB_ASM_OBJ) $(BIN_ASM_OBJ)
-
+ALL_CXX:=$(LIB_CXX) $(BIN_CXX)
 
 lib/strerror_list.cc: script/genstrerror.pl
 	rm -f lib/strerror_list*
@@ -69,6 +69,8 @@ $(BIN_ASM_EXE): %: %.S.o
 %.cc.o: %.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
+%.cc.d: %.cc.o
+	@true
 
 $(CXX_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(DEPFLAGS)
@@ -79,7 +81,7 @@ $(CXX_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
 #    	$(CXX) $(CXXFLAGS) -S $(<:.cc=.cc.ii)  -o $(<:.cc=.cc.s)
 #    	$(CXX) $(ASMFLAGS) -c $(<:.cc=.cc.s)   -o $@
 
-deps=$(wildcard */*.d) /dev/null
+deps=$(patsubst %,%.d,$(ALL_CXX))
 
 depends.mk: $(deps) Makefile
 	perl depends.pl $(deps) > $@.new && mv $@.new $@
