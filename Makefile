@@ -1,22 +1,5 @@
-bin/cat.cc.o:
-
-rep_src:= 
-rep_src+= lib/mm.cc
-rep_src+= lib/dbg.cc
-rep_src+= lib/abi.cc
-rep_src+= lib/new.cc
-rep_src+= lib/c_str.cc
-rep_src+= lib/errno.cc
-rep_src+= lib/init_array.cc
-rep_src+= lib/strerror_list.cc
-rep_obj:= $(patsubst %,%.o,$(rep_src))
-
-bin/report: bin/report.cc.o $(rep_obj)
-	$(LD) -static $(START) $^   -o $@
-
 all:
 
-MAKEFLAGS+= -rR -j1
 AR_FLAGS= rU
 LD_FLAGS= @etc/ld_flags
 CPPFLAGS= @etc/cppflags 
@@ -29,21 +12,30 @@ CXX:= g++
 LD= ld
 
 
+START:= lib/start.S.o
+
 BIN_ASM:=$(wildcard bin/*.S)
 BIN_CXX:=$(wildcard bin/*.cc)
-BIN_OBJ:=$(patsubst %.cc,%.cc.o,$(BIN_CXX))
-BIN_OBJ+=$(patsubst %.S,%.S.o,$(BIN_ASM))
+BIN_CXX_OBJ:=$(patsubst %.cc,%.cc.o,$(BIN_CXX))
+BIN_ASM_OBJ:=$(patsubst %.S,%.S.o,$(BIN_ASM))
+BIN_OBJ:=$(BIN_CXX_OBJ) $(BIN_ASM_OBJ)
+BIN_CXX_EXE:=$(patsubst %.cc,%,$(BIN_CXX))
+BIN_ASM_EXE:=$(patsubst %.S,%,$(BIN_ASM))
 
-LIB_ASM:=$(wildcard lib/*.S)
+LIB_ASM:=$(filter-out lib/start.S, $(wildcard lib/*.S))
 LIB_CXX:=$(wildcard lib/*.cc)
-LIB_OBJ:=$(patsubst %.cc,%.cc.o,$(LIB_CXX))
-LIB_OBJ+=$(patsubst %.S,%.S.o,$(LIB_ASM))
+LIB_CXX_OBJ:=$(patsubst %.cc,%.cc.o,$(LIB_CXX))
+LIB_ASM_OBJ:=$(patsubst %.S,%.S.o,$(LIB_ASM))
+LIB_OBJ:=$(LIB_CXX_OBJ) $(LIB_ASM_OBJ)
+
+CXX_OBJ:=$(LIB_CXX_OBJ) $(BIN_CXX_OBJ)
+ASM_OBJ:=$(LIB_ASM_OBJ) $(BIN_ASM_OBJ)
+
 
 lib/strerror_list.cc: script/genstrerror.pl
 	rm -f lib/strerror_list*
 	vi_perl $<
 
-START:= lib/start.o
 LIB_LIB:=lib/libkernpp.a
 
 LO1:=$(patsubst %.cc,%.cc.o,$(LIB_CXX))
@@ -63,24 +55,33 @@ $(LIB_LIB): $(LIB_OBJ)
 
 bin/false bin/true: START:=
 
-.PRECIOUS: lib/start.o
-$(filter-out bin/report,$(BIN_EXE)): %: %.cc.o $(START) $(LIB_LIB)
+.PRECIOUS: lib/start.S.o
+$(BIN_CXX_EXE): %: %.cc.o $(START) $(LIB_LIB)
 	$(LD) -static $(START) $<  $(LIB_LIB) -o $@
 
-%.S.o: %.S
-	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+$(BIN_ASM_EXE): %: %.S.o
+	$(LD) -static $< -o $@
 
-$(warning $(LIB_OBJ))
-$(LIB_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags fakefile
-	@echo $@
+%.S.o: %.S
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+%.cc.o: %.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+
+$(CXX_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(DEPFLAGS)
+
+#    $(LIB_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
+#    	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(DEPFLAGS)
 #    	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.cc.ii) $(DEPFLAGS)
 #    	$(CXX) $(CXXFLAGS) -S $(<:.cc=.cc.ii)  -o $(<:.cc=.cc.s)
 #    	$(CXX) $(ASMFLAGS) -c $(<:.cc=.cc.s)   -o $@
 
-deps=$(wildcard */*.d)
+deps=$(wildcard */*.d) /dev/null
 
-depends.mk: $(deps)
-	perl depends.pl $(deps) > $@
+depends.mk: $(deps) Makefile
+	perl depends.pl $(deps) > $@.new && mv $@.new $@
 
 include depends.mk
 
