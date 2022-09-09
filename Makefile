@@ -1,4 +1,5 @@
 all:
+MAKEFLAGS+=-rR
 
 AR_FLAGS= rU
 LD_FLAGS= @etc/ld_flags
