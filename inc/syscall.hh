@@ -52,7 +52,7 @@ namespace sys
 #include <stdlib.hh>
 #define chk_return2(val, cast)                                            \
   return (cast)(val < 0 ? set_errno(val) : val)
-#define chk_return(val) return (val < 0 ? set_errno(val) : val)
+#define chk_return(val) return set_errno(val);
 namespace sys
 {
   extern "C"
@@ -60,13 +60,11 @@ namespace sys
     inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AAI;
     inline int     close(fd_t fd) AAI;
     inline int     stat(const char* pathname, struct stat* statbuf) AAI;
-    inline fd_t    open(const char* pathname,
-                        open_flags  flags,
-                        open_mode   mode) AAI;
+    inline fd_t    open(const char* pathname, open_flags  flags, open_mode   mode) AAI;
     inline time_t  time(time_t*) AAI;
     inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len) AAI;
     inline ssize_t read(fd_t fd, char* buf, size_t len) AAI;
-    inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AAI;
+    inline ssize_t write(fd_t fd, const char* buf, size_t len) AAI;
   }
   inline void    exit(int res) NOR;
 
@@ -81,7 +79,7 @@ namespace sys
     chk_return(res);
   }
   // __NR_write=1
-  inline ssize_t sys_write(fd_t fd, const char* buf, size_t len)
+  inline ssize_t write(fd_t fd, const char* buf, size_t len)
   {
     long res;
     if(!buf) {
@@ -453,17 +451,12 @@ namespace sys
 namespace sys
 {
 
-  inline ssize_t write(int fd, const char* buf, size_t len) AAI;
   inline ssize_t write(int fd, const char* buf, const char* end) AAI;
   inline ssize_t write(fd_t fd, const char* buf) AAI;
 
-  inline ssize_t write(int fd, const char* buf, size_t len)
-  {
-    return sys_write(fd, buf, len);
-  }
   inline ssize_t write(int fd, const char* buf, const char* end)
   {
-    return sys_write(fd, buf, end - buf);
+    return write(fd, buf, end - buf);
   }
 
   inline ssize_t write(fd_t fd, const char* buf)
@@ -471,7 +464,7 @@ namespace sys
     const char* end= buf;
     while(*end)
       ++end;
-    return sys_write(fd, buf, end - buf);
+    return write(fd, buf, end - buf);
   }
 
   inline ssize_t full_write(int fd, const char* const beg, size_t len)
@@ -488,7 +481,7 @@ namespace sys
     const char* pos= beg;
     while(pos != end)
     {
-      ssize_t res= sys_write(fd, pos, end - pos);
+      ssize_t res= write(fd, pos, end - pos);
       if(res < 0)
         return nullptr;
       pos+= res;

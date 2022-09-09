@@ -108,7 +108,7 @@ cmp_op(==);
 cmp_op(!=);
 
 inline ssize_t write(fd_t fd, const c_str &str) {
-  return sys::sys_write(fd, str.begin(), str.size());
+  return sys::write(fd, str.begin(), str.size());
 };
 
 #endif
