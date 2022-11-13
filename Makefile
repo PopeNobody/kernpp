@@ -1,5 +1,5 @@
-bin/cat.cc.o:
-
+all:
+	
 rep_src:= 
 rep_src+= lib/mm.cc
 rep_src+= lib/dbg.cc
@@ -13,8 +13,6 @@ rep_obj:= $(patsubst %,%.o,$(rep_src))
 
 bin/report: bin/report.cc.o $(rep_obj)
 	$(LD) -static $(START) $^   -o $@
-
-all:
 
 MAKEFLAGS+= -rR -j1
 AR_FLAGS= rU
@@ -70,7 +68,6 @@ $(filter-out bin/report,$(BIN_EXE)): %: %.cc.o $(START) $(LIB_LIB)
 %.S.o: %.S
 	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-$(warning $(LIB_OBJ))
 $(LIB_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags fakefile
 	@echo $@
 #    	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.cc.ii) $(DEPFLAGS)
