@@ -461,7 +461,7 @@ namespace sys
 
   inline ssize_t write(fd_t fd, const char* buf)
   {
-    const char* end= buf;
+    const char* end= buf ? buf : "(null)";
     while(*end)
       ++end;
     return write(fd, buf, end - buf);
@@ -517,9 +517,6 @@ namespace std
   {
   };
   extern const nothrow_t nothrow;
-  enum align_val_t
-  {
-  };
   typedef void (*new_handler)();
 }
 extern "C"
