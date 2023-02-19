@@ -33,11 +33,14 @@ static const struct file_operations prtree_fops = {
   .release	= single_release,
 };
 
+static const struct proc_ops prtree_pops = {
+};
+
 static int __init 
 prtree_init(void)
 {
   printk(KERN_INFO "Loading pstree module.\n");
-  proc_create("pstree", 0, NULL, &prtree_fops);
+  proc_create("pstree", 0, NULL, &prtree_pops);
   return 0;
 }
 

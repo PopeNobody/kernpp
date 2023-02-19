@@ -169,7 +169,7 @@ int getopt_long(int argc, char* const argv[], const char* optstring,
   if (optind >= argc)
     return -1;
 
-  if (strlen(argv[optind]) < 3 || strncmp(argv[optind], "--", 2) != 0)
+  if (argv[optind][0]!='-' || argv[optind][1]!='-' || argv[optind][2]==0)
     return getopt(argc, argv, optstring);
 
   /* It's an option; starts with -- and is longer than two chars. */
