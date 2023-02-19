@@ -1,0 +1,1 @@
+cmd_/home/nn/src/cpp/kernpp/new/kmod_dev/Module.symvers := sed 's/ko$$/o/' /home/nn/src/cpp/kernpp/new/kmod_dev/modules.order | scripts/mod/modpost    -o /home/nn/src/cpp/kernpp/new/kmod_dev/Module.symvers -e -i Module.symvers   -T -
