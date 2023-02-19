@@ -1,0 +1,17 @@
+depends.mk
+bin/markout
+**.d
+**.[os]
+**.ii
+**.a
+log/
+*.out
+bin/report
+bin/string_view
+output
+tags
+trace
+.gdb_history
+core.*
+out
+fuck
