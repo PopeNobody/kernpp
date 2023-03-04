@@ -8,6 +8,7 @@ _start:
 	call libc_init
   movq 0(%rsp),%rdi
   lea 8(%rsp),%rsi
+  lea 16(%rsp),%rdx
   call main
 	movq %rax,%rdi
 	call exit
