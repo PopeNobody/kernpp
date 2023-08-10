@@ -82,4 +82,4 @@ deps=$(patsubst %,%.d,$(ALL_CXX))
 
 
 clean:
-	rm -f */*.cc.o */*.cc.ii */*.cc.s */*.cc.d $(BIN_EXE) $(LIB_LIB)
+	rm -f */*.{cc,S}.{o,ii,s,d} $(BIN_EXE) $(LIB_LIB)
