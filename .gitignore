@@ -20,3 +20,5 @@ bin/lspath
 depends.mk.new
 a
 b
+bin/not
+bin/test_getopt
