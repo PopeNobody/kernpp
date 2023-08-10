@@ -1,4 +1,0 @@
--ffreestanding
--fno-exceptions
--O2
--fno-stack-protector
