@@ -1,13 +1,10 @@
 depends.mk
-bin/markout
 **.d
 **.[os]
 **.ii
 **.a
 log/
 *.out
-bin/report
-bin/string_view
 output
 tags
 trace
@@ -15,10 +12,6 @@ trace
 core.*
 out
 fuck
-,/bin/lspath
-bin/lspath
 depends.mk.new
 a
 b
-bin/not
-bin/test_getopt
