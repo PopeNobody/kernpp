@@ -35,7 +35,7 @@ ALL_CXX:=$(LIB_CXX) $(BIN_CXX)
 
 lib/strerror_list.cc: script/genstrerror.pl
 	rm -f lib/strerror_list*
-	vi_perl $<
+	vi-perl $<
 
 LIB_LIB:=lib/libkernpp.a
 
@@ -81,7 +81,7 @@ $(CXX_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
 deps=$(patsubst %,%.d,$(ALL_CXX))
 
 depends.mk: $(deps) Makefile depends.pl
-	vi_perl depends.pl $(deps) > $@.new && mv $@.new $@
+	vi-perl depends.pl $(deps) > $@.new && mv $@.new $@
 
 include depends.mk
 
