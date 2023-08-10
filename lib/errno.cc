@@ -1,6 +1,6 @@
 #include <errno.hh>
 #include <syscall.hh>
-#include <write_buf.hh>
+//#include <write_buf.hh>
 
 namespace sys {
   errno_t errno;

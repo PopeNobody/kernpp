@@ -80,13 +80,6 @@ $(CXX_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
 
 deps=$(patsubst %,%.d,$(ALL_CXX))
 
-depends.mk: $(deps) Makefile depends.pl
-	vi-perl depends.pl $(deps) > $@.new && mv $@.new $@
-
-include depends.mk
-
-tags: alldeps
-	ctags $(cat alldeps)
 
 clean:
 	rm -f */*.cc.o */*.cc.ii */*.cc.s */*.cc.d $(BIN_EXE) $(LIB_LIB)
