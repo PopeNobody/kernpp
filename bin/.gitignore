@@ -6,3 +6,15 @@ ls
 markout
 true
 usleep
+not
+cat
+echo
+false
+ls
+lspath
+not
+report
+string_view
+test_getopt
+true
+usleep
