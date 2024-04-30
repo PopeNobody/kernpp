@@ -1,0 +1,26 @@
+#!/bin/bash
+
+die(){ echo $(printf "$@") >&2; exit 1; }
+for o; do
+  case "$o" in
+    (*.oo)
+      die "trying to make .oo file in prec?"
+      ;;
+    (*.ii)
+      r=${o%.ii}
+      s=$r.cc
+      d=$o.d
+      ;;
+    (*)
+      die "no support for file %q\n" "$o"
+      ;;
+  esac
+  set -- -o $o $s 
+  set -- "$@" @etc/cppflags
+  set -- "$@" -MD -MF $d -MP -MT $o
+  set -- "g++" "$@" -E
+  #printf ' (%s)\n' "$@"
+  if ! "$@"; then
+    die "$* returned %d" $?
+  fi
+done

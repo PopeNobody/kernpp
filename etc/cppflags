@@ -1,4 +1,4 @@
 -nostdinc++
 
--Iinclude
+-Iinc
 -g

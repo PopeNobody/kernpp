@@ -1,0 +1,23 @@
+#!/bin/bash
+
+die(){ echo $(printf "$@") >&2; exit 1; }
+for o; do
+  case "$o" in
+    (*.oo)
+      r=${o%.oo}
+      s=$r.cc
+      d=$o.d
+      ;;
+    (*)
+      die "no support for file %q\n" "$o"
+      ;;
+  esac
+  set -- -o $o $s 
+  set -- "$@" @etc/cflags
+  set -- "$@" -MD -MF $d -MP -MT $o
+  set -- "g++" "$@" -c
+  #printf ' (%s)\n' "$@"
+  if ! "$@"; then
+    die "$* returned %d" $?
+  fi
+done

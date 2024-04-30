@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec strace -etrace=read,write,select,bind,connect,accept "$@"

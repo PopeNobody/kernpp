@@ -1,0 +1,27 @@
+#!/bin/bash
+
+die(){ echo $(printf "$@") >&2; exit 1; }
+for o; do
+  case "$o" in
+    (*.[oc][oc])
+      die "terrible name for an executable: %q\n" "$o";
+      ;;
+    (*)
+      i=$o.oo
+      d=$o.d
+      ;;
+    (*)
+      die "no support for file %q\n" "$o"
+      ;;
+  esac
+  set -- "$i"
+  set -- "$@" lib/libsimchat.aa
+  set -- "-Wl,--start-group" "$@" "-Wl,--end-group"
+  set -- "$@" -o "$o" 
+  #set -- "$@" -Wl,--verbose
+  set -- "$@" -MD -MF $d -MP -MT $o
+  set -- g++ -static "$@"
+  if ! "$@"; then
+    die "$* returned %d" $?
+  fi
+done
