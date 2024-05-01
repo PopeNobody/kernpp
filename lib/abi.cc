@@ -14,6 +14,5 @@ extern "C" {
   void __cxa_guard_acquire(void*)
   {
   };
-  //void * __dso_handle=(void*)&__dso_handle;
-
+  void * __dso_handle=(void*)&__dso_handle;
 }

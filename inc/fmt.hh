@@ -110,7 +110,7 @@ namespace fmt {
           break;
         default:
           write(2, "err!");
-          exit(1);
+          sys::exit(1);
       };
     };
     return i;

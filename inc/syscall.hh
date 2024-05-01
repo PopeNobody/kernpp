@@ -346,7 +346,6 @@ namespace sys
     chk_return(res);
 
   }
-// __NR__ exit = 60 
   // __NR_exit = 60
   inline void exit(int res)
   {
@@ -357,7 +356,7 @@ namespace sys
         : "a"(60), "D"(exit_val)
         : "rcx", "r11", "memory");
     while(1)
-      ;
+      sleep(1);
   }
 
   // __NR__ wait4 = 61 

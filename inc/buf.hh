@@ -2,18 +2,21 @@
 #define buf_hh buf_hh
 
 #include <dbg.hh>
+#include <fmt.hh>
 
 namespace buf_ns
 {
   using namespace fmt;
   struct buf_t {
-    buf_t()
+    int fd;
+    buf_t(int fd=1)
+      :fd(fd)
     {
     };
     ssize_t __write(const char *text, ssize_t len)
     {
       xassert(len>=0);
-      sys::write(1,text,len);
+      sys::write(fd,text,len);
       return 0;
     };
     ssize_t write(const char *arg)

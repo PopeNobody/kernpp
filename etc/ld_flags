@@ -1,2 +1,12 @@
--static
 -Llib
+-O0
+-Wl,--verbose
+-ffreestanding
+-fno-exceptions
+-fno-stack-protector
+-ggdb3
+-nodefaultlibs
+-nolibc
+-nostartfiles
+-nostdlib
+-static

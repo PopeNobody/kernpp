@@ -1,6 +1,6 @@
 #include <errno.hh>
 #include <syscall.hh>
-#include <write_buf.hh>
+#include <buf.hh>
 
 namespace sys {
   errno_t errno;
@@ -9,9 +9,9 @@ namespace sys {
     if(err>=0)
       return err;
     {
-      write_buf<> buf(2);
+      buf_ns::buf_t buf(2);
       if(err!=11)
-        buf.put("errno=").fmtln(err);
+        buf.println("seting error to=",err);
     };
     errno=-err;
     return -1;
@@ -28,16 +28,16 @@ namespace sys {
   };
   void perror(const c_str &msg1, const c_str &msg2)
   {
-    write_buf<> buf(2);
+    buf_ns::buf_t buf(2);
     if(msg1) {
-      buf.put(msg1);
-      buf.put(":");
+      buf.print(msg1);
+      buf.print(":");
     };
     if(msg2) {
-      buf.put(msg2);
-      buf.put(":");
+      buf.print(msg2);
+      buf.print(":");
     };
-    buf.putln(strerror(errno));
+    buf.println(strerror(errno));
   };
   void pexit(const c_str &msg1, const c_str &msg2)
   {
