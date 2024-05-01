@@ -4,9 +4,9 @@
 #include <types.hh>
 extern "C"
 {
-  void*         malloc(size_t);
-  void          free(void*);
-  void*         realloc(void* ptr, size_t size);
+  extern void*  malloc(size_t);
+  extern void   free(void*);
+  extern void*  realloc(void* ptr, size_t size);
   inline void*  sbrk(intptr_t increment) AAI;
   inline int    strcmp(const char* s1, const char* s2) AAI;
   inline void*  memset(void* s, int c, size_t n) AAI;

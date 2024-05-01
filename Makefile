@@ -20,6 +20,9 @@ all/obj:= $(lib/obj) $(bin/obj)
 all/cpp:= $(lib/cpp) $(bin/cpp)
 all/src:= $(lib/src) $(bin/src)
 all/dep:= $(lib/dep) $(bin/dep)
+
+include /dev/null $(wildcard $(all/dep))
+
 ext/obj:= $(filter-out $(all/obj), $(wildcard *.oo))
 
 all:= $(bin/exe) $(lib/lib)

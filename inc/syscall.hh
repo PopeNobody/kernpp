@@ -524,9 +524,6 @@ namespace std
   {
   };
   extern const nothrow_t nothrow;
-  enum align_val_t
-  {
-  };
   typedef void (*new_handler)();
 }
 extern "C"
