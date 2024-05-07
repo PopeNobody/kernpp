@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+$|++;
+
+use common::sense;
+use Nobody::Util;
+use Env qw($HOME @PATH);
+$ENV{LANG}="C";
+open(STDIN, "</dev/null");
+system("mkdir -p log") unless -d "log";
+open(STDOUT,"|tee log/make.out");
+open(STDERR,">&STDOUT");
+exec("/usr/bin/make",@ARGV);
+die("exec:/usr/bin/make:$!");
+BEGIN {
+  my %keep;
+  $keep{$_}=1 for qw(PATH HOME LANG TZ TERM );
+  for( sort keys %ENV) {
+    next if $keep{$_};
+    delete $ENV{$_};
+  }
+}

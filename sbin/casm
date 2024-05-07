@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+trap 'die "${BASH_COMMAND}" returned $?' ERR
+set -o pipefail
+act=-c ii=.S oo=.oo flags=@etc/asmflags
+die(){ echo $(printf "$@") >&2; exit 1; }
+o="$1"
+shift
+r=${o%$oo}
+test -z "$oo" || test "x$r" != "x$o" || die "bad ext $o"
+i=$r$ii
+d=$o.d
+set -- "$i" "$@"
+test -n "$oo" || set -- "-Wl,--start-group" "$@" "-Wl,--end-group"  -Wl,--verbose
+set -- "$@" -o "$o" 
+set -- "$@" $flags
+set -- "$@" -MD -MF "$d" -MP -MT "$o"
+set -- "g++" "$@" $act 
+#printf ' (%s)\n' "$@"
+log=log/$o.log
+mkdir -p $(dirname "$log")
+echo "$@" >&2
+report "$@" > log/$o.log 2>&1 && exit 0
+n=$?
+echo >&2 "$log:1:log"
+cat $log
+die "$* returned %d" $n
