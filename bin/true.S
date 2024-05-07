@@ -3,7 +3,7 @@
 #APP
 	.global _start
 _start:
-   movq $0,%rdi
+   movq $1,%rdi
    movl $60,%eax
    syscall
    int3
