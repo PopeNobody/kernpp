@@ -1,26 +1,29 @@
 MAKEFLAGS:= -rR -j24
 .EXPORT_ALL_VARIABLED:
 all:
+define dir_infer
 
-bin/src:= $(wildcard bin/*.cc)
-bin/exe:= $(patsubst %.cc,%,     $(bin/src))
-bin/asm:= $(wildcard bin/*.S)
-bin/xxx:= $(patsubst %.S,%.oo,$(bin/asm))
-bin/exe+= $(patsubst %.S,%,      $(bin/asm))
-bin/obj:= $(patsubst %.cc,%.oo,  $(bin/src))
-bin/cpp:= $(patsubst %.cc,%.ii,  $(bin/src))
-bin/dep:= $(patsubst %,%.d,$(bin/obj) $(bin/cpp))
-bin:=$(bin/exe)
+$1/src:=  $(wildcard  $1/*.cc)                         
+$1/exe:=  $(patsubst  %.cc,%,   $($1/src))             
+$1/asm:=  $(wildcard  $1/*.S)                          
+$1/xxx:=  $(patsubst  %,%.o,   $($1/asm))             
+$1/exe+=  $(patsubst  %,%,      $($1/asm))             
+$1/obj:=  $(patsubst  %,%.o,   $($1/src))             
+$1/cpp:=  $(patsubst  %,%.ii,   $($1/src))             
+$1/dep:=  $(patsubst  %,%.d,    $($1/obj)   $($1/cpp)  $($1/asm))
+$1:=$($1/exe)
+endef
+$(call dir_infir,bin,lib) 
 
-lib/src:= $(wildcard lib/*.cc)
-lib/lib:= lib/libkpp.aa
-lib/asm:= $(wildcard lib/*.S)
-lib/xxx:= $(patsubst %.S,%.oo, $(lib/asm))
-lib/obj:= $(patsubst %.cc,%.oo,  $(lib/src))
-lib/cpp:= $(patsubst %.cc,%.ii,  $(lib/src))
-lib/dep:= $(patsubst %.cc,%.oo.d,$(lib/src))
-lib/dep:= $(patsubst %.cc,%.ii.d,$(lib/src))
-lib:=$(lib/lib)
+#    lib/src:= $(wildcard lib/*.cc)
+#    lib/lib:= lib/libkpp.a
+#    lib/asm:= $(wildcard lib/*.S)
+#    lib/xxx:= $(patsubst %.S,%.o, $(lib/asm))
+#    lib/obj:= $(patsubst %.cc,%.o,  $(lib/src))
+#    lib/cpp:= $(patsubst %.cc,%.ii,  $(lib/src))
+#    lib/dep:= $(patsubst %.cc,%.o.d,$(lib/src))
+#    lib/dep:= $(patsubst %.cc,%.ii.d,$(lib/src))
+#    lib:=$(lib/lib)
 
 all/obj:= $(lib/obj) $(bin/obj)
 all/xxx:= $(lib/xxx) $(bin/xxx)
@@ -30,8 +33,8 @@ all/dep:= $(lib/dep) $(bin/dep)
 
 include /dev/null $(wildcard $(all/dep))
 
-ext/obj:= $(filter-out $(all/obj), $(wildcard *.oo))
-ext/xxx:= $(filter-out $(all/xxx), $(wildcard *.oo))
+ext/obj:= $(filter-out $(all/obj), $(wildcard *.o))
+ext/xxx:= $(filter-out $(all/xxx), $(wildcard *.o))
 
 all:= $(bin/exe) $(lib/lib)
 bin:= $(bin/exe)
@@ -44,22 +47,22 @@ include /dev/null $(wildcard $(all/dep))
 $(lib/lib): $(lib/obj) $(lib/xxx)
 	sbin/arch "$@" $(lib/obj) $(lib/xxx)
 
-$(bin/exe): %: %.oo sbin/link etc/ld_flags
+$(bin/exe): %: %.o sbin/link etc/ld_flags
 	sbin/link "$@" $(lib/lib)
 
 $(all/cpp): %.ii: %.cc sbin/prec etc/cppflags
-	rm -f $*.ii $*.oo
+	rm -f $*.ii $*.o
 	sbin/prec "$@"
 
-$(all/xxx): %.oo: %.S sbin/casm etc/asmflags
+$(all/xxx): %.o: %.S sbin/casm etc/asmflags
 	sbin/casm "$@"
 
-$(all/obj): %.oo: %.ii sbin/comp etc/cxxflags
+$(all/obj): %.o: %.ii sbin/comp etc/cxxflags
 	sbin/comp "$@"
 
-cur/dep:=$(wildcard *.oo.d)
-cur/obj:=$(wildcard *.oo) $(patsubst %.d,%,$(cur/dep))
-cur/src:=$(patsubst %.oo,%.cc,$(cur/obj))
+cur/dep:=$(wildcard *.o.d)
+cur/obj:=$(wildcard *.o) $(patsubst %.d,%,$(cur/dep))
+cur/src:=$(patsubst %.o,%.cc,$(cur/obj))
 
 
 ifneq ($(have),$(want))
@@ -70,7 +73,7 @@ endif
 clean: date:=$(shell serdate)
 
 clean:
-	rm -f */*.[ioa][ioa]
+	rm -f */*.[ioad]
 
 $(all/obj): sbin/comp
 $(bin/exe): sbin/link
@@ -81,4 +84,4 @@ tags: */*.cc */*.hh
 	ctags --language-force=c++ */*.cc */*.hh
 
 nm:
-	nm */*.aa */*.oo --defined-only -A --demangle
+	nm */*.a */*.o --defined-only -A --demangle
