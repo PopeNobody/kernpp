@@ -1,2 +1,13 @@
--Llib
+--freestanding
 -Bdynamic
+-Llib
+-O0
+-ffreestanding
+-fno-exceptions
+-fno-stack-protector
+-ggdb3 -O0
+-nodefaultlibs
+-nolibc
+-nostartfiles
+-nostdlib
+-static

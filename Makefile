@@ -1,92 +1,84 @@
+MAKEFLAGS:= -rR -j24
+.EXPORT_ALL_VARIABLED:
 all:
-MAKEFLAGS+=-rR
 
-AR_FLAGS= rU
-LD_FLAGS= @etc/ld_flags
-CPPFLAGS= @etc/cppflags 
-DEPFLAGS= -MF $<.d -MT $@ -MD
-CXXFLAGS:= @etc/cxxflags
-ASMFLAGS:= @etc/asmflags
+bin/src:= $(wildcard bin/*.cc)
+bin/exe:= $(patsubst %.cc,%,     $(bin/src))
+bin/asm:= $(wildcard bin/*.S)
+bin/xxx:= $(patsubst %.S,%.oo,$(bin/asm))
+bin/exe+= $(patsubst %.S,%,      $(bin/asm))
+bin/obj:= $(patsubst %.cc,%.oo,  $(bin/src))
+bin/cpp:= $(patsubst %.cc,%.ii,  $(bin/src))
+bin/dep:= $(patsubst %,%.d,$(bin/obj) $(bin/cpp))
+bin:=$(bin/exe)
 
-CXX:= g++
+lib/src:= $(wildcard lib/*.cc)
+lib/lib:= lib/libkpp.aa
+lib/asm:= $(wildcard lib/*.S)
+lib/xxx:= $(patsubst %.S,%.oo, $(lib/asm))
+lib/obj:= $(patsubst %.cc,%.oo,  $(lib/src))
+lib/cpp:= $(patsubst %.cc,%.ii,  $(lib/src))
+lib/dep:= $(patsubst %.cc,%.oo.d,$(lib/src))
+lib/dep:= $(patsubst %.cc,%.ii.d,$(lib/src))
+lib:=$(lib/lib)
 
-LD= ld
+all/obj:= $(lib/obj) $(bin/obj)
+all/xxx:= $(lib/xxx) $(bin/xxx)
+all/cpp:= $(lib/cpp) $(bin/cpp)
+all/src:= $(lib/src) $(bin/src)
+all/dep:= $(lib/dep) $(bin/dep)
+
+include /dev/null $(wildcard $(all/dep))
+
+ext/obj:= $(filter-out $(all/obj), $(wildcard *.oo))
+ext/xxx:= $(filter-out $(all/xxx), $(wildcard *.oo))
+
+all:= $(bin/exe) $(lib/lib)
+bin:= $(bin/exe)
+lib:= $(lib/lib)
+$(bin): $(lib)
+all: $(all)
+
+include /dev/null $(wildcard $(all/dep))
+
+$(lib/lib): $(lib/obj) $(lib/xxx)
+	sbin/arch "$@" $(lib/obj) $(lib/xxx)
+
+$(bin/exe): %: %.oo sbin/link etc/ld_flags
+	sbin/link "$@" $(lib/lib)
+
+$(all/cpp): %.ii: %.cc sbin/prec etc/cppflags
+	rm -f $*.ii $*.oo
+	sbin/prec "$@"
+
+$(all/xxx): %.oo: %.S sbin/casm etc/asmflags
+	sbin/casm "$@"
+
+$(all/obj): %.oo: %.ii sbin/comp etc/cxxflags
+	sbin/comp "$@"
+
+cur/dep:=$(wildcard *.oo.d)
+cur/obj:=$(wildcard *.oo) $(patsubst %.d,%,$(cur/dep))
+cur/src:=$(patsubst %.oo,%.cc,$(cur/obj))
 
 
-START:= lib/start.S.o
+ifneq ($(have),$(want))
+$(lib/lib): rem-lib
+endif
 
-BIN_ASM:=$(wildcard bin/*.S)
-BIN_CXX:=$(wildcard bin/*.cc)
-BIN_CXX_OBJ:=$(patsubst %.cc,%.cc.o,$(BIN_CXX))
-BIN_ASM_OBJ:=$(patsubst %.S,%.S.o,$(BIN_ASM))
-BIN_OBJ:=$(BIN_CXX_OBJ) $(BIN_ASM_OBJ)
-BIN_CXX_EXE:=$(patsubst %.cc,%,$(BIN_CXX))
-BIN_ASM_EXE:=$(patsubst %.S,%,$(BIN_ASM))
-
-LIB_ASM:=$(filter-out lib/start.S, $(wildcard lib/*.S))
-LIB_CXX:=$(wildcard lib/*.cc)
-LIB_CXX_OBJ:=$(patsubst %.cc,%.cc.o,$(LIB_CXX))
-LIB_ASM_OBJ:=$(patsubst %.S,%.S.o,$(LIB_ASM))
-LIB_OBJ:=$(LIB_CXX_OBJ) $(LIB_ASM_OBJ)
-
-CXX_OBJ:=$(LIB_CXX_OBJ) $(BIN_CXX_OBJ)
-ASM_OBJ:=$(LIB_ASM_OBJ) $(BIN_ASM_OBJ)
-ALL_CXX:=$(LIB_CXX) $(BIN_CXX)
-
-lib/strerror_list.cc: script/genstrerror.pl
-	rm -f lib/strerror_list*
-	vi-perl $<
-
-LIB_LIB:=lib/libkernpp.a
-
-LO1:=$(patsubst %.cc,%.cc.o,$(LIB_CXX))
-LO2:=$(filter-out $(START),$(LO1)) 
-LO3:=$(sort $(LO2))
-LIB_OBJ:=$(LO3)
-
-BIN_EXE:=$(patsubst %.cc,%,$(BIN_CXX))
-BIN_EXE+=$(patsubst %.S,%,$(BIN_ASM))
-
-all: $(BIN_EXE) 
-
-
-$(LIB_LIB): $(LIB_OBJ)
-	ar $(AR_FLAGS) $@.new $(LIB_OBJ)
-	mv $@.new $@
-
-bin/false bin/true: START:=
-
-.PRECIOUS: lib/start.S.o
-$(BIN_CXX_EXE): %: %.cc.o $(START) $(LIB_LIB) etc/ld_flags
-	$(LD) @etc/ld_flags $(START) $<  $(LIB_LIB) -o $@
-
-$(BIN_ASM_EXE): %: %.S.o etc/ld_flags
-	$(LD) @etc/ld_flags $< -o $@
-
-%.S.o: %.S
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-%.cc.o: %.cc
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
-%.cc.d: %.cc.o
-	@true
-
-$(CXX_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(DEPFLAGS)
-	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.cc.ii) $(DEPFLAGS)
-	$(CXX) $(CXXFLAGS) -S $(<:.cc=.cc.ii)  -o $(<:.cc=.cc.s)
-	$(CXX) $(ASMFLAGS) -c $(<:.cc=.cc.s)   -o $@
-
-deps=$(patsubst %,%.d,$(ALL_CXX))
-
-depends.mk: $(deps) Makefile depends.pl
-	vi-perl depends.pl $(deps) > $@.new && mv $@.new $@
-
-include depends.mk
-
-tags: alldeps
-	ctags $(cat alldeps)
+###   
+clean: date:=$(shell serdate)
 
 clean:
-	rm -f */*.cc.o */*.cc.ii */*.cc.s */*.cc.d $(BIN_EXE) $(LIB_LIB)
+	rm -f */*.[ioa][ioa]
+
+$(all/obj): sbin/comp
+$(bin/exe): sbin/link
+$(lib/lib): sbin/arch
+$(bin/exe): $(lib)
+
+tags: */*.cc */*.hh
+	ctags --language-force=c++ */*.cc */*.hh
+
+nm:
+	nm */*.aa */*.oo --defined-only -A --demangle

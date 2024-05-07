@@ -11,7 +11,7 @@ test -z "$oo" || test "x$r" != "x$o" || die "bad ext $o"
 i=$r$ii
 d=$o.d
 set -- "$i" "$@"
-test -n "$oo" || set -- "-Wl,--start-group" "$@" "-Wl,--end-group"  -Wl,--verbose
+test -n "$oo" || set -- "-Wl,--start-group" "$@" "-Wl,--end-group" 
 set -- "$@" -o "$o" 
 set -- "$@" $flags
 set -- "$@" -MD -MF "$d" -MP -MT "$o"
