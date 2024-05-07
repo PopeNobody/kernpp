@@ -35,4 +35,3 @@ done
 ar r $lib "$@"
 ranlib "$lib"
 ar t "$lib" | sed "s,^,$lib: $(dirname $lib)/," > /dev/null
-
