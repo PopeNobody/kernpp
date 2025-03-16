@@ -9,13 +9,16 @@ include etc/resolve.mk $(wildcard $(all/dep))
 ext/obj:= $(filter-out $(all/obj), $(wildcard *.oo))
 ext/xxx:= $(filter-out $(all/xxx), $(wildcard *.oo))
 
-all:= $(bin/exe) $(lib/lib)
+all:= $(bin/exe) $(lib/lib) bin/echo
 bin:= $(bin/exe)
 lib:= $(lib/lib)
 $(bin): $(lib)
 all: $(all)
 
 include /dev/null $(wildcard $(all/dep))
+
+bin/echo: bin/printenv
+	ln $< $@
 
 $(lib/lib): $(lib/obj) $(lib/xxx)
 	sbin/arch "$@" $(lib/obj) $(lib/xxx)
