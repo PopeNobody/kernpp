@@ -28,7 +28,6 @@ extern "C"
       dst[n]= src[n];
     return dst;
   }
-  void         exit(int res);
   inline void* memchr(const void* _mem, int c, size_t n)
   {
     const char* mem= (const char*)_mem;
