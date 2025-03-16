@@ -349,11 +349,9 @@ namespace sys
   // __NR_exit = 60
   inline void exit(int res)
   {
-    int exit_val;
-    exit_val= res & 0xff;
     asm("syscall\n"
         : "=a"(res)
-        : "a"(60), "D"(exit_val)
+        : "a"(60), "D"(res)
         : "rcx", "r11", "memory");
     while(1)
       sleep(1);
