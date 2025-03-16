@@ -17,3 +17,5 @@ fuck
 
 *.oo
 *.aa
+bin/printenv
+bin/runrep
