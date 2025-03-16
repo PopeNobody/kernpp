@@ -1,7 +1,7 @@
 #include <fmt.hh>
 #include <syscall.hh>
 #include <getopt.hh>
-
+using sys::exit;
 using namespace fmt;
 void fatal(const char* message, size_t len)
 {
