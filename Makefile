@@ -11,9 +11,11 @@ clean:
 all:
 	@echo made all
 
-deps= $(sort $(basename $(wildcard */*.ii.d)))
-mods= $(sort $(patsubst %.cc,%.ii,$(wildcard */*.cc)))
-xtra= $(filter-out $(mods),$(deps))
-show=$(foreach v,$1,$(warning SHOW $v=$($v)))
-$(call show,deps mods xtra)
-include /dev/null 
+deps= $(sort $(wildcard */*.ii.d))
+cxxs= $(sort $(wildcard */*.cc))
+cpps= $(cxxs:.cc=.ii)
+xtra= $(filter-out $(cpps:=.d),$(deps)) $(filter-out $(deps:.d=),$(wildcard */*.ii))
+#show= $(foreach v,$1,$(warning SHOW $v=$($v)))
+#$(call show,deps cpps xtra intr)
+$(shell rm -f $(xtra))
+include /dev/null  $(filter-out $(xtra),$(wildcard */*.d))

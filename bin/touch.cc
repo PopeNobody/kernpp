@@ -10,7 +10,7 @@ using fmt::write_dec;
 using fmt::write_ptr;
 using sys::utimensat;
 using sys::UTIME_NOW;
-//using sys::UTIME_OMIT;
+using sys::UTIME_OMIT;
 using sys::AT_FDCWD;
 
 extern "C" {
