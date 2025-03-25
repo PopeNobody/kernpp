@@ -4,7 +4,7 @@
 	.global _start
 _start:
    movq $1,%rdi
-   movl $60,%eax
+   movq $60,%rax
    syscall
    int3
 
