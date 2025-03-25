@@ -1,5 +1,7 @@
 all:=
 all/var:=
+all/src/c++:=
+all/src/asm:=
 define scandir
 $1/var = src src/c++ src/asm mod mod/c++ mod/asm asm exe obj cpp dep all
 $1/mod/c++ = $$($1/src/c++:.cc=)
@@ -18,6 +20,9 @@ all += $$($1)
 all/var += $$(patsubst %,$1/%,$$($1/var))
 $1= $$($1/exe) $$($1/lib)
 $1: $$($1)
+all/src/asm += $$($1/src/asm)
+all/src/c++ += $$($1/src/c++)
+
 .PHONY: $1
 .PRECIOUS: $$($1/all)
 endef
@@ -25,4 +30,5 @@ save.and.eval=$(eval $1.resolve:=$$(call scandir,$1)) $(eval $($1.resolve))
 tst/exe = $(tst/mod)
 bin/exe = $(bin/mod)
 lib/lib:=lib/libkernpp.a
+src/asm:= $(foreach d,lib test bin,$(eval $$($(d)/src/asm)))
 $(foreach d,lib tst bin,$(call save.and.eval,$d))
