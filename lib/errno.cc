@@ -11,7 +11,7 @@ namespace sys {
     {
       buf_ns::buf_t buf(2);
       if(err!=11)
-        buf.println("seting error to=",err);
+        buf.println("setting error to=",err);
     };
     errno=-err;
     return -1;

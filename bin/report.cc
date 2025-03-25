@@ -24,16 +24,63 @@ void fmt<const char*>(fd_t fd, const char * val)
 {
   write(fd,val);
 }
-
-int main(int argc, char**argv){
-  envp=argv+2;
-  for(int i=0;i<argc;i++){
-    write(1,argv[i],strlen(argv[i]));
-    write(1,"\n",1);
+char **environ=0;
+char *get_path() {
+  for(char **begp=environ; *begp; begp++) {
+    if(strncmp(*begp,"PATH=",5)==0) 
+    {
+      return *begp+5;
+    }
   };
-  envp=argv+argc;
-  while(*envp)
-    write(1,*envp++);
+  return 0;
+};
+static char full[16*1024];
+const char* findpath(const char *prog){
+  if(prog[0]=='/')
+    return prog;
+  char *path=get_path();
+  ssize_t start=sizeof(full)-1;
+  full[start--]=0;
+  ssize_t prog_len=strlen(prog);
+  start-=prog_len;
+  if(start<0){
+    write(2,"error:  program name too long\n");
+    exit(99);
+  };
+  memcpy(full+start,prog,prog_len);
+  full[--start]='/';
+  write(1,"FULL+START=");
+  write(1,full+start);
+  write(1,"\n",1);
+  for(int p=0;path[p];p++){
+    int i;
+    write(1,"path+p=",path+p);
+    for(i=0;path[p+i];i++){
+      if(path[p+i]==':') {
+        memcpy(full+start-i,path+p,i);
+        write(1,full+start-i);
+        write(1,"\n\n");
+        break;
+      };
+    };
+    p+=i;
+  };
+  return 0;
+};
+int main(int argc, char**argv, char**envp){
+  char *path=0;
+  bool abs=true;
+  if(!argv[1]) {
+    write(2,"No program provided\n");
+    exit(2);
+  };
+  const char *full=0;
+  environ=envp;
+  full=findpath(argv[1]);
+  if(!full) {
+    write(2,"not found\n");
+    exit(97);
+  };
   argv++;
   pid_t pid=fork();
   pid_t res;

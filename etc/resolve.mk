@@ -21,7 +21,6 @@ $1: $$($1)
 .PHONY: $1
 .PRECIOUS: $$($1/all)
 endef
-$(warning $(all))
 save.and.eval=$(eval $1.resolve:=$$(call scandir,$1)) $(eval $($1.resolve)) 
 tst/exe = $(tst/mod)
 bin/exe = $(bin/mod)

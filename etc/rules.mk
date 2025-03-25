@@ -2,18 +2,22 @@
 $(lib/lib): $(lib/obj)
 	ar -r "$@" $(lib/obj) $(lib/xxx)
 
-%: %.oo sbin/link etc/ld_flags $(lib/lib)
+%: %.oo etc/ld_flags $(lib/lib)
 	ld -o "$@" $< $(lib/lib)
 
-%.ii: %.cc sbin/prec etc/cppflags
+%.ii: %.cc  etc/cppflags
 	rm -f $*.ii $*.oo $*.S
-	g++ -E -o "$@" $< @etc/cppflags
+	g++ -E -o "$@" $< @etc/cppflags -MD -MT $@ -MF $@.d
 
-%.S: %.ii sbin/comp etc/cxxflags
+%.S: %.ii  etc/cxxflags
 	rm -f $*.S $*.oo
-	g++ -S -o "$@" $< @etc/cxxflags
+	g++ -S -o "$@" $< @etc/cxxflags -MD -MT $@ -MF $@.d
 
-%.oo: %.S sbin/casm etc/asmflags
+%.oo: %.S  etc/asmflags
 	as -o "$@" $< @etc/asmflags
 
+%/run: %
+	./$<
 
+%: %.c
+	gcc -o $@ $<

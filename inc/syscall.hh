@@ -67,6 +67,9 @@ namespace sys
     inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len) AIL;
     inline ssize_t read(fd_t fd, char* buf, size_t len) AIL;
     inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AIL;
+    constexpr auto UTIME_NOW = (((1<<30)-1));
+    constexpr auto UTIME_OMIT = (((1<<30)-2));
+    constexpr auto AT_FDCWD=-100;
     inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags) AIL;
   }
   inline void    exit(int res) NOR;
@@ -447,10 +450,22 @@ namespace sys
     chk_return(res);
   }
   // __NR__ utimensat = 280 
-
+//   //     inline int wait4(pid_t upid, int32_p stat_p, int opt, rusage_p ru)
+  inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags) AIL;
   inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags)
-    __attribute__((__always_inline__));
-  } // namespace sys
+  {
+
+    uint64_t res;
+
+    __asm__ volatile(
+             "\tsyscall;\n"
+             : "=a"(res)
+             : "0"(200), "D"(dfd), "S"(filename), "d"(utimes), "g"(flags)
+             : "rcx", "memory", "r8", "r9");
+
+    chk_return(res);
+  }
+} // namespace sys
 
 namespace sys
 {

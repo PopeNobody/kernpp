@@ -8,6 +8,11 @@ using sys::errno;
 using sys::exit;
 using fmt::write_dec;
 using fmt::write_ptr;
+using sys::utimensat;
+using sys::UTIME_NOW;
+//using sys::UTIME_OMIT;
+using sys::AT_FDCWD;
+
 extern "C" {
   extern char *optarg;
 };
@@ -52,31 +57,25 @@ extern "C" {
   int main(int argc, char**argv, char**envp) ;
 };
 int touch(const char *path){
+  write(1,L("touch "));
+  write(1,path);
+  write(1,"\n",1);
+  timespec times[2];
+  times[0].tv_nsec=times[1].tv_nsec=UTIME_NOW;
+  utimensat(AT_FDCWD,path,times,0);
   return 0;  
 };
 const char *strdup(const char *str) {
-  write(2,L("strdup: str="));
-  write_ptr(2,str);
-  write(2,L("\n"));
-  return str;
+  size_t len=strlen(str);
+  char *dup=new char[len+1];
+  strcpy(dup,str);
+  return dup;
 };
 int main(int argc, char**argv,char**envp) 
 {
   int ch, longidx;
   bool opt_c, opt_h, opt_a, opt_m;
   const char *opt_d, *opt_r, *opt_t, *opt_s;
-//     for(int i=0;optstring[i];i++) {
-//       if(optstring[i]!=':' && ch>optstring[i]) {
-//         write(2,L("\nerror: "));
-//         write(2,optstring+i);
-//         write(2,"\n\n",2);
-//       } else {
-//         write(2,optstring+i);
-//         write(2,"\n");
-//       };
-//       if(optstring[i]!=':')
-//         ch=optstring[i];
-//     };
   while(true)
   {
     ch=getopt_long(argc,argv,optstring,longopts,&longidx);
