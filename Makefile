@@ -4,14 +4,14 @@ all: lib bin tst
 
 include etc/resolve.mk
 include etc/rules.mk
-clean_asm:=$(if $(wildcard */*.S),$(wildcard */*.S),*/*.S)
-clean_asm:=$(filter-out $(bin/src/asm),$(clean_asm))
-clean_asm:=$(filter-out $(lib/src/asm),$(clean_asm))
-clean_asm:=$(filter-out $(tst/src/asm),$(clean_asm))
+clean_asm:=$(filter-out $(all/src/asm),$(all/mod/c++:=.S))
 clean:
 	rm -f $(if $(wildcard */*.ii),$(wildcard */*.ii),*/*.ii)
-	echo rm -f $(clean_asm)
+	rm -f $(if $(wildcard */*.oo),$(wildcard */*.oo),*/*.oo)
+	rm -f $(clean_asm)
 	rm -f $(if $(wildcard */*.ii.d),$(wildcard */*.ii.d),*/*.ii.d)
+	rm -f $(all/exe)
+	ls -l $(all/src)
 
 all:
 	@echo made all

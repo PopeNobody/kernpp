@@ -20,8 +20,10 @@ all += $$($1)
 all/var += $$(patsubst %,$1/%,$$($1/var))
 $1= $$($1/exe) $$($1/lib)
 $1: $$($1)
+all/exe += $$($1/exe)
 all/src/asm += $$($1/src/asm)
 all/src/c++ += $$($1/src/c++)
+all/mod/c++ += $$($1/mod/c++)
 
 .PHONY: $1
 .PRECIOUS: $$($1/all)
@@ -30,5 +32,5 @@ save.and.eval=$(eval $1.resolve:=$$(call scandir,$1)) $(eval $($1.resolve))
 tst/exe = $(tst/mod)
 bin/exe = $(bin/mod)
 lib/lib:=lib/libkernpp.a
-src/asm:= $(foreach d,lib test bin,$(eval $$($(d)/src/asm)))
+all/src = $(all/src/asm) $(all/src/c++)
 $(foreach d,lib tst bin,$(call save.and.eval,$d))
