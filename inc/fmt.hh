@@ -32,7 +32,7 @@ namespace fmt {
     };
     return end;
   };
-  inline char *fmt_ptr(void *val, char *beg, char *end) {
+  inline char *fmt_ptr(const void *val, char *beg, char *end) {
     *--end = ']';
     end = fmt_hex(size_t(val), beg, end);
     *--end = 'x';
@@ -64,9 +64,9 @@ namespace fmt {
     char buf[sizeof(hex) * 4];
     return write(fd, fmt::fmt_hex(hex, buf, &buf[sizeof(buf) - 1]));
   };
-  inline int write_ptr(fd_t fd, void *ptr) {
+  inline int write_ptr(fd_t fd, const void *ptr) {
     char buf[sizeof(ptr) * 4];
-    return write(fd, fmt::fmt_ptr((void *)ptr, buf, &buf[sizeof(buf) - 1]));
+    return write(fd, fmt::fmt_ptr((const void *)ptr, buf, &buf[sizeof(buf) - 1]));
   };
   inline int write_tm(fd_t fd, timeval &tm) {
     char buf[(sizeof(tm.tv_sec) + sizeof(tm.tv_nsec)) * 4 + 16];
@@ -180,7 +180,7 @@ namespace fmt {
     int fmt(float val);
     int fmt(double val);
     int fmt(long double val);
-    int fmt(void *vp)
+    int fmt(const void *vp)
     {
       return pos=fmt_ptr(vp, buf, buf+pos)-buf;
     };

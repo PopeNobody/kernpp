@@ -1,7 +1,7 @@
 .text
 .global _start
 _start:
- xorq %rbp,%rbp
+  xorq %rbp,%rbp
 #  call libc_init
   movq 0(%rsp),%rdi
   lea 8(%rsp),%rsi
@@ -23,3 +23,4 @@ envp_found:
 #   movl $60,%eax
 #   syscall
 #   int3
+.section .note.GNU-stack 
