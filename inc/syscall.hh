@@ -59,7 +59,7 @@ namespace sys
   {
     inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AIL;
     inline int     close(fd_t fd) AIL;
-    inline int     stat(const char* pathname, struct stat* statbuf) AIL;
+    inline int     stat(const char* pathname, struct stat_t* statbuf) AIL;
     inline fd_t    open(const char* pathname,
                         open_flags  flags,
                         open_mode   mode) AIL;
@@ -120,7 +120,7 @@ namespace sys
     chk_return(fd);
   }
   // __NR_stat=4
-  inline int stat(const char* pathname, struct stat* statbuf)
+  inline int stat(const char* pathname, struct stat_t* statbuf)
   {
     int res= -1;
     asm("syscall\n"
