@@ -4,9 +4,9 @@
 #include <syscall.hh>
 #include <c_str.hh>
 #if 1
-#define AAI __attribute__((__always_inline__))
+#define AIL __attribute__((__always_inline__))
 #else
-#define AAI
+#define AIL
 #endif
 
 

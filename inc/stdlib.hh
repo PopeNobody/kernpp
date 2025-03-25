@@ -7,17 +7,17 @@ extern "C"
   extern void*  malloc(size_t);
   extern void   free(void*);
   extern void*  realloc(void* ptr, size_t size);
-  inline void*  sbrk(intptr_t increment) AAI;
-  inline int    strcmp(const char* s1, const char* s2) AAI;
-  inline void*  memset(void* s, int c, size_t n) AAI;
-  inline void*  memcpy(void* dst, const void* src, size_t n) AAI;
-  inline int    memcmp(const void* dst, const void* src, size_t n) AAI;
-  inline void*  memmove(void* dst, const void* src, size_t n) AAI;
-  inline void*  memchr(const void* _mem, int c, size_t n) AAI;
-  inline char*  strcpy(char* d, const char* s) AAI;
-  inline char*  strncpy(char* dst, const char* src, size_t n) AAI;
-  inline char*  strncpy(char* dst, const char* src, size_t n) AAI;
-  inline size_t strlen(const char* s) AAI;
+  inline void*  sbrk(intptr_t increment) AIL;
+  inline int    strcmp(const char* s1, const char* s2) AIL;
+  inline void*  memset(void* s, int c, size_t n) AIL;
+  inline void*  memcpy(void* dst, const void* src, size_t n) AIL;
+  inline int    memcmp(const void* dst, const void* src, size_t n) AIL;
+  inline void*  memmove(void* dst, const void* src, size_t n) AIL;
+  inline void*  memchr(const void* _mem, int c, size_t n) AIL;
+  inline char*  strcpy(char* d, const char* s) AIL;
+  inline char*  strncpy(char* dst, const char* src, size_t n) AIL;
+  inline char*  strncpy(char* dst, const char* src, size_t n) AIL;
+  inline size_t strlen(const char* s) AIL;
   inline void*  memmove(void* _dst, const void* _src, size_t n)
   {
     char*       dst((char*)_dst);

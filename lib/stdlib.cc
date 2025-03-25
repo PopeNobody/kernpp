@@ -1,4 +1,4 @@
 #define inline
-#define AAI
+#define AIL
 #include "stdlib.hh"
 

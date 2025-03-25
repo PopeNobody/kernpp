@@ -5,10 +5,10 @@
 #include <types.hh>
 
 #if 1
-#define AAI __attribute__((__always_inline__))
+#define AIL __attribute__((__always_inline__))
 #define NOR  __attribute__((__noreturn__))
 #else
-#define AAI
+#define AIL
 #endif
 
 namespace sys
@@ -57,16 +57,17 @@ namespace sys
 {
   extern "C"
   {
-    inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AAI;
-    inline int     close(fd_t fd) AAI;
-    inline int     stat(const char* pathname, struct stat* statbuf) AAI;
+    inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AIL;
+    inline int     close(fd_t fd) AIL;
+    inline int     stat(const char* pathname, struct stat* statbuf) AIL;
     inline fd_t    open(const char* pathname,
                         open_flags  flags,
-                        open_mode   mode) AAI;
-    inline time_t  time(time_t*) AAI;
-    inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len) AAI;
-    inline ssize_t read(fd_t fd, char* buf, size_t len) AAI;
-    inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AAI;
+                        open_mode   mode) AIL;
+    inline time_t  time(time_t*) AIL;
+    inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len) AIL;
+    inline ssize_t read(fd_t fd, char* buf, size_t len) AIL;
+    inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AIL;
+    inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags) AIL;
   }
   inline void    exit(int res) NOR;
 
@@ -445,14 +446,18 @@ namespace sys
         : "rcx", "r11", "memory");
     chk_return(res);
   }
-} // namespace sys
+  // __NR__ utimensat = 280 
+
+  inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags)
+    __attribute__((__always_inline__));
+  } // namespace sys
 
 namespace sys
 {
 
-  inline ssize_t write(int fd, const char* buf, size_t len) AAI;
-  inline ssize_t write(int fd, const char* buf, const char* end) AAI;
-  inline ssize_t write(fd_t fd, const char* buf) AAI;
+  inline ssize_t write(int fd, const char* buf, size_t len) AIL;
+  inline ssize_t write(int fd, const char* buf, const char* end) AIL;
+  inline ssize_t write(fd_t fd, const char* buf) AIL;
 
   inline ssize_t write(int fd, const char* buf, size_t len)
   {
@@ -472,11 +477,11 @@ namespace sys
   }
 
   inline ssize_t full_write(int fd, const char* const beg, size_t len)
-    AAI;
+    AIL;
   inline const char* full_write(int               fd,
                                 const char* const beg,
                                 const char*       end)
-    AAI;
+    AIL;
 
   inline const char* full_write(int               fd,
                                 const char* const beg,
@@ -535,7 +540,7 @@ extern "C"
   }
 }
 
-#undef AAI
+#undef AIL
 #define _GLIBCXX_NOEXCEPT noexcept
 #ifndef _GLIBCXX_NOTHROW
 #define _GLIBCXX_NOTHROW

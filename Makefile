@@ -9,16 +9,17 @@ include etc/resolve.mk $(wildcard $(all/dep))
 ext/obj:= $(filter-out $(all/obj), $(wildcard *.oo))
 ext/xxx:= $(filter-out $(all/xxx), $(wildcard *.oo))
 
-all:= $(bin/exe) $(lib/lib) bin/echo
-bin:= $(bin/exe)
+all:= $(bin/exe) $(lib/lib)
+all+=bin/echo
+bin:= $(bin/exe) bin/echo
 lib:= $(lib/lib)
 $(bin): $(lib)
-all: $(all)
 
-include /dev/null $(wildcard $(all/dep))
+include /dev/null $(wildcard $(all/dep) sbin/genctype.mk)
+
 
 bin/echo: bin/printenv
-	ln $< $@
+	ln -f $< $@
 
 $(lib/lib): $(lib/obj) $(lib/xxx)
 	sbin/arch "$@" $(lib/obj) $(lib/xxx)
@@ -61,3 +62,5 @@ tags: */*.cc */*.hh
 
 nm:
 	nm */*.aa */*.oo --defined-only -A --demangle
+
+all: $(all)
