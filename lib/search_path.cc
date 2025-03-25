@@ -1,11 +1,22 @@
 #include <syscall.hh>
-using namespace sys;
+#include <search_path.hh>
 
-const char* search_path(const char *prog,const char *path){
+using namespace sys;
+istr_t shell_ns::get_env(istr_t name) {
+  for(istr_t *begp=environ; *begp; begp++) {
+    if(strncmp(*begp,"PATH=",5)==0) 
+    {
+      return *begp+5;
+    }
+  };
+  return 0;
+};
+istr_t shell_ns::search_path(istr_t prog,istr_t name,bool deep){
   if(prog[0]=='/')
     return prog;
-  const char *s;
+  istr_t s;
   char *d;
+  istr_t path=get_env(name);
   ssize_t path_len=strlen(path);
   ssize_t prog_len=strlen(prog);
   static char *buff=new char[path_len+prog_len+4];
@@ -17,8 +28,8 @@ const char* search_path(const char *prog,const char *path){
     *d--=*s--;
   *d--='/';
   char *r=d;
-  const char *p=path;
-  const char *b=p;
+  istr_t p=path;
+  istr_t b=p;
   while(*p) {
     while(*p && *p!=':')
       p++;

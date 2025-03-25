@@ -3,7 +3,9 @@
 typedef unsigned long size_t;
 typedef long ssize_t;
 typedef unsigned char uint8_t;
-
+namespace shell_ns {
+  istr_t *environ;
+};
 extern void (*__preinit_array_start []) (void) __attribute__((weak));
 extern void (*__preinit_array_end []) (void) __attribute__((weak));
 extern void (*__init_array_start []) (void) __attribute__((weak));
@@ -14,7 +16,7 @@ extern void (*__fini_array_end []) (void) __attribute__((weak));
 #ifndef L
 #define L(x) x,sizeof(x)-1
 #endif
-inline ssize_t write( fd_t fd,  const char *buf,  size_t len)
+inline ssize_t write( fd_t fd,  istr_t buf,  size_t len)
 {
 	long res;
 	asm (
@@ -140,7 +142,8 @@ extern "C" {
     sys::exit(return_code);
 	}
 
-	void libc_init() {
+	void libc_init(int argc, istr_t *argv, istr_t *envp) {
+    shell_ns::environ=envp;
 		__libc_init_array();
 	}
 }

@@ -41,9 +41,9 @@
 
 struct c_str;
 namespace sys {
-  typedef long errno_t;
+  typedef int errno_t;
   extern errno_t errno;
-  ssize_t set_errno(errno_t err);
+  ssize_t set_errno(long err);
   const c_str &strerror(errno_t err=errno);
   void perror(const c_str &msg1, const c_str &msg2);
   void pexit(const c_str &msg1, const c_str &msg2);

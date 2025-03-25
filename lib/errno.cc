@@ -4,7 +4,7 @@
 
 namespace sys {
   errno_t errno;
-  ssize_t set_errno(errno_t err)
+  ssize_t set_errno(ssize_t err)
   {
     if(err>=0)
       return err;

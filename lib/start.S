@@ -2,7 +2,6 @@
 .global _start
 _start:
   xorq %rbp,%rbp
-#  call libc_init
   movq 0(%rsp),%rdi
   lea 8(%rsp),%rsi
   mov %rsi, %rdx      # Copy argv pointer to rdx (envp)
@@ -14,7 +13,18 @@ loop_check:
     jmp loop_check     # Continue the loop
 
 envp_found:
-    add $8, %rdx       # Increment rdx (now points to envp)
+  add $8, %rdx       # Increment rdx (now points to envp)
+  push %rbp;
+  push %rsi;
+  push %rdi
+  push %rdx;
+  push %rax;
+  call libc_init
+  pop %rax;
+  pop %rdx;
+  pop %rdi
+  pop %rsi;
+  pop %rbp;
   call main
   movq %rax,%rdi
   call exit

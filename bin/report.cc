@@ -1,5 +1,6 @@
 #include <syscall.hh>
-
+#include <search_path.hh>
+using shell_ns::search_path;
 using namespace sys;
 char **envp;
 template<typename val_t>
@@ -19,54 +20,14 @@ void fmt<int>(fd_t fd, int val)
   };
   write(2,end);
 };
+extern istr_t *environ;
 template<>
 void fmt<const char*>(fd_t fd, const char * val)
 {
   write(fd,val);
 }
-char **environ=0;
-char *get_path() {
-  for(char **begp=environ; *begp; begp++) {
-    if(strncmp(*begp,"PATH=",5)==0) 
-    {
-      return *begp+5;
-    }
-  };
-  return 0;
-};
 static char full[16*1024];
-const char* findpath(const char *prog){
-  if(prog[0]=='/')
-    return prog;
-  char *path=get_path();
-  ssize_t start=sizeof(full)-1;
-  full[start--]=0;
-  ssize_t prog_len=strlen(prog);
-  start-=prog_len;
-  if(start<0){
-    write(2,"error:  program name too long\n");
-    exit(99);
-  };
-  memcpy(full+start,prog,prog_len);
-  full[--start]='/';
-  write(1,"FULL+START=");
-  write(1,full+start);
-  write(1,"\n",1);
-  for(int p=0;path[p];p++){
-    int i;
-    write(1,"path+p=",path+p);
-    for(i=0;path[p+i];i++){
-      if(path[p+i]==':') {
-        memcpy(full+start-i,path+p,i);
-        write(1,full+start-i);
-        write(1,"\n\n");
-        break;
-      };
-    };
-    p+=i;
-  };
-  return 0;
-};
+using shell_ns::search_path;
 int main(int argc, char**argv, char**envp){
   char *path=0;
   bool abs=true;
@@ -75,8 +36,7 @@ int main(int argc, char**argv, char**envp){
     exit(2);
   };
   const char *full=0;
-  environ=envp;
-  full=findpath(argv[1]);
+  full=search_path(argv[1],"PATH",false);
   if(!full) {
     write(2,"not found\n");
     exit(97);
