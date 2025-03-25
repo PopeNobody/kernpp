@@ -3,6 +3,7 @@ MAKEFLAGS:= -rR -j24
 all:
 
 bin/src:= $(wildcard bin/*.cc)
+tst/src:= $(wildcard tst/*.cc)
 
 include etc/resolve.mk $(wildcard $(all/dep))
 
@@ -50,7 +51,7 @@ endif
 clean: date:=$(shell serdate)
 
 clean:
-	rm -f */*.[ioa][ioa]
+	rm -f $(wildcard $(bin/exe) $(all/cpp) $(all/obj) $(all/cpp))
 
 $(all/obj): sbin/comp
 $(bin/exe): sbin/link

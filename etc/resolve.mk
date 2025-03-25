@@ -1,21 +1,16 @@
-bin/exe:= $(patsubst %.cc,%,     $(bin/src))
-bin/asm:= $(wildcard bin/*.S)
-bin/xxx:= $(patsubst %.S,%.oo,$(bin/asm))
-bin/exe+= $(patsubst %.S,%,      $(bin/asm))
-bin/obj:= $(patsubst %.cc,%.oo,  $(bin/src))
-bin/cpp:= $(patsubst %.cc,%.ii,  $(bin/src))
-bin/dep:= $(patsubst %,%.d,$(bin/obj) $(bin/cpp))
-bin:=$(bin/exe)
+define search_dir
+$1/src:= $$(wildcard $1/*.cc)
+$1/mod:= $$($1/src:.cc=)
+$1/cpp:= $$($1/mod:=.ii)
+$1/asm:= $$($1/mod:=.SS)
+$1/obj:= $$($1/mod:=.oo)
+ifeq ($1,lib)
+else
+$1/exe:= $$($1/mod)
+endif
+endef
+$(eval $(call search_dir,bin))
 
-lib/src:= $(wildcard lib/*.cc)
-lib/lib:= lib/libkpp.aa
-lib/asm:= $(wildcard lib/*.S)
-lib/xxx:= $(patsubst %.S,%.oo, $(lib/asm))
-lib/obj:= $(patsubst %.cc,%.oo,  $(lib/src))
-lib/cpp:= $(patsubst %.cc,%.ii,  $(lib/src))
-lib/dep:= $(patsubst %.cc,%.oo.d,$(lib/src))
-lib/dep:= $(patsubst %.cc,%.ii.d,$(lib/src))
-lib:=$(lib/lib)
 
 all/obj:= $(lib/obj) $(bin/obj)
 all/xxx:= $(lib/xxx) $(bin/xxx)
