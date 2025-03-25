@@ -6,3 +6,8 @@ ls
 markout
 true
 usleep
+printenv
+report
+runrep
+string_view
+touch
