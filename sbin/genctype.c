@@ -32,7 +32,7 @@ int main(int, char**) {
     };
     dprintf(1,"(%3d)",i);
     if(i==106 || i==116)
-      dprintf(1,"\\n");
+      dprintf(1,"\\n\"\n\"");
   };
   dprintf(1,"\";\n");
   dprintf(1,"int write(int, const char*, int);\n");

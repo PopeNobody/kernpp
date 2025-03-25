@@ -21,3 +21,8 @@ bin/printenv
 bin/runrep
 bin/touch
 hide
+*.S
+*.i
+doit.c
+doit
+sbin/genctype
