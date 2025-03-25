@@ -19,3 +19,5 @@ fuck
 *.aa
 bin/printenv
 bin/runrep
+bin/touch
+hide
