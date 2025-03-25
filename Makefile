@@ -6,7 +6,7 @@ include etc/resolve.mk
 include etc/rules.mk
 
 clean:
-	@echo rm -f $(wildcard $(tst/all))
+	rm -f $(wildcard $(all))
 
 all:
 	@echo made all
