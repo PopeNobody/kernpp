@@ -17,7 +17,7 @@ $1/all = $$($1/cpp) $$($1/obj) $$($1/lib) $$($1/exe) $$(filter-out $$($1/src/asm
 $1= $$($1/exe) $$($1/lib)
 $1: $$($1)
 .PHONY: $1
-.PRECIOUS: $$(tst/all)
+.PRECIOUS: $$($1/all)
 endef
 #$(warning $(scandir))
 #$(warning $(call scandir,bin))

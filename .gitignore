@@ -1,7 +1,5 @@
-**.d
-**.[os]
-**.ii
-**.a
+**.[io][io]
+**.[dS]
 log/
 *.out
 output
@@ -13,4 +11,5 @@ out
 fuck
 *.oo
 *.aa
+*.a
 hide
