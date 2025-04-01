@@ -1,23 +1,23 @@
 
-ifeq ($(sub),)
+ifeq (lib-$(sub),)
 $(error include $(MAKEFILE) with $(sub) set to a dir)
 endif
 
-$(sub)/c++:=$(wildcard $(sub)/*.cc)
-$(sub)/asm:=$(wildcard $(sub)/*.SS)
-$(sub)/obj:=$($(sub)/asm:.SS=.oo) $($(sub)/c++:.cc=.oo)
-$(sub)/exe:=$($(sub)/obj:.oo=)
+lib-$(sub)/c++:=$(wildcard lib-$(sub)/*.cc)
+lib-$(sub)/asm:=$(wildcard lib-$(sub)/*.SS)
+lib-$(sub)/obj:=$(lib-$(sub)/asm:.SS=.oo) $(lib-$(sub)/c++:.cc=.oo)
+lib-$(sub)/exe:=$(lib-$(sub)/obj:.oo=)
 
-all/exe+=$($(sub)/exe)
+all/exe+=$(lib-$(sub)/exe)
 
 include etc/rules.mk
 
 
-#$(warning $(sub) $($(sub)/c++))
-#$(warning $(sub) $($(sub)/asm))
-#$(warning $(sub) $($(sub)/obj))
-#$(warning $(sub) $($(sub)/exe))
+#$(warning lib-$(sub) $(lib-$(sub)/c++))
+#$(warning lib-$(sub) $(lib-$(sub)/asm))
+#$(warning lib-$(sub) $(lib-$(sub)/obj))
+#$(warning lib-$(sub) $(lib-$(sub)/exe))
 
-#$(warning $($(sub)/exe))
+#$(warning $(lib-$(sub)/exe))
 
 

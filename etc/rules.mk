@@ -1,18 +1,19 @@
-
 .SECONDEXPANSION:
 
 
 all: $(P)
 
-$(warning $(all/lib))
+asm-src:=$(lib-$(sub)/asm)
+asm-obj:=$(asm-src:=.oo)
 
-$($(sub)/asm:.SS+.oo): %.oo: %.SS  etc/asmflags
+%.SS.oo: %.SS  etc/asmflags
 	as     -o "$@" $< @etc/asmflags
 
-$($(sub)/c++:.cc=.oo): %.oo: %.cc  etc/cxxflags
+%.cc.oo: %.cc  etc/cxxflags
 	g++ -c -o "$@" $< @etc/cppflags -MD -MT $@ -MF $@.dd
 
-$($(sub)/lib): $($(sub)/obj)
+
+$(lib-$(sub)/lib): $(lib-$(sub)/obj)
 	ar -r "$@" $($(sub)/obj)
 	ranlib $@
 

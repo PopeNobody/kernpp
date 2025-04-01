@@ -2,12 +2,17 @@ ifeq ($(sub),)
 $(error include $(MAKEFILE) with $(sub) set to a dir)
 endif
 
-$(sub)/c++:=$(wildcard $(sub)/*.cc)
-$(sub)/asm:=$(wildcard $(sub)/*.SS)
-$(sub)/obj:=$($(sub)/asm:.SS=.oo) $($(sub)/c++:.cc=.oo)
-$(sub)/lib:=lib/lib$(sub).a
+lib-$(sub)/asm:=$(wildcard $(sub)/*.SS)
+lib-$(sub)/c++:=$(wildcard $(sub)/*.cc)
+lib-$(sub)/obj := $(lib-$(sub)/asm:=.oo) $(lib-$(sub)/c++:=.oo)
+lib-$(sub)/lib := $(lib-$(sub)/lib)
+
+lib-$(sub)/lib := lib/lib$(sub).a
 all/lib+=$($(sub)/lib)
+include etc/rules.mk
+
+#$(warning sub:=$(sub))
+#$(warning $(sub)/asm:=$($(sub/asm)))
 
 .SECONDEXPANSION:
 
-include etc/rules.mk
