@@ -5,7 +5,7 @@
 all: $(P)
 
 $(int/cpp): %.ii: %.cc  etc/cppflags
-	rm -f $*.ii $*.oo $*.SS
+	rm -f $*.ii $*.ii.dd $*.oo $*.SS
 	g++ -E -o "$@" $< @etc/cppflags -MD -MT $@ -MF $@.dd
 
 $(int/asm): %.SS: %.ii  etc/cxxflags
