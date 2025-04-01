@@ -1,4 +1,13 @@
 #all: lib bin tst
+all:
+
+etc/makflags:;
+include etc/makflags
+etc/resolv.mk:;
+etc/rules.mk:;
+Makefile:;
+GNUmakefile:;
+
 include etc/resolve.mk
 include etc/rules.mk
 
@@ -8,7 +17,7 @@ include etc/rules.mk
 clean:
 	rm -f $(if $(wildcard */*.ii),$(wildcard */*.ii),*/*.ii)
 	rm -f $(if $(wildcard */*.oo),$(wildcard */*.oo),*/*.oo)
-	rm -f $(if $(wildcard */*.ii.d),$(wildcard */*.ii.d),*/*.ii.d)
+	rm -f $(if $(wildcard */*.dd),$(wildcard */*.dd),*/.dd)
 #
 all:
 	@echo made all
@@ -19,6 +28,8 @@ cpps= $(cxxs:.cc=.ii)
 xtra= $(filter-out $(cpps:=.d),$(deps)) $(filter-out $(deps:.d=),$(wildcard */*.ii))
 #show= $(foreach v,$1,$(info SHOW $v=$($v)))
 #$(call show,deps cpps xtra intr)
-$(shell rm -f $(xtra))
-include /dev/null  $(filter-out $(xtra),$(wildcard */*.d))
-#endif
+$(shell /bin/rm -f $(xtra))
+deps=$(wildcard */*.dd)
+ifneq ($(deps),)
+include $(deps)
+endif

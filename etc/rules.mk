@@ -20,22 +20,25 @@ lib/liblib.a: $(lib/obj)
 	nm -A $< | tee $@
 
 
-%: %.oo etc/ld_flags $(lib/lib)
+$(all/exe): %: %.oo etc/ld_flags $(lib/lib)
 	ld -o "$@" --start-group $< $(lib/lib) --end-group
 
-%.ii: %.cc  etc/cppflags
+$(all/cpp): %.ii: %.cc  etc/cppflags
 	rm -f $*.ii $*.oo $*.SS
 	g++ -E -o "$@" $< @etc/cppflags -MD -MT $@ -MF $@.dd
 
-%.SS: %.ii  etc/cxxflags
+$(all/asm): %.SS: %.ii  etc/cxxflags
 	rm -f $*.SS $*.oo
 	g++ -S -o "$@" $< @etc/cxxflags -MD -MT $@ -MF $@.dd
 
-%.oo: %.SS  etc/asmflags
+$(all/obj): %.oo: %.SS  etc/asmflags
 	as -o "$@" $< @etc/asmflags
+
+$(sort $(all/cpp:.ii=.ii.dd)): ;
 
 %/run: %
 	./$<
 
 %: %.c
 	gcc -o $@ $<
+
