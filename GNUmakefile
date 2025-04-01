@@ -1,0 +1,11 @@
+MAKEFILES=etc/makflags
+
+ifeq ($(MAKECMDGOALS),)
+MAKECMDGOALS:=all
+endif
+
+MAKECMDGOALS:
+	${MAKE} -f Makefile  $(MAKECMDGOALS) 
+
+$(MAKECMDGOALS): MAKECMDGOALS
+

@@ -1,19 +1,37 @@
 
-$(lib/lib): $(lib/obj)
-	ar -r "$@" $(lib/obj) $(lib/xxx)
+.SECONDEXPANSION:
+
+
+all: $(P)
+
+lib/libkernpp.a: $(kernpp/obj)
+	ar -r "$@" $(kernpp/obj)
+	ranlib $@
+
+lib/liblinux.a: $(linux/obj)
+	ar -r "$@" $(linux/obj)
+	ranlib $@
+
+lib/liblib.a: $(lib/obj)
+	ar -r "$@" $(lib/obj) 
+	ranlib $@
+
+%.nm: lib/lib%.a
+	nm -A $< | tee $@
+
 
 %: %.oo etc/ld_flags $(lib/lib)
-	ld -o "$@" $< $(lib/lib)
+	ld -o "$@" --start-group $< $(lib/lib) --end-group
 
 %.ii: %.cc  etc/cppflags
-	rm -f $*.ii $*.oo $*.S
-	g++ -E -o "$@" $< @etc/cppflags -MD -MT $@ -MF $@.d
+	rm -f $*.ii $*.oo $*.SS
+	g++ -E -o "$@" $< @etc/cppflags -MD -MT $@ -MF $@.dd
 
-%.S: %.ii  etc/cxxflags
-	rm -f $*.S $*.oo
-	g++ -S -o "$@" $< @etc/cxxflags -MD -MT $@ -MF $@.d
+%.SS: %.ii  etc/cxxflags
+	rm -f $*.SS $*.oo
+	g++ -S -o "$@" $< @etc/cxxflags -MD -MT $@ -MF $@.dd
 
-%.oo: %.S  etc/asmflags
+%.oo: %.SS  etc/asmflags
 	as -o "$@" $< @etc/asmflags
 
 %/run: %

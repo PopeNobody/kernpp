@@ -1,38 +1,41 @@
-all:=
-all/var:=
-all/src/c++:=
-all/src/asm:=
-define scandir
-$1/var = src src/c++ src/asm mod mod/c++ mod/asm asm exe obj cpp dep all
-$1/mod/c++ = $$($1/src/c++:.cc=)
-$1/cpp = $$($1/mod/c++:=.ii)
-$1/src/c++ := $$(wildcard $1/*.cc)
-$1/src/asm = $$(filter-out $$($1/mod/c++:=.S),$$(wildcard $1/*.S))
-$1/mod/asm = $$($1/src/asm:.S=)
-$1/mod = $$($1/mod/c++) $$($1/mod/asm)
-$1/src = $$($1/src/c++) $$($1/src/asm)
-$1/asm = $$($1/mod:=.S)
-$1/obj = $$($1/mod:=.oo)
-$1/all = $$($1/cpp) $$($1/obj) $$($1/lib) $$($1/exe) $$(filter-out $$($1/src/asm),$$($1/asm))
-# $1 = $$($1/exe) $$($1/lib)
-dir += $1
-all += $$($1)
-all/var += $$(patsubst %,$1/%,$$($1/var))
-$1= $$($1/exe) $$($1/lib)
-$1: $$($1)
-all/exe += $$($1/exe)
-all/src/asm += $$($1/src/asm)
-all/src/c++ += $$($1/src/c++)
-all/mod/c++ += $$($1/mod/c++)
 
-.PHONY: $1
-.PRECIOUS: $$($1/all)
-endef
-save.and.eval=$(eval $1.resolve:=$$(call scandir,$1)) $(eval $($1.resolve)) 
-tst/exe = $(tst/mod)
-bin/exe = $(bin/mod)
-lib/lib+=lib/libkernpp.a
-lib/lib+=lib/liblinux.a
-all/src = $(all/src/asm) $(all/src/c++)
-$(foreach d,lib linux tst bin,$(call save.and.eval,$d))
-$(warning $(dir))
+src/c++ =$(wildcard */*.cc)
+P+=$(src/c++)
+src/asm =$(wildcard */*.SS)
+P+=$(src/asm)
+int/cpp =$(src/c++:.cc=.ii)
+P+=$(int/cpp)
+int/asm =$(src/c++:.cc=.SS)
+P+=$(int/asm)
+all/asm =$(src/asm) $(int/asm)
+P+=$(all/asm)
+all/obj =$(all/asm:.SS=.oo)
+P+=$(all/obj)
+bin/obj =$(filter bin/%,$(all/obj))
+P+=$(bin/obj)
+bin/exe = $(bin/obj:.oo=)
+P+=$(bin/exe)
+lib/obj = $(filter lib/%,$(all/obj))
+P+=$(lib/obj)
+kernpp/obj = $(filter kernpp/%,$(all/obj))
+P+=$(kernpp/obj)
+linux/obj =$(filter linux/%,$(all/obj))
+P+=$(linux/obj)
+tst/obj = $(filter tst/%,$(all/obj))
+P+=$(tst/obj)
+tst/exe = $(tst/obj:.oo=)
+P+=$(tst/exe)
+lib/obj = $(filter lib/%,$(all/obj))
+P+=$(lib/obj)
+
+lib/lib+= lib/libkernpp.a lib/liblinux.a lib/liblib.a
+
+.PRECIOUS: $(P)
+
+USE/obj = $(bin/obj) $(linux/obj) $(kernpp/obj) $(tst/obj) $(lib/obj)
+NOUSE/obj = $(filter-out $(USE/obj),$(all/obj))
+
+ifneq ($(NOUSE/obj),)
+$(error NOUSE/obj:=$(NOUSE/obj))
+endif
+
