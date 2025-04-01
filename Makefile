@@ -1,7 +1,9 @@
 MAKEFLAGS+= -rR
 SHELL:=/bin/bash
-all: lib bin tst
-
+all: linux lib bin tst
+LC_ALL:=
+LANG:=
+LANGUAGE:=
 include etc/resolve.mk
 include etc/rules.mk
 clean_asm:=$(filter-out $(all/src/asm),$(all/mod/c++:=.S))
