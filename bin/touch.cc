@@ -1,8 +1,8 @@
 #include <syscall.hh>
-#include <new.hh>
 #include <fmt.hh>
 #include <getopt.hh>
 
+using std::abort;
 using sys::write;
 using sys::errno;
 using sys::exit;
@@ -13,9 +13,7 @@ using sys::UTIME_NOW;
 using sys::UTIME_OMIT;
 using sys::AT_FDCWD;
 
-extern "C" {
-  extern char *optarg;
-};
+char *optarg;
 namespace fmt {
   inline ssize_t write_quote(fd_t fd, int ch) {
     int res=0;
@@ -31,8 +29,7 @@ namespace fmt {
   };
 };
 using fmt::write_quote;
-
-static option longopts[]={
+static option_t longopts[]={
   { "version", 0, 0, 1 },
   { "help",    0, 0, 2 },
   { "date",    1, 0, 'd'},
@@ -65,20 +62,26 @@ int touch(const char *path){
   utimensat(AT_FDCWD,path,times,0);
   return 0;  
 };
-const char *strdup(const char *str) {
-  size_t len=strlen(str);
-  char *dup=new char[len+1];
-  strcpy(dup,str);
-  return dup;
+struct strs {
+  char memory[1024*1024];
 };
+
+//   const char *strdup(const char *str) {
+//     size_t len=true_n(str);
+//     char *dup=new char[len+1];
+//     copy(dup,str);
+//     return dup;
+//   };
+static getopt_t getopt;
 int main(int argc, char**argv,char**envp) 
 {
   int ch, longidx;
   bool opt_c, opt_h, opt_a, opt_m;
-  const char *opt_d, *opt_r, *opt_t, *opt_s;
+  c_str  opt_d, opt_r, opt_t, opt_s;
+  int optind;
   while(true)
   {
-    ch=getopt_long(argc,argv,optstring,longopts,&longidx);
+    ch=getopt(argv);
     if(ch==-1) {
       write(2,L("ch==-1\n"));
       write(2,"longidx=");
@@ -96,10 +99,10 @@ int main(int argc, char**argv,char**envp)
       case 'c': opt_c=true; break;
       case 'h': opt_h=true; break;
       case 'm': opt_m=true; break;
-      case 'd': write_ptr(2,optarg); opt_d=strdup(optarg); break;
-      case 'r': write_ptr(2,optarg); opt_r=strdup(optarg); break;
-      case 't': write_ptr(2,optarg); opt_t=strdup(optarg); break;
-      case 's': write_ptr(2,optarg); opt_s=strdup(optarg); break;
+      case 'd': write_ptr(2,optarg); opt_d=optarg; break;
+      case 'r': write_ptr(2,optarg); opt_r=optarg; break;
+      case 't': write_ptr(2,optarg); opt_t=optarg; break;
+      case 's': write_ptr(2,optarg); opt_s=optarg; break;
       case 'f': break;
       default: {
                  write(2,L("unexpected flag: "));

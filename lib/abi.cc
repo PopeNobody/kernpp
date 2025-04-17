@@ -2,6 +2,7 @@
 
 extern "C" {
   using sys::write;
+  using std::abort;
 
   void __cxa_pure_virtual() { 
     write(2,L("pure virtual function called\n"));

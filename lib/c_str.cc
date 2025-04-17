@@ -1,16 +1,18 @@
 #include <c_str.hh>
-
+#include <cmp.hh>
 const char c_str::null_str[1]="";
-const c_str c_str::colon=":";
-const c_str c_str::newline="\n";
-
-int c_str::cmp(size_t lhs, size_t rhs) {
-  return lhs-rhs;
+const char c_str::colon[2]=":";
+const char c_str::newline[2]="\n";
+template<class t1>
+t1 min(t1 lhs, t1 rhs){
+  return (lhs<rhs)?lhs:rhs;
 };
-int c_str::cmp(const c_str &lhs, const c_str &rhs)
-{
-  int res = cmp(lhs.len(),rhs.len());
-  if(!res)
-    res=strncmp(lhs.begin(),rhs.begin(),lhs.size());
-  return res;
+template<class i1_t, class i2_t>
+int icmp(i1_t b1, i1_t e1, i2_t b2, i2_t e2){
+  while(*b1 && *b2) {
+    b1++; b2++;
+    if(b1==e1 || b2==e1)
+      break;
+  };
+  return (b1==e1?-1:0)+(b2==e2?1:0);
 };

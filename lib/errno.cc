@@ -9,7 +9,8 @@ namespace sys {
     if(err>=0)
       return err;
     {
-      buf_ns::buf_t buf(2);
+      buf_ns::buf_t<80> buf(2);
+      // XXX why is 11 a special case?
       if(err!=11)
         buf.println("setting error to=",err);
     };
@@ -28,7 +29,7 @@ namespace sys {
   };
   void perror(const c_str &msg1, const c_str &msg2)
   {
-    buf_ns::buf_t buf(2);
+    buf_ns::buf_t<256> buf(2);
     if(msg1) {
       buf.print(msg1);
       buf.print(":");

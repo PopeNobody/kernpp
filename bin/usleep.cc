@@ -17,13 +17,14 @@ const static int billion=1000*million;
 extern "C" {
   int main(int argc, char**argv, char **envp);
 };
+getopt_t getopt(0,0,0);
 int main(int argc, char**argv, char **envp)
 {
   int opt;
   ++argv;
   --argv; 
   size_t mul=0;
-  while ((opt = getopt(argc, argv, "sun")) != -1) {
+  while ((opt = getopt(argv)) != -1) {
     write(1,L("main: got '"));
     char ch=opt;
     write(1,&ch,1);
@@ -60,16 +61,16 @@ int main(int argc, char**argv, char **envp)
     };
   };
   timespec tm;
-  if(optind<argc) {
-    tm.tv_nsec=atoi(argv[optind++]);
-    if(tm.tv_nsec >= billion){
-      tm.tv_sec=tm.tv_nsec/billion;
-      tm.tv_nsec=tm.tv_nsec%billion;
-    };
-  } else {
-    tm.tv_sec=1;
-    tm.tv_nsec=0;
-  };
+//     if(getopt.ind()<argc) {
+//       tm.tv_nsec=atoi(argv[getind++]);
+//       if(tm.tv_nsec >= billion){
+//         tm.tv_sec=tm.tv_nsec/billion;
+//         tm.tv_nsec=tm.tv_nsec%billion;
+//       };
+//     } else {
+//       tm.tv_sec=1;
+//       tm.tv_nsec=0;
+//     };
   write_tm(2,tm);write(2,L("\n"));
   nanosleep(&tm,0);
   return 0;

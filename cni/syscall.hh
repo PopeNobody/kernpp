@@ -49,6 +49,7 @@ namespace sys
   }
 } // namespace sys
 
+#include <stdlib.hh>
 #define chk_return2(val, cast)                                            \
   return (cast)(val < 0 ? set_errno(val) : val)
 #define chk_return(val) return (val < 0 ? set_errno(val) : val)
@@ -531,11 +532,27 @@ namespace std
     } while(true);
   }
   void terminate() noexcept __attribute__((__noreturn__));
+  using ::free;
+  using ::malloc;
+  using ::memset;
+  using ::realloc;
+  using ::size_t;
   enum nothrow_t
   {
   };
   extern const nothrow_t nothrow;
   typedef void (*new_handler)();
+}
+extern "C"
+{
+  void        abort() __attribute__((__noreturn__));
+  inline void abort()
+  {
+    do
+    {
+      asm("int3");
+    } while(true);
+  }
 }
 
 #undef AIL

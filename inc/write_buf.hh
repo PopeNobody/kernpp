@@ -32,7 +32,7 @@ struct write_buf
       , pos(0)
       , tot(0)
   {
-    memset(buf, 0, end - buf);
+    set(buf, end, 0);
   };
   ~write_buf()
   {
@@ -52,7 +52,7 @@ struct write_buf
     tot+=pos;
     sys::full_write(fd,buf,pos);
     pos=0;
-    memset(&buf,0,end-buf);
+    set(buf,end,0);
   }
   size_t room() const
   {

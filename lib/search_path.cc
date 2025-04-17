@@ -1,10 +1,11 @@
 #include <syscall.hh>
 #include <search_path.hh>
+#include <cmp.hh>
 
 using namespace sys;
 istr_t shell_ns::get_env(istr_t name) {
   for(istr_t *begp=environ; *begp; begp++) {
-    if(strncmp(*begp,"PATH=",5)==0) 
+    if(seq_cmp(*begp,"PATH=",5)==(0<=>0)) 
     {
       return *begp+5;
     }
@@ -17,9 +18,9 @@ istr_t shell_ns::search_path(istr_t prog,istr_t name,bool deep){
   istr_t s;
   char *d;
   istr_t path=get_env(name);
-  ssize_t path_len=strlen(path);
-  ssize_t prog_len=strlen(prog);
-  static char *buff=new char[path_len+prog_len+4];
+  ssize_t path_len=true_n(path);
+  ssize_t prog_len=true_n(prog);
+  static char *buff=0;//new char[path_len+prog_len+4];
   static char *ebuf=buff+path_len+prog_len+3;
   s=prog+prog_len;
   d=ebuf;

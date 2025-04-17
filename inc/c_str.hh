@@ -2,7 +2,9 @@
 #define c_str_hh c_str_hh
 
 #include <syscall.hh>
-
+#include <dbg.hh>
+#include <cmp.hh>
+#include <itr.hh>
 class c_str {
   struct body_t {
     char *beg;
@@ -13,28 +15,20 @@ class c_str {
     };
   } body;
   static const char null_str[1];
+  static const char colon[2];
+  static const char newline[2];
   public:
-  c_str()
-    : body((char*)null_str,(char*)null_str)
-  {
-  };
-  c_str(const char *b, const char *e = 0)
-    : body((char*)b,(char*)e)
-  {
-    if(body.end)
-      return;
-    body.end=body.beg;
-    while(*body.end)
-      ++body.end;
-  };
   c_str(char *b, char *e = 0)
-    : body(b,e)
+    :body(b,e)
   {
-    if(body.end)
-      return;
-    body.end=body.beg;
-    while(*body.end)
-      ++body.end;
+    if(!body.beg)
+      body.end=0;
+    if(!body.end)
+      body.end=body.beg+true_n(body.beg);
+  };
+  c_str(const char *b=0, const char *e=0)
+    : body((char*)b,(char*)(e))
+  {
   };
   c_str(const char *b, size_t l)
     : body((char*)b,(char*)(b+l))
@@ -44,6 +38,11 @@ class c_str {
     : body(b,b+l)
   {
   };
+  template<size_t n>
+    c_str(char(b)[n], bool i)
+    :body(b,b+n-i?0:1)
+    {
+    }
   c_str(const c_str &lhs)
     : body(lhs.body.beg,lhs.body.end)
   {
@@ -91,21 +90,13 @@ class c_str {
   char *end() {
     return body.end;
   };
-  static int cmp(size_t lhs, size_t rhs);
-  static int cmp(const c_str &lhs, const c_str &rhs);
-  static const c_str colon;
-  static const c_str newline;
-};
-#define cmp_op(x) \
-  inline bool operator x(const c_str &lhs, const c_str &rhs) { \
-    return c_str::cmp(lhs,rhs) x 0; \
+  friend auto cmp(const c_str &lhs, const c_str &rhs)
+  {
+    auto msize=min(lhs.size(),rhs.size());
+    auto r=seq_cmp(lhs.begin(),rhs.begin(),msize);
+    return r!=(0<=>0) ? r : (lhs.size()<=>rhs.size());
   };
-cmp_op(<);
-cmp_op(>);
-cmp_op(<=);
-cmp_op(>=);
-cmp_op(==);
-cmp_op(!=);
+};
 
 inline ssize_t write(fd_t fd, const c_str &str) {
   return sys::sys_write(fd, str.begin(), str.size());

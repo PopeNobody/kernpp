@@ -7,8 +7,11 @@
 namespace buf_ns
 {
   using namespace fmt;
+  template<size_t _size>
   struct buf_t {
+    static constexpr size_t size=_size;
     int fd;
+    char buf[size];
     buf_t(int fd=1)
       :fd(fd)
     {
@@ -23,7 +26,7 @@ namespace buf_ns
     {
       if(arg==0)
         arg="(null)";
-      return __write(arg,strlen(arg));
+      return __write(arg,true_n(arg));
     };
     ssize_t write(char &arg)
     {
