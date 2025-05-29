@@ -31,6 +31,5 @@ endef
 save.and.eval=$(eval $1.resolve:=$$(call scandir,$1)) $(eval $($1.resolve)) 
 tst/exe = $(tst/mod)
 bin/exe = $(bin/mod)
-lib/lib:=lib/libkernpp.a
 all/src = $(all/src/asm) $(all/src/c++)
 $(foreach d,lib tst bin,$(call save.and.eval,$d))

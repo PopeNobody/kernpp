@@ -2,14 +2,13 @@ MAKEFLAGS+= -rR
 SHELL:=/bin/bash
 all: lib bin tst
 
+lib/lib:=lib/libkernpp.aa
 include etc/resolve.mk
 include etc/rules.mk
 clean_asm:=$(filter-out $(all/src/asm),$(all/mod/c++:=.S))
 clean:
-	rm -f $(if $(wildcard */*.ii),$(wildcard */*.ii),*/*.ii)
-	rm -f $(if $(wildcard */*.oo),$(wildcard */*.oo),*/*.oo)
+	rm -f */*.ii */*.oo */*.aa
 	rm -f $(clean_asm)
-	rm -f $(if $(wildcard */*.ii.d),$(wildcard */*.ii.d),*/*.ii.d)
 	rm -f $(all/exe)
 	ls -l $(all/src)
 
