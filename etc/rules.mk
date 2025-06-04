@@ -6,14 +6,14 @@ $(lib/lib): $(lib/obj)
 	ld -o "$@" $< $(lib/lib)
 
 %.ii: %.cc  etc/cppflags
-	rm -f $*.ii $*.oo $*.S
-	g++ -E -o "$@" $< @etc/cppflags -MD -MT $@ -MF $@.d
+	rm -f $*.ii $*.oo $*.SS
+	g++ -E -o "$@" $< @etc/cppflags -MD -MT $@ -MF $@.dd
 
-%.S: %.ii  etc/cxxflags
-	rm -f $*.S $*.oo
-	g++ -S -o "$@" $< @etc/cxxflags -MD -MT $@ -MF $@.d
+%.SS: %.ii  etc/cxxflags
+	rm -f $*.SS $*.oo
+	g++ -S -o "$@" $< @etc/cxxflags -MD -MT $@ -MF $@.dd
 
-%.oo: %.S  etc/asmflags
+%.oo: %.SS  etc/asmflags
 	as -o "$@" $< @etc/asmflags
 
 %/run: %

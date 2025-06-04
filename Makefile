@@ -1,4 +1,4 @@
-MAKEFLAGS+= -rR
+MAKEFLAGS+= -rR -j $(shell nproc)
 SHELL:=/bin/bash
 all: lib bin tst
 
