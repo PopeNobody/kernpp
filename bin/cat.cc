@@ -1,6 +1,9 @@
 #include <fmt.hh>
 #include <syscall.hh>
 #include <getopt.hh>
+#include <stdlib.hh>
+#include <getopt.hh>
+
 using sys::exit;
 using namespace fmt;
 void fatal(const char* message, size_t len)
@@ -105,8 +108,8 @@ struct opts_t
   };
 
 } opts;
-
-static struct option long_options[] = {
+using namespace getopt_ns;
+static struct option_t long_options[] = {
   { "number", no_argument, 0, 'n' },
   { "number-non-empty", no_argument, 0, 'b' },
   { "show-nonprinting", no_argument, 0, 'v' },
@@ -120,69 +123,12 @@ int main(int argc, char** argv,char**envp)
   int c;
   c_str names[argc];
   int nnames=0;
-  while(1)
-  {
-    int this_option_intind = optind ? optind: 1;
-    int option_index=0;
-    c=getopt_long(argc,argv,"nbvteA",long_options,&option_index);
-    write(1,"c=");
-    write_dec(1,c);
-    write(1," argc=");
-    write_dec(1,argc);
-    write(1," optind=");
-    write_dec(1,optind);
-    write(1,"\n");
-    switch(c) {
-      case -1:
-        names[nnames++]=argv[optind++];
-        break;
-      case 0:
-        write(1,L("option: "));
-        write(1,long_options[option_index].name);
-        write(1,L("\n"));
-        break;
-      case 'n':
-        opts.num=1;
-        opts.empty=1;
-        break;
-      case 'b':
-        opts.num=1;
-        opts.empty=0;
-        break;
-      case 'v':
-        opts.show_non=1;
-        break;
-      case 't':
-        opts.show_tab=1;
-        break;
-      case 'e':
-        opts.show_end=1;
-        break;
-      case 'A':
-        opts.show_non=1;
-        opts.show_tab=1;
-        opts.show_end=1;
-        break;
-      default: 
-        write(2,L("unexpected option'"));
-        char chs[2];
-        chs[0]=c;
-        chs[1]=0;
-        write(2,c_str(chs,chs+1));
-        write(2,"'\n");
-        sys::exit(1);
-    };
-    if(optind==argc)
-      break;
-  };
   for(int i=0;i<nnames;i++)
   {
-    auto &name=names[i];
-    if(name=="--")
-      continue;
-    else if (name=="-")
+    c_str name=names[i];
+    if (name=="-") {
       catfile(0,1);
-    else {
+    } else {
       int fd=open(name.begin(),o_rdonly);
       if(fd<0) {
         write(2,"open:",5);

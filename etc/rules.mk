@@ -1,23 +1,26 @@
 
 $(lib/lib): $(lib/obj)
-	ar -r "$@" $(lib/obj) $(lib/xxx)
+	ar -r $@ $(lib/obj) $(lib/xxx)
 
-%: %.oo etc/ld_flags $(lib/lib)
-	ld -o "$@" $< $(lib/lib)
+$(all/exe): %: %.oo etc/ld_flags $(lib/lib)
+	ld -o $@ $< $(lib/lib)
 
-%.ii: %.cc  etc/cppflags
-	rm -f $*.ii $*.oo $*.SS
-	g++ -E -o "$@" $< @etc/cppflags -MD -MT $@ -MF $@.dd
+$(all/cpp): %.ii: %.cc  etc/cppflags
+	g++ -E -o $@ $< @etc/cppflags -MD -MT $@ -MF $@.dd
 
-%.SS: %.ii  etc/cxxflags
-	rm -f $*.SS $*.oo
-	g++ -S -o "$@" $< @etc/cxxflags -MD -MT $@ -MF $@.dd
+$(gen/asm): %.SS: %.ii  etc/cxxflags
+	g++ -S -o $@ $< @etc/cxxflags -MD -MT $@ -MF $@.dd
 
-%.oo: %.SS  etc/asmflags
-	as -o "$@" $< @etc/asmflags
+$(all/obj): %.oo: %.SS  etc/asmflags
+	as -o $@ $< @etc/asmflags
+
 
 %/run: %
 	./$<
 
 %: %.c
 	gcc -o $@ $<
+
+/dev/null:;
+%.mk:;
+Makefile:;

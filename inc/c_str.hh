@@ -96,6 +96,26 @@ class c_str {
     auto r=seq_cmp(lhs.begin(),rhs.begin(),msize);
     return r!=(0<=>0) ? r : (lhs.size()<=>rhs.size());
   };
+  friend bool lt(const c_str &lhs, const c_str &rhs) {
+    auto msize=min(lhs.size(),rhs.size());
+    for(auto i=0*msize;i<msize;i++){
+      if(lhs[i]!=rhs[i])
+        return lhs[i]<rhs[i]?true:false;
+    };
+    return lhs.size()<rhs.size();
+  };
+  friend auto operator<=>(const c_str &lhs, const char *rhs){
+    return cmp(lhs,rhs);
+  };
+  friend auto operator<=>(const char *lhs, const c_str &rhs){
+    return cmp(lhs,rhs);
+  };
+  friend auto operator<=>(const c_str &lhs, const c_str &rhs){
+    return cmp(lhs,rhs);
+  };
+  friend auto operator==(const c_str &lhs, const c_str &rhs){
+    return cmp(lhs,rhs)==(0<=>0);
+  };
 };
 
 inline ssize_t write(fd_t fd, const c_str &str) {

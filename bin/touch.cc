@@ -12,6 +12,7 @@ using sys::utimensat;
 using sys::UTIME_NOW;
 using sys::UTIME_OMIT;
 using sys::AT_FDCWD;
+using namespace getopt_ns;
 
 char *optarg;
 namespace fmt {

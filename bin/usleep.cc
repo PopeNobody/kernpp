@@ -7,6 +7,7 @@ using sys::write;
 using sys::nanosleep;
 using sys::exit;
 using namespace fmt;
+using namespace getopt_ns;
 
 void too_many() {
   write(2,L("too many!\n\n"));

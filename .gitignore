@@ -11,3 +11,9 @@ fuck
 *.oo
 *.aa
 hide
+!lib/start.SS
+!bin/true.SS
+!bin/false.SS
+!tst/test3.t.SS
+arc
+*.log
