@@ -1,0 +1,965 @@
+diff '--color=auto' -r main/.git kernpp/.git
+1c1
+< gitdir: /home/nn/src/git/hub/.git/worktrees/main
+---
+> gitdir: /home/nn/src/git/hub/.git/worktrees/kernpp
+diff '--color=auto' -r main/.gitignore kernpp/.gitignore
+1d0
+< depends.mk
+18,19c17
+< ,/bin/lspath
+< bin/lspath
+---
+> 
+diff '--color=auto' -r main/Makefile kernpp/Makefile
+4d3
+< define dir_infer
+6,16c5,23
+< $1/src:=  $(wildcard  $1/*.cc)                         
+< $1/exe:=  $(patsubst  %.cc,%,   $($1/src))             
+< $1/asm:=  $(wildcard  $1/*.S)                          
+< $1/xxx:=  $(patsubst  %,%.o,   $($1/asm))             
+< $1/exe+=  $(patsubst  %,%,      $($1/asm))             
+< $1/obj:=  $(patsubst  %,%.o,   $($1/src))             
+< $1/cpp:=  $(patsubst  %,%.ii,   $($1/src))             
+< $1/dep:=  $(patsubst  %,%.d,    $($1/obj)   $($1/cpp)  $($1/asm))
+< $1:=$($1/exe)
+< endef
+< $(call dir_infir,bin,lib) 
+---
+> bin/src:= $(wildcard bin/*.cc)
+> bin/exe:= $(patsubst %.cc,%,     $(bin/src))
+> bin/asm:= $(wildcard bin/*.S)
+> bin/xxx:= $(patsubst %.S,%.oo,$(bin/asm))
+> bin/exe+= $(patsubst %.S,%,      $(bin/asm))
+> bin/obj:= $(patsubst %.cc,%.oo,  $(bin/src))
+> bin/cpp:= $(patsubst %.cc,%.ii,  $(bin/src))
+> bin/dep:= $(patsubst %,%.d,$(bin/obj) $(bin/cpp))
+> bin:=$(bin/exe)
+> 
+> lib/src:= $(wildcard lib/*.cc)
+> lib/lib:= lib/libkpp.aa
+> lib/asm:= $(wildcard lib/*.S)
+> lib/xxx:= $(patsubst %.S,%.oo, $(lib/asm))
+> lib/obj:= $(patsubst %.cc,%.oo,  $(lib/src))
+> lib/cpp:= $(patsubst %.cc,%.ii,  $(lib/src))
+> lib/dep:= $(patsubst %.cc,%.oo.d,$(lib/src))
+> lib/dep:= $(patsubst %.cc,%.ii.d,$(lib/src))
+> lib:=$(lib/lib)
+26,27c33,34
+< ext/obj:= $(filter-out $(all/obj), $(wildcard *.o))
+< ext/xxx:= $(filter-out $(all/xxx), $(wildcard *.o))
+---
+> ext/obj:= $(filter-out $(all/obj), $(wildcard *.oo))
+> ext/xxx:= $(filter-out $(all/xxx), $(wildcard *.oo))
+40c47
+< $(bin/exe): %: %.o sbin/link etc/ld_flags
+---
+> $(bin/exe): %: %.oo sbin/link etc/ld_flags
+44c51
+< 	rm -f $*.ii $*.o
+---
+> 	rm -f $*.ii $*.oo
+47c54
+< $(all/xxx): %.o: %.S sbin/casm etc/asmflags
+---
+> $(all/xxx): %.oo: %.S sbin/casm etc/asmflags
+50c57
+< $(all/obj): %.o: %.ii sbin/comp etc/cxxflags
+---
+> $(all/obj): %.oo: %.ii sbin/comp etc/cxxflags
+53,55c60,62
+< cur/dep:=$(wildcard *.o.d)
+< cur/obj:=$(wildcard *.o) $(patsubst %.d,%,$(cur/dep))
+< cur/src:=$(patsubst %.o,%.cc,$(cur/obj))
+---
+> cur/dep:=$(wildcard *.oo.d)
+> cur/obj:=$(wildcard *.oo) $(patsubst %.d,%,$(cur/dep))
+> cur/src:=$(patsubst %.oo,%.cc,$(cur/obj))
+66c73
+< 	rm -f */*.[ioad]
+---
+> 	rm -f */*.[ioa][ioa]
+77c84
+< 	nm */*.a */*.o --defined-only -A --demangle
+---
+> 	nm */*.aa */*.oo --defined-only -A --demangle
+diff '--color=auto' -r main/bin/.gitignore kernpp/bin/.gitignore
+9,20d8
+< not
+< cat
+< echo
+< false
+< ls
+< lspath
+< not
+< report
+< string_view
+< test_getopt
+< true
+< usleep
+diff '--color=auto' -r main/bin/cat.cc kernpp/bin/cat.cc
+51a52,93
+> extern "C" {
+>   int main(int argc, char**argv,char **envp);
+> };
+> template<typename val_t>
+> struct vector
+> {
+>   val_t *arr;
+>   size_t len;
+>   vector()
+>     : arr(nullptr), len(0)
+>   {
+>   };
+>   vector(val_t *beg, val_t *end)
+>     : arr(beg), len(end-beg)
+>   {
+>   };
+>   val_t &operator[](size_t n)
+>   {
+>     assert(n<size());
+>     return arr[n];
+>   };
+>   const val_t &operator[](size_t n) const
+>   {
+>     assert(n<size());
+>     return arr[n];
+>   };
+>   size_t size() const {
+>     return  len;
+>   };
+>   const val_t *begin() const {
+>     return arr;
+>   };
+>   const val_t *end() const {
+>     return arr+len;
+>   };
+>   val_t *begin() {
+>     return arr;
+>   };
+>   val_t *end() {
+>     return arr+len;
+>   };
+> };
+85a128,134
+>     write(1,"c=");
+>     write_dec(1,c);
+>     write(1," argc=");
+>     write_dec(1,argc);
+>     write(1," optind=");
+>     write_dec(1,optind);
+>     write(1,"\n");
+139c188
+<         write(2,"open:");
+---
+>         write(2,"open:",5);
+diff '--color=auto' -r main/bin/echo.cc kernpp/bin/echo.cc
+4c4,7
+< int main(int argc, char**argv,char **envp) {
+---
+> extern "C" {
+>   int main(int argc, char**argv);
+> };
+> int main(int argc, char**argv) {
+diff '--color=auto' -r main/bin/ls.cc kernpp/bin/ls.cc
+10c10
+< void swap(obj_t &lhs, obj_t &rhs)
+---
+> void swap(obj_t &lhs, obj_t rhs)
+15a16,80
+> struct dirents_t {
+>   struct ent_t {
+>     bool dir;
+>     char name[256];
+>     ent_t()
+>       :dir(false)
+>     {
+>     };
+>     ent_t(const char *_name, bool _dir)
+>       :dir(_dir)
+>     {
+>       strncpy(name,_name,sizeof(name));
+>     };
+>   };
+>   size_t cap;
+>   size_t cnt;
+>   ent_t **lst;
+>   dirents_t()
+>     : lst(0), cap(0), cnt(0)
+>   {
+>   };
+>   int cmp(ent_t &lhs, ent_t&rhs) {
+>     return strcmp(rhs.name,lhs.name);
+>   };
+>   void sort() {
+>     size_t n=size();
+>     for(int i=0;i<n-2;i++) {
+>       int m=i;
+>       for(int j=i+1;j<n;j++) {
+>         if(cmp(*lst[m],*lst[j])<0)
+>           m=j;
+>       };
+>       if(i!=m)
+>         swap(lst[i],lst[m]);
+>     };
+>   };
+>   ~dirents_t() {
+>     for(int i=0;i<cnt;i++)
+>       delete lst[i];
+>     delete[] lst;
+>   };
+>   void push_back(const char *name, bool isdir)
+>   {
+>     if(cnt==cap) {
+>       if(cap) {
+>         ent_t **nlst = new ent_t*[cap+16];
+>         memcpy(nlst,lst,sizeof(ent_t*)*cap);
+>         delete[] lst;
+>         lst=nlst;
+>       } else {
+>         lst = new ent_t*[16];
+>       };
+>       cap+=16;
+>     };
+>     ent_t *new_ent=new ent_t(name,isdir);
+>     lst[cnt++]=new_ent;
+>   };
+>   ent_t &get(size_t pos)
+>   {
+>     return *lst[pos];
+>   };
+>   size_t size() const {
+>     return cnt;
+>   };
+> };
+24d88
+< bool dotfiles=false;
+28,68d91
+< 
+< int sign(int lhs){
+<   if(lhs<0)
+<     return -1;
+<   else if (lhs>0)
+<     return 1;
+<   else
+<     return 0;
+< };
+< int cmp(const char *lhs, const char *rhs){
+<   while(*lhs == *rhs && *lhs)
+<     ++lhs, ++rhs;
+<   return sign(*lhs-*rhs);
+< };
+< void sort(linux_dirent **beg, linux_dirent**end)
+< {
+<   if(beg==end)
+<     return;
+<   linux_dirent** pos=beg;
+<   while(pos<end){
+<     while(++beg<end){
+<       if(cmp((*beg)->d_name,(*pos)->d_name)<0)
+<         swap(*beg,*pos);
+<     }
+<     pos++;
+<     beg=pos;
+<   }
+< };
+< bool skip(const char *name){
+<   if(name[0]!='.')
+<     return false;
+<   if(ignore==normal)
+<     return true;
+<   if(ignore==minimal)
+<     return false;
+<   if(name[1]==0)
+<     return true;
+<   if(name[1]=='.' && name[2]==0)
+<     return true;
+<   return false;
+< };
+70,71d92
+<   int n=0;
+<   linux_dirent*ents[8192];
+72a94
+>   dirents_t ents;
+82,85c104,105
+<     while(beg!=end){
+<       if(!skip(beg->d_name)){
+<         ents[n++]=beg;
+<       };
+---
+>     while(beg!=end) {
+>       ents.push_back(beg->d_name,beg->d_type == DT_DIR);
+87c107,108
+<     }
+---
+>     };
+>     //mm_show();
+89,92c110,124
+<   sort(ents,ents+n);
+<   for(int i=0;i<n;i++){
+<     write(1,ents[i]->d_name);
+<     write(1,"\n");
+---
+>   ents.sort();
+>   for(size_t i=0;i<ents.size();i++)
+>   {
+>     auto ent=ents.get(i);
+>     if(ignore==dot_dot) {
+>       if(!strcmp(ent.name,"."))
+>         continue;
+>       if(!strcmp(ent.name,".."))
+>         continue;
+>     } else if ( ignore != minimal ) {
+>       if(ent.name[0]=='.')
+>         continue;
+>     };
+>     write(1,ent.name);
+>     write(1,L("\n"));
+150a183,185
+> extern "C" {
+>   int main(int argc, char**argv, char**envp) ;
+> };
+161d195
+<   using fmt::write_dec;
+Only in main/bin: lspath.cc
+Only in main/bin: not.cc
+diff '--color=auto' -r main/bin/report.cc kernpp/bin/report.cc
+1c1,5
+< #include<syscall.hh>
+---
+> #include <errno.hh>
+> #include <fmt.hh>
+> #include <syscall.hh>
+> #include <getopt.hh>
+> #include <buf.hh>
+3,61c7,308
+< //   #define wifexited(res) (wtermsig(res)==0)
+< //   #define wtermsig(res) (res&0x7f)
+< //   #define wexitstatus(res) ((res&0xff00)>>8)
+< //   
+< //   
+< //   typedef char * str_t;
+< //   typedef const char *str_c;
+< //   
+< //   int main(int argc, char** argv, char **envp)
+< //   {
+< //     if(argc<2) {
+< //       write(2,"usage: ");
+< //       write(2,argv[0]);
+< //       write(2," <command>\n");
+< //       return 2;
+< //     };
+< //     pid_t opid=sys::getpid();
+< //     pid_t npid=xfork();
+< //     int res;
+< //     if(npid) {
+< //       if(sys::wait(&res)<0){
+< //         write(2,"wait: ");
+< //         write(2,sys::strerror(sys::errno));
+< //         write(2,"\n");
+< //         return 1;
+< //       };
+< //   
+< //       auto pos=argv;
+< //       if(pos){
+< //         if(*pos){
+< //           write(2,*pos);
+< //           while(*++pos){
+< //             write(2," ");
+< //             write(2,*pos);
+< //           };
+< //           write(2," returned ");
+< //           write_dec(2,res);
+< //           write(2,"\n");
+< //           exit(res);
+< //         };
+< //       };
+< //       if( wifexited(res) ) {
+< //         res=wexitstatus(res);
+< //         write(2,"returned ");
+< //         write_dec(2,res);
+< //         write(2,"\n");
+< //         exit(res);
+< //       } else {
+< //         write(2,"sig: ");
+< //         write_dec(2,wtermsig(res));
+< //         write(2,"\n\n");
+< //       };
+< //     } else {
+< //       ++argv;
+< //       sys::execve(argv[0],argv, envp);
+< //       return 0;
+< //     };
+< //     return res;
+< //   };
+---
+> using namespace fmt;
+> extern "C" {
+>   int main(int argc, char**argv, char**envp);
+> };
+> #define assert(x) _assert((x),#x)
+> buf_ns::buf_t buf;
+> void _assert(bool ok, const char *cond){
+>   if(ok)
+>     return;
+>   buf.println("assertion failed:\n  ", cond,"\n");
+>   exit(1);
+> };
+> // int execve(const char * fn, char *const * argv, char *const * envp)
+> pid_t xfork()
+> {
+>   pid_t pid=sys::fork();
+>   if(pid<0) {
+>     sys::write(1,"fork:",5);
+>     sys::write(1,"wtf?",4);
+>     exit(1);
+>   };
+>   return pid;
+> };
+> char def1[]="/bin/echo";
+> char def2[]="/bin/sh";
+> char *defs[] = { 
+>   def1, def2, 0
+> };
+> #define wifexited(res) (wtermsig(res)==0)
+> #define wtermsig(res) (res&0x7f)
+> #define wexitstatus(res) ((res&0xff00)>>8)
+> 
+> 
+> static char to_char(int num)
+> {
+>   return num+'0';
+> };
+> char env1[]="TEST1=test1";
+> char env2[]="TEST2=test2";
+> char env3[]="TEST3=test3";
+> char *env[]
+> {
+>   env1, env2, env3, 0
+> };
+> char **clone(char **in)
+> {
+>   int c=0;
+>   while(in[c])
+>     ++c;
+>   char **res=new char*[c+1];
+>   for(int i=0;i<c;i++)
+>   {
+>     res[i]=in[i];
+>   };
+>   res[c]=0;
+>   return res;
+> };
+> int count(char**arr) 
+> {
+>   int c=0;
+>   while(arr[c])
+>     ++c;
+>   return c;
+> };
+> int dump(char**arr) 
+> {
+>   buf.println("\narr: ",(void*)arr);
+>   int c=0;
+>   buf.println();
+>   while(arr[c])
+>     ++c;
+>   buf.println("arr.size()=",c);
+>   for(int i=0;i<=c;i++) {
+>     buf.println("arr[",i,"]=",arr[i]?arr[i]:"<null>  &=",(void*)arr[i]);
+>   };
+>   buf.println();
+>   return c;
+> };
+> 
+> template<typename itr_t, typename pred_t>
+> itr_t find( itr_t &beg, pred_t pred )
+> {
+>   while(true)
+>   {
+>     if(pred(*beg))
+>       return beg;
+>     ++beg;
+>   };
+> };
+> 
+> typedef char * str_t;
+> typedef const char *str_c;
+> 
+> template<size_t _n>
+> struct str_list
+> {
+>   static constexpr size_t n = _n;
+>   typedef str_t value_type;
+>   //typedef str_t *iterator;
+>   typedef str_t &reference;
+>   typedef str_t *pointer;
+>   typedef const str_t *const_pointer;
+>   struct lim_int {
+>     size_t min;
+>     size_t max;
+>     size_t val;
+>     lim_int(size_t min, size_t max, size_t val)
+>       : min(min), max(max),val(min)
+>     {
+>       set(val);
+>     }
+>     lim_int(const lim_int &copy, int val)
+>       : min(copy.min), max(copy.max), val(copy.min)
+>     {
+>       set(val);
+>     }
+>     void set(size_t newval) {
+>       assert(newval>=min && newval<=max);
+>       val=newval;
+>     };
+>     operator const size_t &() const {
+>       return val;
+>     };
+>     lim_int operator++(int) {
+>       lim_int res(*this);
+>       ++*this;
+>       return res;
+>     };
+>     lim_int &operator++() {
+>       set(val+1);
+>       return *this;
+>     };
+>   };
+>   struct iterator {
+>     str_list &list;
+>     lim_int i;
+>     iterator(str_list list, const lim_int &i)
+>       :list(list), i(i,0)
+>     {
+>       assert(i<=n);
+>     };
+>     ~iterator() {
+>       memset(this,0,sizeof(this));
+>     };
+>     bool operator!=(const iterator &rhs)
+>     {
+>       assert(&list==&rhs.list);
+>       return i!=rhs.i;
+>     }
+>     iterator operator++(int) {
+>       iterator res(*this);
+>       ++i;
+>       return res;
+>     };
+>     iterator &operator++() {
+>       assert(i<list.data.i);
+>       ++i;
+>       return *this;
+>     };
+>     str_t &operator*() {
+>       assert(list.data.i<n);
+>       while(i<list.data.i) {
+>         assert(list.data.i<n);
+>         list.push_back("");
+>       };
+>       return list[i];
+>     };
+>   };
+>   str_t &operator[](size_t p)
+>   {
+>     assert(p<=data.i);
+>     return data.list[p];
+>   };
+> 
+> 
+>   struct data_t {
+>     str_t list[n+1];
+>     lim_int i;
+>     data_t()
+>       :i(0,n,0)
+>     {
+>       memset(list,0,sizeof(list));
+>     };
+>     void push_back(const str_t &str)
+>     {
+>       if(i<n)
+>         list[i++]=str;
+>     }
+>     template<typename itr_t>
+>     void push_back(itr_t beg, itr_t end)
+>     {
+>       while(beg!=end)
+>         push_back(*beg++);
+>     };
+>   }data;
+> 
+>   str_list(str_t * const &beg, str_t * const &end)
+>   {
+>     push_back(beg,end);
+>   }
+>   template<typename itr_t>
+>     str_list(itr_t beg)
+>     {
+>       while(*beg)
+>         push_back(*beg++);
+>     }
+>   void push_back(str_c str)
+>   {
+>     assert(data.i<n);
+>     static int count=0;
+>     data.push_back((str_t)str);
+>   };
+>   void push_back(str_t str)
+>   {
+>     assert(data.i<n);
+>     data.push_back(str);
+>   };
+>   const_pointer end() const
+>   {
+>     assert(data.i<n);
+>     return &data.list[data.i];
+>   };
+>   const_pointer begin() const
+>   {
+>     assert(data.i<n);
+>     return &data.list[0];
+>   };
+>   iterator begin() {
+>     assert(data.i<n);
+>     return iterator(*this,lim_int(0,n,0));
+>   };
+>   iterator end() {
+>     assert(data.i<n);
+>     return iterator(*this,lim_int(0,n,size()));
+>   };
+>   template<typename itr_t>
+>   void push_back(itr_t beg, itr_t end)
+>   {
+>     assert(data.i<n);
+>     auto osize=size();
+>     while(beg!=end) {
+>       push_back(*beg++);
+>     };
+>     auto nsize=size();
+>     buf.println("added ", (nsize-osize), "messags");
+>   };
+>   size_t size() const
+>   {
+>     return data.i;
+>   };
+> };
+> 
+> int main(int argc, char** _argv, char **_envp)
+> {
+>   int res=0;
+>   str_list<1024> argv(_argv,_argv+argc);
+>   str_list<1024> envp(_envp);
+> 
+>   argv.push_back(".");
+>   for( auto str : argv )
+>     buf.println(str);
+> 
+>   buf.println(argv.size()," items");
+>   envp=_envp;
+> #if 0
+>   int fd=open("/dev/pts/7", sys::o_wronly);
+>   sys::dup2(fd,2);
+>   if(fd>2)
+>     sys::close(fd);
+> #endif
+> 
+>   if(argc<2) {
+>     buf.println("argc=",argc," need 2");
+>     return 2;
+>   };
+>   timespec_t dur = { 0, 100000 };
+>   timespec_t rem = { -1, -1 };
+>   pid_t opid=sys::getpid();
+>   pid_t npid=xfork();
+>   if(npid) {
+>     if(sys::wait(&res)<0){
+>       buf.println(sys::errno,"wait:",sys::strerror(sys::errno));
+>       return 1;
+>     };
+>     
+>     if( wifexited(res) ) {
+>       res=wexitstatus(res);
+>     } else {
+>       buf.println("sig: ", wtermsig(res), "\n\n");
+>     };
+>     auto pos=argv.begin();
+>     while(pos!=argv.end()){
+>       buf.print(*pos++," ");
+>     };
+>     buf.println("returned ",res);
+>   } else {
+>     sys::execve(argv[0],argv.data.list, envp.data.list);
+>     buf.println("failed to exec: ", argv[0]);
+>     return 0;
+>   };
+>   return res;
+> };
+diff '--color=auto' -r main/bin/string_view.cc kernpp/bin/string_view.cc
+2a3,4
+> extern "C" int main(int, char**);
+> 
+Only in main/bin: test_getopt.cc
+Only in main/: breakpoints
+Only in main/: depends.pl
+Only in main/doc: lspath.bash
+diff '--color=auto' -r main/etc/cppflags kernpp/etc/cppflags
+2d1
+< 
+4a4,7
+> -ffreestanding
+> -fno-exceptions
+> -ggdb3 -O0
+> -fno-stack-protector
+diff '--color=auto' -r main/etc/cxxflags kernpp/etc/cxxflags
+3,4c3
+< -ggdb3
+< -O0
+---
+> -ggdb3 -O0
+diff '--color=auto' -r main/etc/ld_flags kernpp/etc/ld_flags
+1,2d0
+< --freestanding
+< -Bdynamic
+4a3
+> -Wl,--verbose
+8c7
+< -ggdb3 -O0
+---
+> -ggdb3
+Only in main/: files.md5
+Only in kernpp/inc: assert.h
+diff '--color=auto' -r main/inc/buf.hh kernpp/inc/buf.hh
+4a5
+> #include <fmt.hh>
+10c11,13
+<     buf_t()
+---
+>     int fd;
+>     buf_t(int fd=1)
+>       :fd(fd)
+16c19
+<       sys::write(1,text,len);
+---
+>       sys::write(fd,text,len);
+diff '--color=auto' -r main/inc/c_str.hh kernpp/inc/c_str.hh
+111c111
+<   return sys::write(fd, str.begin(), str.size());
+---
+>   return sys::sys_write(fd, str.begin(), str.size());
+diff '--color=auto' -r main/inc/fmt.hh kernpp/inc/fmt.hh
+53,54d52
+<     if(neg)
+<       *--end = '-';
+61c59
+<   inline int write_dec(fd_t fd, int val) {
+---
+>   inline int write_dec(fd_t fd, size_t val) {
+63c61
+<     return write(fd, fmt::fmt_dec(val<0,val<0?-val:val, buf, &buf[sizeof(buf) - 1]));
+---
+>     return write(fd, fmt::fmt_dec(false,val, buf, &buf[sizeof(buf) - 1]));
+115c113
+<           exit(1);
+---
+>           sys::exit(1);
+119a118,137
+> #define show_val(x) do_show_val(L(#x),(x))
+> #define show_dec(x)                                                            \
+>   do {                                                                         \
+>     write(2, L(#x " => "));                                                    \
+>     write_dec(2, (x));                                                         \
+>     write(2, L("\n"));                                                         \
+>   } while (false);
+> #define show_ptr(x)                                                            \
+>   do {                                                                         \
+>     write(2, L(#x " => "));                                                    \
+>     write_ptr(2, (x));                                                         \
+>     write(2, L("\n"));                                                         \
+>   } while (false);
+> #define show_hex(x)                                                            \
+>   do {                                                                         \
+>     write(2, L(#x " => "));                                                    \
+>     write_hex(2, (x));                                                         \
+>     write(2, L("\n"));                                                         \
+>   } while (false);
+> #undef AAI
+diff '--color=auto' -r main/inc/getopt.hh kernpp/inc/getopt.hh
+1,2c1,34
+< #ifndef GETOPT_HH
+< #define GETOPT_HH GETOPT_HH
+---
+> /*******************************************************************************
+>  * Copyright (c) 2012-2017, Kim Grasman <kim.grasman@gmail.com>
+>  * All rights reserved.
+>  *
+>  * Redistribution and use in source and binary forms, with or without
+>  * modification, are permitted provided that the following conditions are met:
+>  *   * Redistributions of source code must retain the above copyright
+>  *     notice, this list of conditions and the following disclaimer.
+>  *   * Redistributions in binary form must reproduce the above copyright
+>  *     notice, this list of conditions and the following disclaimer in the
+>  *     documentation and/or other materials provided with the distribution.
+>  *   * Neither the name of Kim Grasman nor the
+>  *     names of contributors may be used to endorse or promote products
+>  *     derived from this software without specific prior written permission.
+>  *
+>  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+>  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+>  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+>  * ARE DISCLAIMED. IN NO EVENT SHALL KIM GRASMAN BE LIABLE FOR ANY
+>  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+>  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+>  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+>  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+>  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+>  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+>  *
+>  ******************************************************************************/
+> 
+> #ifndef INCLUDED_GETOPT_PORT_H
+> #define INCLUDED_GETOPT_PORT_H
+> 
+> #if defined(__cplusplus)
+> extern "C" {
+> #endif
+22a55,57
+> #if defined(__cplusplus)
+> }
+> #endif
+Only in main/inc: ostream.hh
+diff '--color=auto' -r main/inc/stdlib.hh kernpp/inc/stdlib.hh
+7,9c7,9
+<   void*         malloc(size_t);
+<   void          free(void*);
+<   void*         realloc(void* ptr, size_t size);
+---
+>   extern void*  malloc(size_t);
+>   extern void   free(void*);
+>   extern void*  realloc(void* ptr, size_t size);
+diff '--color=auto' -r main/inc/syscall.hh kernpp/inc/syscall.hh
+55c55
+< #define chk_return(val) return set_errno(val);
+---
+> #define chk_return(val) return (val < 0 ? set_errno(val) : val)
+63c63,65
+<     inline fd_t    open(const char* pathname, open_flags  flags, open_mode   mode) AAI;
+---
+>     inline fd_t    open(const char* pathname,
+>                         open_flags  flags,
+>                         open_mode   mode) AAI;
+67c69
+<     inline ssize_t write(fd_t fd, const char* buf, size_t len) AAI;
+---
+>     inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AAI;
+82c84
+<   inline ssize_t write(fd_t fd, const char* buf, size_t len)
+---
+>   inline ssize_t sys_write(fd_t fd, const char* buf, size_t len)
+347d348
+< // __NR__ exit = 60 
+358c359
+<       ;
+---
+>       sleep(1);
+453a455
+>   inline ssize_t write(int fd, const char* buf, size_t len) AAI;
+456a459,462
+>   inline ssize_t write(int fd, const char* buf, size_t len)
+>   {
+>     return sys_write(fd, buf, len);
+>   }
+459c465
+<     return write(fd, buf, end - buf);
+---
+>     return sys_write(fd, buf, end - buf);
+464c470
+<     const char* end= buf ? buf : "(null)";
+---
+>     const char* end= buf;
+467c473
+<     return write(fd, buf, end - buf);
+---
+>     return sys_write(fd, buf, end - buf);
+484c490
+<       ssize_t res= write(fd, pos, end - pos);
+---
+>       ssize_t res= sys_write(fd, pos, end - pos);
+539,543d544
+< 
+< extern "C" {
+<   int main(int argc, char**argv, char**envp);
+< };
+< 
+diff '--color=auto' -r main/lib/abi.cc kernpp/lib/abi.cc
+18d17
+< 
+Only in main/lib: cxxabi.cc
+diff '--color=auto' -r main/lib/errno.cc kernpp/lib/errno.cc
+3c3
+< #include <write_buf.hh>
+---
+> #include <buf.hh>
+10a11,15
+>     {
+>       buf_ns::buf_t buf(2);
+>       if(err!=11)
+>         buf.println("seting error to=",err);
+>     };
+26c31
+<     write_buf<> buf(2);
+---
+>     buf_ns::buf_t buf(2);
+28,29c33,34
+<       buf.put(msg1);
+<       buf.put(":");
+---
+>       buf.print(msg1);
+>       buf.print(":");
+32,33c37,38
+<       buf.put(msg2);
+<       buf.put(":");
+---
+>       buf.print(msg2);
+>       buf.print(":");
+35c40
+<     buf.putln(strerror(errno));
+---
+>     buf.println(strerror(errno));
+diff '--color=auto' -r main/lib/getopt.cc kernpp/lib/getopt.cc
+172c172
+<   if (argv[optind][0]!='-' || argv[optind][1]!='-' || argv[optind][2]==0)
+---
+>   if (strlen(argv[optind]) < 3 || strncmp(argv[optind], "--", 2) != 0)
+diff '--color=auto' -r main/lib/start.S kernpp/lib/start.S
+1,5c1,2
+< #ifdef __ELF__
+< .section .note.GNU-stack,""
+< #endif
+< 	.text
+< 	.global _start
+---
+> .text
+> .global _start
+7,15c4,11
+<   xorl %ebp,%ebp
+< 	call libc_init
+<   movq 0(%rsp),%rdi
+<   lea 8(%rsp),%rsi
+<   lea 16(%rsp),%rdx
+<   call main
+< 	movq %rax,%rdi
+< 	call exit
+< 	int3
+---
+> xorl %ebp,%ebp
+> call libc_init
+> movq 0(%rsp),%rdi
+> lea 8(%rsp),%rsi
+> call main
+> movq %rax,%rdi
+> call exit
+> int3
+Only in main/: script
+Only in main/: test.pl

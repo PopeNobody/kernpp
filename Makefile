@@ -15,16 +15,6 @@ $1:=$($1/exe)
 endef
 $(call dir_infir,bin,lib) 
 
-#    lib/src:= $(wildcard lib/*.cc)
-#    lib/lib:= lib/libkpp.a
-#    lib/asm:= $(wildcard lib/*.S)
-#    lib/xxx:= $(patsubst %.S,%.o, $(lib/asm))
-#    lib/obj:= $(patsubst %.cc,%.o,  $(lib/src))
-#    lib/cpp:= $(patsubst %.cc,%.ii,  $(lib/src))
-#    lib/dep:= $(patsubst %.cc,%.o.d,$(lib/src))
-#    lib/dep:= $(patsubst %.cc,%.ii.d,$(lib/src))
-#    lib:=$(lib/lib)
-
 all/obj:= $(lib/obj) $(bin/obj)
 all/xxx:= $(lib/xxx) $(bin/xxx)
 all/cpp:= $(lib/cpp) $(bin/cpp)

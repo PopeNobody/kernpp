@@ -1,0 +1,1698 @@
+Only in main/: .clang-format
+Only in add_rtti: .gdb_history
+diff '--color=auto' -r main/.git add_rtti/.git
+1c1
+< gitdir: /home/nn/src/git/hub/.git/worktrees/main
+---
+> gitdir: /home/nn/src/git/hub/.git/worktrees/add_rtti
+diff '--color=auto' -r main/.gitignore add_rtti/.gitignore
+1,10c1,18
+< depends.mk
+< bin/markout
+< **.d
+< **.[os]
+< **.ii
+< **.a
+< log/
+< *.out
+< bin/report
+< bin/string_view
+---
+> #programs
+> bin/new
+> bin/fmt
+> bin/rc
+> bin/static
+> bin/cat
+> bin/echo
+> bin/false
+> bin/ls
+> bin/true
+> bin/malloc_test
+> bin/sc
+> bin/vec
+> bin/brk
+> 
+> tst
+> 
+> out
+11a20,61
+> *.out
+> *.orig
+> *.map
+> # Prerequisites
+> *.d
+> 
+> # Compiled Object files
+> *.slo
+> *.lo
+> *.o
+> *.obj
+> *.s
+> *.i
+> *.ii
+> *.d
+> 
+> # Precompiled Headers
+> *.gch
+> *.pch
+> 
+> # Compiled Dynamic libraries
+> *.so
+> *.dylib
+> *.dll
+> 
+> # Fortran module files
+> *.mod
+> *.smod
+> 
+> # Compiled Static libraries
+> *.lai
+> *.la
+> *.a
+> *.lib
+> 
+> # Executables
+> *.exe
+> *.out
+> *.app
+> 
+> 
+> deps
+13,21c63
+< trace
+< .gdb_history
+< core.*
+< out
+< fuck
+< ,/bin/lspath
+< bin/lspath
+< *.oo
+< *.aa
+---
+> 
+diff '--color=auto' -r main/Makefile add_rtti/Makefile
+1,60c1
+< MAKEFLAGS:= -rR -j24
+< .EXPORT_ALL_VARIABLED:
+< all:
+< define dir_infer
+< 
+< $1/src:=  $(wildcard  $1/*.cc)                         
+< $1/exe:=  $(patsubst  %.cc,%,   $($1/src))             
+< $1/asm:=  $(wildcard  $1/*.S)                          
+< $1/xxx:=  $(patsubst  %,%.o,   $($1/asm))             
+< $1/exe+=  $(patsubst  %,%,      $($1/asm))             
+< $1/obj:=  $(patsubst  %,%.o,   $($1/src))             
+< $1/cpp:=  $(patsubst  %,%.ii,   $($1/src))             
+< $1/dep:=  $(patsubst  %,%.d,    $($1/obj)   $($1/cpp)  $($1/asm))
+< $1:=$($1/exe)
+< endef
+< $(call dir_infir,bin,lib) 
+< 
+< all/obj:= $(lib/obj) $(bin/obj)
+< all/xxx:= $(lib/xxx) $(bin/xxx)
+< all/cpp:= $(lib/cpp) $(bin/cpp)
+< all/src:= $(lib/src) $(bin/src)
+< all/dep:= $(lib/dep) $(bin/dep)
+< 
+< include /dev/null $(wildcard $(all/dep))
+< 
+< ext/obj:= $(filter-out $(all/obj), $(wildcard *.o))
+< ext/xxx:= $(filter-out $(all/xxx), $(wildcard *.o))
+< 
+< all:= $(bin/exe) $(lib/lib)
+< bin:= $(bin/exe)
+< lib:= $(lib/lib)
+< $(bin): $(lib)
+< all: $(all)
+< 
+< include /dev/null $(wildcard $(all/dep))
+< 
+< $(lib/lib): $(lib/obj) $(lib/xxx)
+< 	sbin/arch "$@" $(lib/obj) $(lib/xxx)
+< 
+< $(bin/exe): %: %.o sbin/link etc/ld_flags
+< 	sbin/link "$@" $(lib/lib)
+< 
+< $(all/cpp): %.ii: %.cc sbin/prec etc/cppflags
+< 	rm -f $*.ii $*.o
+< 	sbin/prec "$@"
+< 
+< $(all/xxx): %.o: %.S sbin/casm etc/asmflags
+< 	sbin/casm "$@"
+< 
+< $(all/obj): %.o: %.ii sbin/comp etc/cxxflags
+< 	sbin/comp "$@"
+< 
+< cur/dep:=$(wildcard *.o.d)
+< cur/obj:=$(wildcard *.o) $(patsubst %.d,%,$(cur/dep))
+< cur/src:=$(patsubst %.o,%.cc,$(cur/obj))
+< 
+< 
+< ifneq ($(have),$(want))
+< $(lib/lib): rem-lib
+< endif
+---
+> test:
+62,63d2
+< ###   
+< clean: date:=$(shell serdate)
+65,66c4,39
+< clean:
+< 	rm -f */*.[ioad]
+---
+> MAKEFLAGS:=-rR
+> AR_FLAGS = rvU
+> LD_FLAGS = @ld_flags
+> CPPFLAGS= @cppflags 
+> DEPFLAGS= -MF $<.d -MT $@ -MD
+> CXXFLAGS:= @cxxflags
+> 
+> CXX:= g++
+> LD= ld.gold 
+> 
+> 
+> BIN_SRC:=$(wildcard bin/*.cc bin/*.S)
+> LIB_SRC:=$(wildcard lib/*.cc lib/*.S)
+> 
+> 
+> BIN_ASM:=$(patsubst %.S,  %, $(filter %.S,  $(BIN_SRC)))
+> BIN_CXX:=$(patsubst %.cc, %, $(filter %.cc, $(BIN_SRC)))
+> 
+> LIB_ASM:=$(patsubst %.S,  %, $(filter %.S,  $(LIB_SRC)))
+> LIB_CXX:=$(patsubst %.cc, %, $(filter %.cc, $(LIB_SRC)))
+> 
+> START:= lib/start.o
+> BIN_EXE:=$(BIN_CXX) $(BIN_ASM)
+> LIB_LIB:=lib/libkernpp.a
+> LIB_OBJ:=$(filter-out $(START), $(patsubst %,%.o,$(LIB_CXX) $(LIB_ASM)))
+> ALL_SRC:=$(LIB_SRC) $(BIN_SRC)
+> test: all
+> 
+> all: $(BIN_EXE)
+> 	@echo sizes
+> 	@du -k $(BIN_EXE) | sort -n | xargs -n 8 | column -t
+> 	@du -k */*.o */*.a | sort -n | xargs -n 8 | column -t
+> 	@echo
+> 
+> $(LIB_LIB): $(LIB_OBJ)
+> 	ar $(AR_FLAGS) $@ $(LIB_OBJ)
+68,71c41
+< $(all/obj): sbin/comp
+< $(bin/exe): sbin/link
+< $(lib/lib): sbin/arch
+< $(bin/exe): $(lib)
+---
+> $(BIN_ASM): START:=
+73,74c43,69
+< tags: */*.cc */*.hh
+< 	ctags --language-force=c++ */*.cc */*.hh
+---
+> $(BIN_EXE): %: %.o $(START) $(LIB_LIB) cxxflags cppflags ld_flags
+> 	$(LD) -static $(START) $<  $(LIB_LIB) -o $@
+> 
+> #    $(LIB_LIB): $(patsubst %, $(LIB_LIB)(%), $(LIB_OBJ))
+> #    	touch $@
+> 
+> %.o: %.S
+> 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+> 
+> #    bin/fmt.o: bin/fmt.ii
+> #    	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -S $<            -o $(<:.ii=.s)
+> #    	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(<:.ii=.s)   -o $@
+> 
+> %.o: %.cc cxxflags cppflags
+> 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -E $< -o $(<:.cc=.ii) $(DEPFLAGS)
+> 	$(CXX) $(CXXFLAGS) -S $(<:.cc=.ii)  -o $(<:.cc=.s)
+> 	$(CXX) $(CXXFLAGS) -c $(<:.cc=.s)   -o $@
+> 
+> tags:
+> 	ctags -R .
+> 
+> $(ALL_SRC) $(ALL_SRC:=.d):;
+> 
+> include /dev/null $(wildcard $(ALL_SRC:=.d))
+> 
+> clean:
+> 	rm -f */*.o */*.ii */*.s */*.d $(BIN_EXE) $(LIB_LIB)
+76,77c71,72
+< nm:
+< 	nm */*.a */*.o --defined-only -A --demangle
+---
+> check_env:
+> 	printenv
+diff '--color=auto' -r main/README.md add_rtti/README.md
+10a11,14
+> 
+> 
+> 
+> 
+Only in main/bin: .gitignore
+diff '--color=auto' -r main/bin/cat.cc add_rtti/bin/cat.cc
+1d0
+< #include <fmt.hh>
+3d1
+< #include <getopt.hh>
+5,33c3,11
+< using namespace fmt;
+< void fatal(const char* message, size_t len)
+< {
+<   if(len < 0)
+<     len= strlen(message);
+<   write(2, message, len);
+<   exit(1);
+< }
+< void fatal(const char* message)
+< {
+<   fatal(message, strlen(message));
+< }
+< template <size_t size_>
+< struct sbuf_t
+< {
+<   enum
+<   {
+<     size= size_
+<   };
+<   char  buf[size - 1];
+<   char  end[1];
+<   char* b()
+<   {
+<     return buf;
+<   };
+<   char* e()
+<   {
+<     return end;
+<   };
+---
+> ssize_t full_write(int fd, const char * const beg, const char *end){
+> 	const char*pos=beg;
+> 	while(pos!=end){
+> 		ssize_t res=write(fd,pos,end-pos);
+> 		if(res<0)
+> 			return -1;
+> 		pos+=res;
+> 	};
+> 	return pos-beg;
+35,49c13,26
+< static sbuf_t<1024 * 10> buf;
+< using namespace sys;
+< bool catfile(int ifd, int ofd)
+< {
+<   while(true)
+<   {
+<     size_t rres= read(ifd, buf.buf, sizeof(buf.buf));
+<     if(rres == 0)
+<       return true;
+<     if(rres < 0)
+<       fatal(L("read error\n"));
+<     size_t wres= full_write(ofd, buf.buf, rres);
+<     if(wres != rres)
+<       fatal(L("write error\n"));
+<   };
+---
+> static char buf[1L<<16];
+> bool catfile(int fd) {
+> 	ssize_t res=0;
+> 	while((res=read(fd,buf,sizeof(buf)))>0)
+> 	{
+> 		ssize_t wres=full_write(1,buf,buf+res);
+> 		if(wres!=res){
+> 			write(2,L("write error\n"));
+> 			return false;
+> 		};
+> 	}
+> 	if(res<0)
+> 		write(2,L("read error\n"));
+> 	return !res;
+51,74c28,45
+< 
+< const char *program_name=nullptr;
+< struct opts_t
+< {
+<   int num;
+<   int empty;
+<   int show_non;
+<   int show_tab;
+<   int show_end;
+<   opts_t()
+<     : num(0), empty(0), show_non(0), show_tab(0), show_end(0)
+<   {
+<   };
+< 
+< } opts;
+< 
+< static struct option long_options[] = {
+<   { "number", no_argument, 0, 'n' },
+<   { "number-non-empty", no_argument, 0, 'b' },
+<   { "show-nonprinting", no_argument, 0, 'v' },
+<   { "show-tabs", no_argument, 0, 't' },
+<   { "show-ends", no_argument, 0, 'e' },
+<   { "show-all", no_argument, 0, 'A' },
+<   { 0, 0, 0, 0 },
+---
+> int main(int argc, char**argv) {
+> 	++argv;
+> 	if(*argv) {
+> 		while(*argv)
+> 		{
+> 			int fd=open(*argv,0);
+> 			if(fd<0){
+> 				write(2,L("open error\n"));
+> 				return 1;
+> 			};
+> 			catfile(fd);
+> 			close(fd);
+> 			++argv;
+> 		}	
+> 	} else {
+> 		catfile(0);
+> 	};
+> 	return 0;
+76,166d46
+< int main(int argc, char** argv,char**envp)
+< {
+<   int c;
+<   c_str names[argc];
+<   int nnames=0;
+<   while(1)
+<   {
+<     int this_option_intind = optind ? optind: 1;
+<     int option_index=0;
+<     c=getopt_long(argc,argv,"nbvteA",long_options,&option_index);
+<     switch(c) {
+<       case -1:
+<         names[nnames++]=argv[optind++];
+<         break;
+<       case 0:
+<         write(1,L("option: "));
+<         write(1,long_options[option_index].name);
+<         write(1,L("\n"));
+<         break;
+<       case 'n':
+<         opts.num=1;
+<         opts.empty=1;
+<         break;
+<       case 'b':
+<         opts.num=1;
+<         opts.empty=0;
+<         break;
+<       case 'v':
+<         opts.show_non=1;
+<         break;
+<       case 't':
+<         opts.show_tab=1;
+<         break;
+<       case 'e':
+<         opts.show_end=1;
+<         break;
+<       case 'A':
+<         opts.show_non=1;
+<         opts.show_tab=1;
+<         opts.show_end=1;
+<         break;
+<       default: 
+<         write(2,L("unexpected option'"));
+<         char chs[2];
+<         chs[0]=c;
+<         chs[1]=0;
+<         write(2,c_str(chs,chs+1));
+<         write(2,"'\n");
+<         sys::exit(1);
+<     };
+<     if(optind==argc)
+<       break;
+<   };
+<   for(int i=0;i<nnames;i++)
+<   {
+<     auto &name=names[i];
+<     if(name=="--")
+<       continue;
+<     else if (name=="-")
+<       catfile(0,1);
+<     else {
+<       int fd=open(name.begin(),o_rdonly);
+<       if(fd<0) {
+<         write(2,"open:");
+<         write(2,name.begin());
+<         write(2,":",1);
+<         write_dec(2,errno);
+<         write(2,":",1);
+<         write(2,strerror(errno));
+<         write(2,"\n",1);
+<       } else {
+<         catfile(fd,1);
+<       };
+<     };
+<   };
+<   return 0;
+< }
+< #if 0
+< BusyBox v1.27.2 (Ubuntu 1:1.27.2-2ubuntu3.2) multi-call binary.
+< 
+< Usage: cat [-nbvteA] [FILE]...
+< 
+< Print FILEs to stdout
+< 
+< 	-n	Number output lines
+< 	-b	Number nonempty lines
+< 	-v	Show nonprinting characters as ^x or M-x
+< 	-t	...and tabs as ^I
+< 	-e	...and end lines with $
+< 	-A	Same as -vte
+< #endif
+diff '--color=auto' -r main/bin/echo.cc add_rtti/bin/echo.cc
+2d1
+< using sys::write;
+4,13c3,16
+< int main(int argc, char**argv,char **envp) {
+<   ++argv;
+<   if(*argv)
+<     write(1, *argv++);
+<   while(*argv) {
+<     write(1,L(" "));
+<     write(1, *argv++);
+<   };
+<   write(1, L("\n"));
+<   return 0;
+---
+> void err_exit(const char *message){
+> 	ssize_t res=write(2,message);
+> 	exit(1);
+> };
+> int main(int argc, char*argv[]) {
+> 	++argv;
+> 	if(*argv)
+> 		write(1, *argv++);
+> 	while(*argv) {
+> 		write(1,L(" "));
+> 		write(1, *argv++);
+> 	};
+> 	write(1, L("\n"));
+> 	return 0;
+Only in add_rtti/bin: fmt.cc
+diff '--color=auto' -r main/bin/ls.cc add_rtti/bin/ls.cc
+4c4
+< #include <getopt.hh>
+---
+> #include "getopt.h"
+6,7c6,27
+< using sys::write;
+< using sys::errno;
+---
+> enum open_mode {
+> 	o_rdonly  =  0000,
+> 	o_wronly  =  0001,
+> 	o_rdwr    =  0002,
+> 	o_mask    =  0003,
+> };
+> enum open_flags {
+> 	o_creat      =  00000100,
+> 	o_excl       =  00000200,
+> 	o_noctty     =  00000400,
+> 	o_trunc      =  00001000,
+> 	o_append     =  00002000,
+> 	o_nonblock   =  00004000,
+> 	o_dsync      =  00010000,
+> 	o_fasync     =  00020000,
+> 	o_direct     =  00040000,
+> 	o_largefile  =  00100000,
+> 	o_directory  =  00200000,
+> 	o_nofollow   =  00400000,
+> 	o_noatime    =  01000000,
+> 	o_cloexec    =  02000000,
+> };
+9,10c29
+< template<typename obj_t>
+< void swap(obj_t &lhs, obj_t &rhs)
+---
+> void handle_error(errno_t err, const char *call)
+12,27c31,41
+<   obj_t tmp(lhs);
+<   lhs=rhs;
+<   rhs=tmp;
+< };
+< enum ignore_t {
+<   normal,
+<   minimal,
+<   dot_dot,
+< } ignore;
+< extern "C" {
+<   void mm_show();
+< };
+< bool dotfiles=false;
+< static void *ptrs[4096];
+< static size_t nptr=0;
+< using namespace sys;
+---
+> 	char buf[1024];
+> 	char *pos=buf;
+> 	char *end=buf+sizeof(buf);
+> 	while(*call)
+> 		*pos++=*call++;
+> 	*pos++=':';
+> 	call = " error\n";
+> 	while(*call)
+> 		*pos++=*call++;
+> 	write(2,buf,pos-buf);
+> 	exit(1);
+29,40d42
+< int sign(int lhs){
+<   if(lhs<0)
+<     return -1;
+<   else if (lhs>0)
+<     return 1;
+<   else
+<     return 0;
+< };
+< int cmp(const char *lhs, const char *rhs){
+<   while(*lhs == *rhs && *lhs)
+<     ++lhs, ++rhs;
+<   return sign(*lhs-*rhs);
+42,67c44,157
+< void sort(linux_dirent **beg, linux_dirent**end)
+< {
+<   if(beg==end)
+<     return;
+<   linux_dirent** pos=beg;
+<   while(pos<end){
+<     while(++beg<end){
+<       if(cmp((*beg)->d_name,(*pos)->d_name)<0)
+<         swap(*beg,*pos);
+<     }
+<     pos++;
+<     beg=pos;
+<   }
+< };
+< bool skip(const char *name){
+<   if(name[0]!='.')
+<     return false;
+<   if(ignore==normal)
+<     return true;
+<   if(ignore==minimal)
+<     return false;
+<   if(name[1]==0)
+<     return true;
+<   if(name[1]=='.' && name[2]==0)
+<     return true;
+<   return false;
+---
+> #define assert(x) do{auto r=(x);if(!r){handle_error(-1,#x);};}while(0)
+> 
+> template<typename int_t>
+> void write_dec(fd_t fd, int_t val) {
+> 	char buf[sizeof(val)*5];
+> 	char *end=&buf[sizeof(buf)-1];
+> 	char *str=fmt::fmt_dec(val,buf,end);
+> 	while(str<end) {
+> 		int res=write(fd,str,end);
+> 		if(res<0)
+> 			handle_error(errno,"write");
+> 		str+=res;
+> 	};
+> };
+> #if 0
+> #define ENTER do { write(2,L(__PRETTY_FUNCTION__)); write(2,L("\n")); } while(0)
+> #else
+> #define ENTER do { ; } while(0)
+> #endif
+> template<typename type_t>
+> struct free_ptr {
+> 	type_t *ptr;
+> 	free_ptr(type_t *ptr)
+> 		: ptr(ptr)
+> 	{
+> 		ENTER;
+> 	};
+> 	~free_ptr()
+> 	{
+> 		ENTER;
+> 		free(ptr);
+> 		ptr=0;
+> 	};
+> 	type_t *drop()
+> 	{
+> 		ptr=0;
+> 	};
+> 	operator type_t*() const
+> 	{
+> 		ENTER;
+> 		return ptr;
+> 	};
+> };
+> struct dirents_t {
+> 	struct ent_t {
+> 		bool dir;
+> 		char name[256];
+> 		ent_t()
+> 			:dir(false)
+> 		{
+> 		};
+> 		ent_t(const char *_name, bool _dir)
+> 			:dir(_dir)
+> 		{
+> 			strncpy(name,_name,sizeof(name));
+> 		};
+> 	};
+> 	size_t cap;
+> 	size_t cnt;
+> 	ent_t **lst;
+> 	dirents_t()
+> 		: lst(0), cap(0), cnt(0)
+> 	{
+> 	};
+> 	int cmp(ent_t &lhs, ent_t&rhs) {
+> 		return _cmp(lhs,rhs);
+> 	};
+> 	int _cmp(ent_t &lhs, ent_t&rhs) {
+> 		return strcmp(rhs.name,lhs.name);
+> 	};
+> 	void sort() {
+> 		size_t n=size();
+> 		for(int i=0;i<n-2;i++) {
+> 			int m=i;
+> 			for(int j=i+1;j<n;j++) {
+> 				if(cmp(*lst[m],*lst[j])<0){
+> 					m=j;
+> 				};
+> 			};
+> 			if(i!=m) {
+> 				ent_t *tmp=lst[i];
+> 				lst[i]=lst[m];
+> 				lst[m]=tmp;
+> 			};
+> 		};
+> 	};
+> 	~dirents_t() {
+> 		for(int i=0;i<cnt;i++)
+> 			delete lst[i];
+> 		delete[] lst;
+> 	};
+> 	void push_back(const char *name, bool isdir)
+> 	{
+> 		if(cnt==cap) {
+> 			if(cap) {
+> 				ent_t **nlst = new ent_t*[cap+16];
+> 				memcpy(nlst,lst,sizeof(ent_t*)*cap);
+> 				delete[] lst;
+> 				lst=nlst;
+> 			} else {
+> 				lst = new ent_t*[16];
+> 			};
+> 			cap+=16;
+> 		};
+> 		ent_t *new_ent=new ent_t(name,isdir);
+> 		lst[cnt++]=new_ent;
+> 	};
+> 	ent_t &get(size_t pos)
+> 	{
+> 		return *lst[pos];
+> 	};
+> 	size_t size() const {
+> 		return cnt;
+> 	};
+68a159,163
+> enum ignore_t {
+> 	normal,
+> 	minimal,
+> 	dot_dot,
+> } ignore;
+70,93c165,197
+<   int n=0;
+<   linux_dirent*ents[8192];
+<   enum { size = 4096 };
+<   char buf[size];
+<   for(;;){
+<     int nread=getdents(fd,(linux_dirent*)(char*)buf,size);
+<     if(nread<0)
+<       pexit("getdents");
+<     else if (nread==0)
+<       break;
+<     auto beg = reinterpret_cast<linux_dirent*>(&buf[0]);
+<     auto end = reinterpret_cast<linux_dirent*>(&buf[nread]);
+<     while(beg!=end){
+<       if(!skip(beg->d_name)){
+<         ents[n++]=beg;
+<       };
+<       beg=beg->next();
+<     }
+<   };
+<   sort(ents,ents+n);
+<   for(int i=0;i<n;i++){
+<     write(1,ents[i]->d_name);
+<     write(1,"\n");
+<   };
+---
+> 	enum { size = 4096 };
+> 	dirents_t ents;
+> 	char buf[size];
+> 	for(;;){
+> 		assert((void*)buf);
+> 		int nread=getdents(fd,(linux_dirent*)(char*)buf,size);
+> 		if(nread<0)
+> 			handle_error(errno_t(-nread), "getdents");
+> 		else if (nread==0)
+> 			break;
+> 		auto beg = reinterpret_cast<linux_dirent*>(&buf[0]);
+> 		auto end = reinterpret_cast<linux_dirent*>(&buf[nread]);
+> 		while(beg!=end) {
+> 			ents.push_back(beg->d_name,beg->d_type == DT_DIR);
+> 			beg=beg->next();
+> 		};
+> 	};
+> 	ents.sort();
+> 	for(size_t i=0;i<ents.size();i++)
+> 	{
+> 		auto ent=ents.get(i);
+> 		if(ignore==dot_dot) {
+> 			if(!strcmp(ent.name,"."))
+> 				continue;
+> 			if(!strcmp(ent.name,".."))
+> 				continue;
+> 		} else if ( ignore != minimal ) {
+> 			if(ent.name[0]=='.')
+> 				continue;
+> 		};
+> 		write(1,ent.name);
+> 		write(1,L("\n"));
+> 	};
+97,116c201,218
+<   int fd = open(path,open_flags(o_directory|o_rdonly));
+<   if(fd>=0)
+<   {
+<     lsdir(fd);
+<   } else if ( errno == ENOTDIR ) {
+<     write(1,path);
+<     write(1,"\n",1);
+<   } else {
+<     write(2,"open: ");
+<     write(2,path);
+<     write(2," failed (");
+<     char buf[32];
+<     char *end=&buf[sizeof(buf)-1];
+<     bool neg = (errno<0);
+<     unsigned long num=(neg?-1:1)*errno; 
+<     char *str=fmt::fmt_dec(neg,num,buf,end);
+<     write(2,str,end);
+<     write(2,")\n");
+<   };
+<   close(fd);
+---
+> 	int fd = open(path,o_directory|o_rdonly);
+> 	if(fd>=0)
+> 	{
+> 		lsdir(fd);
+> 	} else if ( errno == ENOTDIR ) {
+> 		write(1,path);
+> 		write(1,"\n",1);
+> 	} else {
+> 		write(2,"open: ");
+> 		write(2,path);
+> 		write(2," failed (");
+> 		char buf[32];
+> 		char *end=&buf[sizeof(buf)-1];
+> 		char *str=fmt::fmt_dec(errno,buf,end);
+> 		write(2,str,end);
+> 		write(2,")\n");
+> 	};
+> 	close(fd);
+117a220
+> using namespace fmt;
+120,122c223,225
+<   { "version", 0, 0, 1 },
+<   { "help",    0, 0, 2 },
+<   { 0, 0, 0, 0}
+---
+> 	{ "version", 0, 0, 1 },
+> 	{ "help",    0, 0, 2 },
+> 	{ 0, 0, 0, 0}
+144,145c247,248
+<   write((res?2:1),L(help_msg));
+<   return 0;
+---
+> 	write((res?2:1),L(help_msg));
+> 	return 0;
+148,149c251,255
+<   write(1,L("ls (kernpp) 1.0\n"));
+<   return 0;
+---
+> 	write(1,L("ls (kernpp) 1.0\n"));
+> 	return 0;
+> };
+> void __gxx_abort() {
+> 	::abort();
+151c257
+< int main(int argc, char**argv,char**envp) 
+---
+> int main(int argc, char**argv) 
+153,188c259,282
+<   int ch;
+<   int longidx=0;
+<   signed long u=1;
+<   signed long lu=0;
+<   // show directory contents
+<   bool dir_cont=true;
+<   if(dup2(1,2)<0)
+<     pexit("dup2");
+<   using fmt::write_dec;
+<   while((ch=getopt_long(argc,argv,"aA",longopts,&longidx))!=-1)
+<   {
+<     switch(ch) {
+<       case 1: return version();
+<       case 2: return help(0);
+<       case 'a': ignore=minimal; break;
+<       case 'A': ignore=dot_dot; break;
+<       case 'd': dir_cont=false; break;
+<       default: return help(1);
+<     };
+<   };
+<   if(optind<argc) {
+<     for(int i=optind;i<argc;i++){
+<       lsarg(argv[i]);
+<     };
+<   } else {
+<     lsarg(".");
+<   };
+<   for(int i=0;i<nptr;i++) {
+<     if(ptrs[i]){
+<       fmt::write_ptr(2,ptrs[i]);
+<       write(2,L("\n"));
+<       free(ptrs[i]);
+<       ptrs[i]=0;
+<     };
+<   };
+<   return 0;
+---
+> 	int ch;
+> 	int longidx=0;
+> 	char buf[25];
+> 	auto slen=&strlen;
+> 	fmt::fmt_ptr((void*)slen,buf,&buf[sizeof(buf)-1]);
+> 	//write_ptr(1,slen);
+> 	while((ch=getopt_long(argc,argv,"aA",longopts,&longidx))!=-1)
+> 	{
+> 		switch(ch) {
+> 			case 1: return version();
+> 			case 2: return help(0);
+> 			case 'a': ignore=minimal; break;
+> 			case 'A': ignore=dot_dot; break;
+> 			default: return help(1);
+> 		};
+> 	};
+> 	if(optind<argc) {
+> 		for(int i=optind;i<argc;i++){
+> 			lsarg(argv[i]);
+> 		};
+> 	} else {
+> 		lsarg(".");
+> 	};
+> 	return 0;
+Only in main/bin: lspath.cc
+Only in main/bin: not.cc
+Only in main/bin: report.cc
+Only in main/bin: string_view.cc
+Only in main/bin: test_getopt.cc
+Only in main/bin: usleep.cc
+Only in main/: breakpoints
+Only in add_rtti: cppflags
+Only in add_rtti: cxxflags
+Only in main/: depends.pl
+Only in main/doc: all_syscalls.h
+Only in main/doc: lspath.bash
+Only in main/: etc
+Only in main/: files.md5
+Only in main/: inc
+Only in add_rtti: include
+Only in add_rtti: ld_flags
+diff '--color=auto' -r main/lib/abi.cc add_rtti/lib/abi.cc
+4c4,7
+<   using sys::write;
+---
+> 	void __cxa_pure_virtual() { 
+> 		write(2,L("pure virtual function called\n"));
+> 		abort();
+> 	}
+6,17c9,19
+<   void __cxa_pure_virtual() { 
+<     write(2,L("pure virtual function called\n"));
+<     abort();
+<   }
+< 
+<   void __cxa_guard_release(void*)
+<   {
+<   };
+<   void __cxa_guard_acquire(void*)
+<   {
+<   };
+<   void * __dso_handle=(void*)&__dso_handle;
+---
+> 	void __cxa_guard_release(void*)
+> 	{
+> 		write(1,L(__PRETTY_FUNCTION__));
+> 		write(1,L("\n"));
+> 	};
+> 	void __cxa_guard_acquire(void*)
+> 	{
+> 		write(1,L("hi!\n"));
+> 		write(1,L("\n"));
+> 	};
+> 	void * __dso_handle=(void*)&__dso_handle;
+Only in main/lib: c_str.cc
+Only in main/lib: cxxabi.cc
+Only in main/lib: dbg.cc
+diff '--color=auto' -r main/lib/delete.cc add_rtti/lib/delete.cc
+8a9
+> #pragma GCC diagnostic ignored "-Wsized-deallocation"
+Only in main/lib: errno.cc
+diff '--color=auto' -r main/lib/getopt.cc add_rtti/lib/getopt.cc
+29c29
+< #include <getopt.hh>
+---
+> #include "getopt.h"
+33a34,50
+> template <typename val_t>
+> ssize_t write_dec(val_t val, int width=0)
+> {
+> 	bool neg=val<0;
+> 	if(neg)
+> 		val=-val;
+> 	char buf[sizeof(val)*4];
+> 	char *end=buf+sizeof(buf);
+> 	*--end=0;
+> 	char *pos=end;
+> 	pos=fmt_dec(val,buf,end);
+> 	if(neg)
+> 		*--pos='-';
+> 	while(end-pos<width)
+> 		*--pos=' ';
+> 	return write(1,pos,end);
+> };
+172c189
+<   if (argv[optind][0]!='-' || argv[optind][1]!='-' || argv[optind][2]==0)
+---
+>   if (strlen(argv[optind]) < 3 || strncmp(argv[optind], "--", 2) != 0)
+diff '--color=auto' -r main/lib/init_array.cc add_rtti/lib/init_array.cc
+1,2d0
+< #include <types.hh>
+< #include <syscall.hh>
+3a2
+> typedef int fd_t;
+14d12
+< #ifndef L
+16d13
+< #endif
+31c28,41
+< 	void exit(int return_code) __attribute__((noreturn));
+---
+> 	void _exit(int return_code) __attribute__((noreturn));
+> 	inline void _exit(int res)
+> 	{
+> 		int exit_val;
+> 		exit_val=res&0xff;
+> 		asm (
+> 				"syscall\n" 
+> 				: "=a"(res) 
+> 				: "a"(60), "D"(exit_val)
+> 				: "rcx", "r11", "memory"
+> 				);
+> 		while(1);
+> 	}
+> 
+52,54c62
+<     {
+<       __fini_array_start[i]();
+<     };
+---
+> 			__fini_array_start[i]();
+123c131
+< 			exit(1);
+---
+> 			_exit(1);
+140c148
+<     sys::exit(return_code);
+---
+> 		_exit(return_code);
+diff '--color=auto' -r main/lib/mm.cc add_rtti/lib/mm.cc
+3d2
+< #include <write_buf.hh>
+5,29c4,35
+< using fmt::write_dec;
+< using fmt::write_ptr;
+< using fmt::write_hex;
+< 
+< namespace fmt {
+<   inline char *fmt_sphex(unsigned long val, char *beg, char *end)
+<   {
+<     int i;
+<     for(i=0;i<2*sizeof(val);i++){
+<       *--end=hex_dig(val);
+<       if((val/=0x10)==0)
+<         break;
+<     };
+<     for(;i<2*sizeof(val);i++)
+<       *--end=' ';
+<     return end;
+<   };
+<   inline int write_sphex(fd_t fd, size_t hex) {
+<     char buf[sizeof(hex)*4];
+<     return write(fd, fmt::fmt_sphex(hex,buf,&buf[sizeof(buf)-1]));
+<   };
+< };
+< using fmt::write_sphex;
+< using fmt::fmt_sphex;
+< using namespace sys;
+---
+> void write_dec(size_t val, int width=0)
+> {
+> 	char buf[128];
+> 	char *end=buf+sizeof(buf)-1;
+> 	char *pos=fmt::fmt_dec(val,buf,end,width);
+> 	write(2,pos,end);
+> };
+> void write_ptr(void *val) {
+> 	char buf[128];
+> 	char *end=buf+sizeof(buf)-1;
+> 	char *pos=fmt::fmt_hex(size_t(val),buf,buf+sizeof(buf)-1);
+> 	*--pos='x';
+> 	*--pos='0';
+> 	write(2,pos,end);
+> };
+> void write_hex(size_t val) {
+> 	char buf[128];
+> 	char *end=buf+sizeof(buf)-1;
+> 	char *pos=fmt::fmt_hex(val,buf,buf+sizeof(buf)-1);
+> 	write(2,pos,end);
+> };
+> void assert_fail(const char *file, size_t line, const char *msg) {
+> 	write(2,L("\n"));
+> 	write(2,file);
+> 	write(2,L(":"));
+> 	write_dec(line);
+> 	write(2,L(":assert("));
+> 	write(2,msg);
+> 	write(2,L(") failed\n"));
+> 	exit(1);
+> };
+> #define assert(x) do{if(!(x))assert_fail(__FILE__,__LINE__,#x);}while(0)
+31,162c37,130
+<   enum magic_t { magic = 0xdeadbeef };
+<   struct block_t {
+<     magic_t magic1;
+<     block_t *next;
+<     magic_t magic2;
+<     size_t size;
+<     magic_t magic3;
+<     bool used;
+<     void combine() {
+<       if(!next)
+<         return;
+<       if(next->used)
+<         return;
+<       size+=sizeof(*next)+next->size;
+<       next=next->next;
+<     };
+<   };
+<   block_t *list;
+<   public:
+<   block_l()
+<     :list(0)
+<   {
+<   };
+<   void *malloc(size_t size)
+<   {
+<     void *res=_malloc(size);
+<     if(0){
+<       write_buf<> msg(2);
+<       msg.put("malloc(");
+<       msg.fmt(size);
+<       msg.put(") => ");
+<       msg.fmtln(res);
+<     };
+<     return res;
+< 
+<   };
+<   void *_malloc(size_t size)
+<   {
+<     block_t **pos=&list;
+<     while(*pos) {
+<       block_t *blk=*pos;
+<       void *ptr = (void*)(blk+1);
+<       if( blk->magic1 != magic || blk->magic2 != magic || blk->magic3 != magic ) 
+<       {
+<         using fmt::hex_t;
+<         write_buf<> msg(2);
+<         msg.put(__FILE__);
+<         msg.put(":");
+<         msg.fmt(__LINE__);
+<         msg.put(":");
+<         msg.put("free: ");
+<         msg.fmtln(ptr);
+<         msg.put("blk: ");
+<         msg.fmtln(blk);
+<         msg.put("magic1: ");
+<         msg.fmtln(hex_t((unsigned long)blk->magic1));
+<         msg.put("magic2: ");
+<         msg.fmtln(hex_t((unsigned long)blk->magic2));
+<         msg.put("magic3: ");
+<         msg.fmtln(hex_t((unsigned long)blk->magic3));
+<       };
+<       if(!(*pos)->used && (*pos)->size>=size) {
+<         (*pos)->used=true;
+<         return *pos+1;
+<       };
+<       pos=&((*pos)->next);
+<     };
+<     block_t *blk=(block_t*)sbrk(size+sizeof(block_t));
+<     blk->magic1=blk->magic2=blk->magic3=magic;
+<     blk->used=true;
+<     blk->size=size;
+<     blk->next=0;
+<     *pos=blk;
+<     return blk+1;
+<   };
+<   ~block_l() {
+<     //show();
+<     list=0;
+<   };
+<   typedef char* char_p;
+<   void free(void *ptr){
+<     if(!ptr)
+<       return;
+<     block_t *blk=(block_t*)ptr;
+<     --blk;
+<     if( blk->magic1 != magic || blk->magic2 != magic || blk->magic3 != magic ) 
+<     {
+<         using fmt::hex_t;
+<       write_buf<> msg(2);
+<       msg.put(__FILE__);
+<       msg.put(":");
+<       msg.fmt(__LINE__);
+<       msg.put(":");
+<       msg.put("free: ");
+<       msg.fmtln(ptr);
+<       msg.put("blk: ");
+<       msg.fmtln(blk);
+<       msg.put("magic1: ");
+<       msg.fmtln(hex_t((unsigned long)blk->magic1));
+<       msg.put("magic2: ");
+<       msg.fmtln(hex_t((unsigned long)blk->magic2));
+<       msg.put("magic3: ");
+<       msg.fmtln(hex_t((unsigned long)blk->magic3));
+<       msg.flush();
+<     };
+<     if(!blk->used) {
+<       write(2,L("warning: double free of: "));
+<       write_ptr(2,ptr);
+<       write(2,L("\n"));
+<     };
+<     blk->used=false;
+<     for(blk=list;blk;blk=blk->next)
+<       blk->combine();
+<   };
+<   void show() {
+<     write(2,L("(---BLOCK LIST----\n"));
+<     for( block_t *blk=list; blk; blk=blk->next ) {
+<       write(2,L("blk: "));
+<       write_ptr(2,blk);
+<       write(2,L(" data: "));
+<       write_ptr(2,blk+1);
+<       write(2,L(" size: "));
+<       write_sphex(2,blk->size);
+<       write(2,L(" used: "));
+<       write_dec(2,blk->used);
+<       write(2,L("\n"));
+<       write(2,L("       "));
+<       write_ptr(2,char_p(blk)+blk->size+sizeof(*blk));
+<       write(2,L("\n"));
+<     };
+<     write(2,L("----BLOCK LIST---}\n"));
+<   };
+---
+> 	enum magic_t { magic = 0xdeadbeef };
+> 	struct block_t {
+> 		magic_t magic1;
+> 		block_t *next;
+> 		magic_t magic2;
+> 		size_t size;
+> 		magic_t magic3;
+> 		bool used;
+> 		void combine() {
+> 			while(next){
+> 				if(next->used)
+> 					return;
+> 				if(char_p(next)!=char_p(this)+sizeof(*this)+size)
+> 					return;
+> 				size+=sizeof(*next)+next->size;
+> 				next=next->next;
+> 			};
+> 		};
+> 	};
+> 	block_t *list;
+> 	public:
+> 	block_l()
+> 		:list(0)
+> 	{
+> 	};
+> 	void *malloc(size_t size)
+> 	{
+> 		block_t **pos=&list;
+> 		while(*pos) {
+> 			assert((*pos)->magic1 == magic);
+> 			assert((*pos)->magic2 == magic);
+> 			assert((*pos)->magic3 == magic);
+> 			if(!(*pos)->used && (*pos)->size>=size) {
+> 				(*pos)->used=true;
+> 				return *pos+1;
+> 			};
+> 			pos=&((*pos)->next);
+> 		};
+> 		block_t *blk=(block_t*)sbrk(size+sizeof(block_t));
+> 		blk->magic1=blk->magic2=blk->magic3=magic;
+> 		blk->used=true;
+> 		blk->size=size;
+> 		blk->next=0;
+> 		*pos=blk;
+> 		return blk+1;
+> 	};
+> 	~block_l() {
+> 		show();
+> 		list=0;
+> 	};
+> 	typedef char* char_p;
+> 	void free(void *ptr){
+> 		if(!ptr)
+> 			return;
+> 		block_t *blk=(block_t*)ptr;
+> 		--blk;
+> 		assert(blk->magic1 == magic);
+> 		assert(blk->magic2 == magic);
+> 		assert(blk->magic3 == magic);
+> //   		write(2,L(__PRETTY_FUNCTION__));
+> //   		write(2,L("\n  ptr="));
+> //   		write_ptr(blk);
+> //   		write(2,L("\n  nxt="));
+> //   		write_ptr(blk->next);
+> //   		write(2,L("\n  end="));
+> //   		write_ptr(char_p(blk)+blk->size+sizeof(*blk));
+> //   		write(2,L("\n"));
+> 		if(!blk->used) {
+> 			write(2,L("warning: double free of: "));
+> 			write_ptr(ptr);
+> 			write(2,L("\n"));
+> 		};
+> 		blk->used=false;
+> 		for(blk=list;blk;blk=blk->next)
+> 			blk->combine();
+> 	};
+> 	void show() {
+> 		write(2,L("(---BLOCK LIST----\n"));
+> 		for( block_t *blk=list; blk; blk=blk->next ) {
+> 			write(2,L("blk: "));
+> 			write_ptr(blk);
+> 			write(2,L(" data: "));
+> 			write_ptr(blk+1);
+> 			write(2,L(" size: "));
+> 			write_hex(blk->size);
+> 			write(2,L(" used: "));
+> 			write_dec(blk->used);
+> 			write(2,L("\n"));
+> 			write(2,L("       "));
+> 			write_ptr(char_p(blk)+blk->size+sizeof(*blk));
+> 			write(2,L("\n"));
+> 		};
+> 		write(2,L("----BLOCK LIST---}\n"));
+> 	};
+165,169d132
+< extern "C" {
+< //     void mm_show() {
+< //       list.show();
+< //     };
+< };
+171,181c134
+< #if 1
+<   return list.malloc(size);
+< #else
+<   write(2,L("malloc("));
+<   write_dec(2,size);
+<   write(2,L(") => "));
+<   void *res=list.malloc(size);
+<   write_ptr(2,res);
+<   write(2,L("\n"));
+<   return res;
+< #endif
+---
+> 	return list.malloc(size);
+184,188c137,141
+<   char *optr=(char*)ptr;
+<   char *nptr=(char*)malloc(size);
+<   memcpy(nptr,optr,size);
+<   free(optr);
+<   return nptr;
+---
+> 	char *optr=(char*)ptr;
+> 	char *nptr=(char*)malloc(size);
+> 	memcpy(nptr,optr,size);
+> 	free(optr);
+> 	return nptr;
+191c144
+<   list.free(ptr);
+---
+> 	list.free(ptr);
+197c150
+<   char *newbrk;
+---
+> 	char *newbrk;
+199,204c152,157
+<   asm (
+<       "syscall\n" 
+<       : "=a"(newbrk) 
+<       : "0"(12), "D"(addr)
+<       : "rcx", "r11", "memory"
+<       );
+---
+> 	asm (
+> 			"syscall\n" 
+> 			: "=a"(newbrk) 
+> 			: "0"(12), "D"(addr)
+> 			: "rcx", "r11", "memory"
+> 			);
+206c159
+<   __curbrk=newbrk;
+---
+> 	__curbrk=newbrk;
+225,226c178,179
+<   if (!__curbrk && (brk(0)<0))
+<     return (void*)-1;
+---
+> 	if (!__curbrk && (brk(0)<0))
+> 		return (void*)-1;
+Only in add_rtti/lib: rc.cc
+diff '--color=auto' -r main/lib/start.S add_rtti/lib/start.S
+1,3d0
+< #ifdef __ELF__
+< .section .note.GNU-stack,""
+< #endif
+7,15c4,11
+<   xorl %ebp,%ebp
+< 	call libc_init
+<   movq 0(%rsp),%rdi
+<   lea 8(%rsp),%rsi
+<   lea 16(%rsp),%rdx
+<   call main
+< 	movq %rax,%rdi
+< 	call exit
+< 	int3
+---
+>    xorl %ebp,%ebp
+> 	 call libc_init
+>    movq 0(%rsp),%rdi
+>    lea 8(%rsp),%rsi
+>    call main
+> 	 movq %rax,%rdi
+> 		call exit
+> 		int3
+Only in main/lib: stdlib.cc
+Only in add_rtti/lib: stream.cc
+Only in main/lib: strerror_list.cc
+Only in main/lib: write_buf.cc
+Only in main/: sbin
+diff '--color=auto' -r main/script/genheaders.pl add_rtti/script/genheaders.pl
+5d4
+< use autodie qw(:all);
+7a7
+> our(%calls);
+10,12d9
+< 
+< 
+< our(%calls);
+21,22d17
+< print q(#file __FILE__);
+< print q(#line __LINE__);
+34d28
+<         print "// __NR__", $call{name}, "=", $call{code}, "\n";
+Only in main/script: genlist.pl
+Only in main/script: genstrerror.pl
+diff '--color=auto' -r main/script/gensyscall.pl add_rtti/script/gensyscall.pl
+5d4
+< use autodie qw(:all);
+13,20d11
+< BEGIN {
+<   open(STDERR,"|less -FS");
+<   open(STDOUT,">&STDERR");
+< };
+< END {
+<   close(STDOUT);
+<   close(STDERR) or warn "less returned non zero\n";
+< };
+27a19
+> our(@args);
+36,37d27
+< my %args;
+< #print Dumper \%calls;
+39,48c29,35
+<   local *call=$calls{$_};
+<   next unless $call{impl};
+<   for(@{$call{args}}){
+<     next unless ($_->[0] eq "istr_t") || ($_->[0] eq "ostr_t");
+<     if( $_->[1] eq "oldname" ) {
+<       $_->[1] = "opath";
+<     } elsif ( $_->[1] eq "newname" ) {
+<       $_->[1] = "npath";
+<     };
+<   };
+---
+> 	local *call=$calls{$_};
+> 	next unless $call{impl};
+> 	for(@{$call{args}}){
+> 		if( $_->[0] eq "struct stat *"){
+> 			$_->[0] = "stat_p";
+> 		};
+> 	};
+50d36
+< #print Dumper \%calls;
+diff '--color=auto' -r main/script/syscall.pl add_rtti/script/syscall.pl
+49c49
+<         'path'
+---
+>         'filename'
+81c81
+<         'path'
+---
+>         'filename'
+113c113
+<         'path'
+---
+>         'filename'
+257a258,261
+>       ],
+>       [
+>         'size_t',
+>         'sigsetsize'
+413c417
+<         'path'
+---
+>         'filename'
+1504c1508
+<         'path'
+---
+>         'filename'
+1528c1532
+<         'opath'
+---
+>         'oldname'
+1532c1536
+<         'npath'
+---
+>         'newname'
+1544c1548
+<         'path'
+---
+>         'pathname'
+1560c1564
+<         'path'
+---
+>         'pathname'
+1572c1576
+<         'path'
+---
+>         'pathname'
+1588c1592
+<         'opath'
+---
+>         'oldname'
+1592c1596
+<         'npath'
+---
+>         'newname'
+1604c1608
+<         'path'
+---
+>         'pathname'
+1616c1620
+<         'opath'
+---
+>         'oldname'
+1620c1624
+<         'npath'
+---
+>         'newname'
+1652c1656
+<         'path'
+---
+>         'filename'
+1684c1688
+<         'path'
+---
+>         'filename'
+1724c1728
+<         'path'
+---
+>         'filename'
+2277c2281
+<         'path'
+---
+>         'filename'
+2293c2297
+<         'path'
+---
+>         'filename'
+2346c2350
+<         'path'
+---
+>         'pathname'
+2720c2724
+<         'path'
+---
+>         'filename'
+3064c3068
+<         'path'
+---
+>         'pathname'
+3092c3096
+<         'path'
+---
+>         'pathname'
+3148c3152
+<         'path'
+---
+>         'pathname'
+3172c3176
+<         'path'
+---
+>         'pathname'
+3220c3224
+<         'path'
+---
+>         'pathname'
+3240c3244
+<         'path'
+---
+>         'pathname'
+3280c3284
+<         'path'
+---
+>         'pathname'
+3296c3300
+<         'path'
+---
+>         'pathname'
+3923c3927
+<         'path'
+---
+>         'filename'
+4327c4331
+<         'path'
+---
+>         'pathname'
+4387c4391
+<         'path'
+---
+>         'filename'
+4411c4415
+<         'path'
+---
+>         'pathname'
+4431c4435
+<         'path'
+---
+>         'filename'
+4455c4459
+<         'path'
+---
+>         'filename'
+4483c4487
+<         'path'
+---
+>         'filename'
+4503c4507
+<         'path'
+---
+>         'filename'
+4527c4531
+<         'path'
+---
+>         'pathname'
+4547c4551
+<         'opath'
+---
+>         'oldname'
+4555c4559
+<         'npath'
+---
+>         'newname'
+4571c4575
+<         'opath'
+---
+>         'oldname'
+4579c4583
+<         'npath'
+---
+>         'newname'
+4595c4599
+<         'opath'
+---
+>         'oldname'
+4603c4607
+<         'npath'
+---
+>         'newname'
+4619c4623
+<         'path'
+---
+>         'pathname'
+4643c4647
+<         'path'
+---
+>         'filename'
+4663c4667
+<         'path'
+---
+>         'filename'
+4927c4931
+<         'path'
+---
+>         'filename'
+5382,5383c5386,5387
+<         'istr_t',
+<         'path'
+---
+>         'long',
+>         'pathname'
+5548c5552
+<       ]
+---
+>       ],
+5719c5723
+<         'opath'
+---
+>         'oldname'
+5727c5731
+<         'npath'
+---
+>         'newname'
+5851c5855
+<         'path'
+---
+>         'filename'
+Only in main/: test.pl
+Only in add_rtti: tst

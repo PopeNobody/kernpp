@@ -1,0 +1,20 @@
+Only in main/: .clang-format
+diff '--color=auto' -r main/.git empty/.git
+1c1
+< gitdir: /home/nn/src/git/hub/.git/worktrees/main
+---
+> gitdir: /home/nn/src/git/hub/.git/worktrees/empty
+Only in main/: .gitignore
+Only in main/: LICENSE
+Only in main/: Makefile
+Only in main/: bin
+Only in main/: breakpoints
+Only in main/: depends.pl
+Only in main/: doc
+Only in main/: etc
+Only in main/: files.md5
+Only in main/: inc
+Only in main/: lib
+Only in main/: sbin
+Only in main/: script
+Only in main/: test.pl

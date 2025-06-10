@@ -1,0 +1,282 @@
+diff '--color=auto' -r main/.git lspath/.git
+1c1
+< gitdir: /home/nn/src/git/hub/.git/worktrees/main
+---
+> gitdir: /home/nn/src/git/hub/.git/worktrees/lspath
+diff '--color=auto' -r main/.gitignore lspath/.gitignore
+2d1
+< bin/markout
+9,10d7
+< bin/report
+< bin/string_view
+18,21c15,17
+< ,/bin/lspath
+< bin/lspath
+< *.oo
+< *.aa
+---
+> depends.mk.new
+> a
+> b
+diff '--color=auto' -r main/Makefile lspath/Makefile
+1,2d0
+< MAKEFLAGS:= -rR -j24
+< .EXPORT_ALL_VARIABLED:
+4c2
+< define dir_infer
+---
+> MAKEFLAGS+=-rR
+6,60c4,9
+< $1/src:=  $(wildcard  $1/*.cc)                         
+< $1/exe:=  $(patsubst  %.cc,%,   $($1/src))             
+< $1/asm:=  $(wildcard  $1/*.S)                          
+< $1/xxx:=  $(patsubst  %,%.o,   $($1/asm))             
+< $1/exe+=  $(patsubst  %,%,      $($1/asm))             
+< $1/obj:=  $(patsubst  %,%.o,   $($1/src))             
+< $1/cpp:=  $(patsubst  %,%.ii,   $($1/src))             
+< $1/dep:=  $(patsubst  %,%.d,    $($1/obj)   $($1/cpp)  $($1/asm))
+< $1:=$($1/exe)
+< endef
+< $(call dir_infir,bin,lib) 
+< 
+< all/obj:= $(lib/obj) $(bin/obj)
+< all/xxx:= $(lib/xxx) $(bin/xxx)
+< all/cpp:= $(lib/cpp) $(bin/cpp)
+< all/src:= $(lib/src) $(bin/src)
+< all/dep:= $(lib/dep) $(bin/dep)
+< 
+< include /dev/null $(wildcard $(all/dep))
+< 
+< ext/obj:= $(filter-out $(all/obj), $(wildcard *.o))
+< ext/xxx:= $(filter-out $(all/xxx), $(wildcard *.o))
+< 
+< all:= $(bin/exe) $(lib/lib)
+< bin:= $(bin/exe)
+< lib:= $(lib/lib)
+< $(bin): $(lib)
+< all: $(all)
+< 
+< include /dev/null $(wildcard $(all/dep))
+< 
+< $(lib/lib): $(lib/obj) $(lib/xxx)
+< 	sbin/arch "$@" $(lib/obj) $(lib/xxx)
+< 
+< $(bin/exe): %: %.o sbin/link etc/ld_flags
+< 	sbin/link "$@" $(lib/lib)
+< 
+< $(all/cpp): %.ii: %.cc sbin/prec etc/cppflags
+< 	rm -f $*.ii $*.o
+< 	sbin/prec "$@"
+< 
+< $(all/xxx): %.o: %.S sbin/casm etc/asmflags
+< 	sbin/casm "$@"
+< 
+< $(all/obj): %.o: %.ii sbin/comp etc/cxxflags
+< 	sbin/comp "$@"
+< 
+< cur/dep:=$(wildcard *.o.d)
+< cur/obj:=$(wildcard *.o) $(patsubst %.d,%,$(cur/dep))
+< cur/src:=$(patsubst %.o,%.cc,$(cur/obj))
+< 
+< 
+< ifneq ($(have),$(want))
+< $(lib/lib): rem-lib
+< endif
+---
+> AR_FLAGS= rU
+> LD_FLAGS= @etc/ld_flags
+> CPPFLAGS= @etc/cppflags 
+> DEPFLAGS= -MF $<.d -MT $@ -MD
+> CXXFLAGS:= @etc/cxxflags
+> ASMFLAGS:= @etc/asmflags
+62,63c11
+< ###   
+< clean: date:=$(shell serdate)
+---
+> CXX:= g++
+65,66c13,50
+< clean:
+< 	rm -f */*.[ioad]
+---
+> LD= ld
+> 
+> 
+> START:= lib/start.S.o
+> 
+> BIN_ASM:=$(wildcard bin/*.S)
+> BIN_CXX:=$(wildcard bin/*.cc)
+> BIN_CXX_OBJ:=$(patsubst %.cc,%.cc.o,$(BIN_CXX))
+> BIN_ASM_OBJ:=$(patsubst %.S,%.S.o,$(BIN_ASM))
+> BIN_OBJ:=$(BIN_CXX_OBJ) $(BIN_ASM_OBJ)
+> BIN_CXX_EXE:=$(patsubst %.cc,%,$(BIN_CXX))
+> BIN_ASM_EXE:=$(patsubst %.S,%,$(BIN_ASM))
+> 
+> LIB_ASM:=$(filter-out lib/start.S, $(wildcard lib/*.S))
+> LIB_CXX:=$(wildcard lib/*.cc)
+> LIB_CXX_OBJ:=$(patsubst %.cc,%.cc.o,$(LIB_CXX))
+> LIB_ASM_OBJ:=$(patsubst %.S,%.S.o,$(LIB_ASM))
+> LIB_OBJ:=$(LIB_CXX_OBJ) $(LIB_ASM_OBJ)
+> 
+> CXX_OBJ:=$(LIB_CXX_OBJ) $(BIN_CXX_OBJ)
+> ASM_OBJ:=$(LIB_ASM_OBJ) $(BIN_ASM_OBJ)
+> ALL_CXX:=$(LIB_CXX) $(BIN_CXX)
+> 
+> lib/strerror_list.cc: script/genstrerror.pl
+> 	rm -f lib/strerror_list*
+> 	vi-perl $<
+> 
+> LIB_LIB:=lib/libkernpp.a
+> 
+> LO1:=$(patsubst %.cc,%.cc.o,$(LIB_CXX))
+> LO2:=$(filter-out $(START),$(LO1)) 
+> LO3:=$(sort $(LO2))
+> LIB_OBJ:=$(LO3)
+> 
+> BIN_EXE:=$(patsubst %.cc,%,$(BIN_CXX))
+> BIN_EXE+=$(patsubst %.S,%,$(BIN_ASM))
+> 
+> all: $(BIN_EXE) 
+68,71d51
+< $(all/obj): sbin/comp
+< $(bin/exe): sbin/link
+< $(lib/lib): sbin/arch
+< $(bin/exe): $(lib)
+73,74c53,55
+< tags: */*.cc */*.hh
+< 	ctags --language-force=c++ */*.cc */*.hh
+---
+> $(LIB_LIB): $(LIB_OBJ)
+> 	ar $(AR_FLAGS) $@.new $(LIB_OBJ)
+> 	mv $@.new $@
+76,77c57,85
+< nm:
+< 	nm */*.a */*.o --defined-only -A --demangle
+---
+> bin/false bin/true: START:=
+> 
+> .PRECIOUS: lib/start.S.o
+> $(BIN_CXX_EXE): %: %.cc.o $(START) $(LIB_LIB) etc/ld_flags
+> 	$(LD) @etc/ld_flags $(START) $<  $(LIB_LIB) -o $@
+> 
+> $(BIN_ASM_EXE): %: %.S.o etc/ld_flags
+> 	$(LD) @etc/ld_flags $< -o $@
+> 
+> %.S.o: %.S
+> 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+> 
+> %.cc.o: %.cc
+> 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+> 
+> %.cc.d: %.cc.o
+> 	@true
+> 
+> $(CXX_OBJ): %.cc.o: %.cc  etc/asmflags etc/cppflags etc/cxxflags
+> 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(DEPFLAGS)
+> 	$(CXX) $(CPPFLAGS) -E $< -o $(<:.cc=.cc.ii) $(DEPFLAGS)
+> 	$(CXX) $(CXXFLAGS) -S $(<:.cc=.cc.ii)  -o $(<:.cc=.cc.s)
+> 	$(CXX) $(ASMFLAGS) -c $(<:.cc=.cc.s)   -o $@
+> 
+> deps=$(patsubst %,%.d,$(ALL_CXX))
+> 
+> 
+> clean:
+> 	rm -f */*.cc.o */*.cc.ii */*.cc.s */*.cc.d $(BIN_EXE) $(LIB_LIB)
+diff '--color=auto' -r main/bin/.gitignore lspath/bin/.gitignore
+1,2d0
+< cat
+< echo
+4,13d1
+< fmt
+< ls
+< markout
+< true
+< usleep
+< not
+< cat
+< echo
+< false
+< ls
+15,18d2
+< not
+< report
+< string_view
+< test_getopt
+20d3
+< usleep
+Only in main/bin: cat.cc
+Only in main/bin: echo.cc
+Only in main/bin: ls.cc
+diff '--color=auto' -r main/bin/lspath.cc lspath/bin/lspath.cc
+1a2,3
+> #include <c_str.hh>
+> 
+3a6
+> 
+5,12c8
+<   ++argv;
+<   if(*argv)
+<     write(1, *argv++);
+<   while(*argv) {
+<     write(1,L(" "));
+<     write(1, *argv++);
+<   };
+<   write(1, L("\n"));
+---
+> 
+Only in main/bin: not.cc
+Only in main/bin: report.cc
+Only in main/bin: string_view.cc
+Only in main/bin: test_getopt.cc
+Only in main/bin: usleep.cc
+Only in main/: depends.pl
+Only in main/doc: all_syscalls.h
+Only in main/doc: syscalls.html
+diff '--color=auto' -r main/etc/cxxflags lspath/etc/cxxflags
+3,4c3
+< -ggdb3
+< -O0
+---
+> -O2
+diff '--color=auto' -r main/etc/ld_flags lspath/etc/ld_flags
+1,2d0
+< --freestanding
+< -Bdynamic
+4,13d1
+< -O0
+< -ffreestanding
+< -fno-exceptions
+< -fno-stack-protector
+< -ggdb3 -O0
+< -nodefaultlibs
+< -nolibc
+< -nostartfiles
+< -nostdlib
+< -static
+Only in main/: files.md5
+Only in main/inc: buf.hh
+Only in main/inc: char_traits.hh
+Only in main/inc: cxxabi.hh
+Only in main/inc: getopt.hh
+Only in main/inc: new.hh
+Only in main/inc: ostream.hh
+Only in main/inc: reverse_iterator.hh
+Only in main/inc: string_view.hh
+Only in main/inc: tinfo.hh
+Only in main/inc: typeinfo.hh
+Only in main/lib: abi.cc
+Only in main/lib: c_str.cc
+Only in main/lib: cxxabi.cc
+Only in main/lib: dbg.cc
+Only in main/lib: delete.cc
+Only in main/lib: dyncast.cc
+Only in main/lib: getopt.cc
+Only in main/lib: mm.cc
+Only in main/lib: new.cc
+Only in main/lib: stdlib.cc
+Only in main/lib: strerror_list.cc
+Only in main/lib: type_info.cc
+Only in main/lib: unistd.cc
+Only in main/lib: write_buf.cc
+Only in main/: sbin
+Only in main/: script
+Only in main/: test.pl
