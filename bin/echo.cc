@@ -1,8 +1,8 @@
 #include <syscall.hh>
 using sys::write;
 
-int main(int argc, char**argv,char **envp) {
-  ++argv;
+int main(int argc, const char**argv,const char **envp) {
+  ++argv;--argc;
   if(*argv)
     write(1, *argv++);
   while(*argv) {
