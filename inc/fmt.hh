@@ -12,6 +12,7 @@
 
 typedef unsigned fd_t;
 namespace fmt {
+  using sys::exit;
   struct hex_t {
     size_t val;
     size_t size;

@@ -1,19 +1,26 @@
-#ifdef __ELF__
-.section .note.GNU-stack,""
-#endif
-	.text
-	.global _start
+.text
+.global _start
 _start:
-  xorl %ebp,%ebp
-	call libc_init
+  xorq %rbp,%rbp
+#  call libc_init
   movq 0(%rsp),%rdi
   lea 8(%rsp),%rsi
-  lea 16(%rsp),%rdx
+  mov %rsi, %rdx      # Copy argv pointer to rdx (envp)
+loop_check:
+    mov (%rdx), %rax    # Load the current argv element
+    test %rax, %rax    # Check if it's null
+    jz envp_found      # Jump if null (end of argv)
+    add $8, %rdx       # Increment rdx (move to next argv element)
+    jmp loop_check     # Continue the loop
+
+envp_found:
+    add $8, %rdx       # Increment rdx (now points to envp)
   call main
-	movq %rax,%rdi
-	call exit
-	int3
+  movq %rax,%rdi
+  call exit
+  int3
 #   movq %rax,%rdi
 #   movl $60,%eax
 #   syscall
 #   int3
+.section .note.GNU-stack 

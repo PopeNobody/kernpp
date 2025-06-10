@@ -1,5 +1,10 @@
 #include<syscall.hh>
-
+extern "C" {
+  int main(int, const char **, const char **);
+};
+int main(int, const char**, const char **) {
+  return 0;
+};
 //   #define wifexited(res) (wtermsig(res)==0)
 //   #define wtermsig(res) (res&0x7f)
 //   #define wexitstatus(res) ((res&0xff00)>>8)
