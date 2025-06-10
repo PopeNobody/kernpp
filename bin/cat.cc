@@ -38,6 +38,7 @@ int copy(const char *path,int ofd){
       };
     };
   };
+  return 0;
 };
 int main(int argc, const char**argv, const char **envp) {
   while(*++argv){

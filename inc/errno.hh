@@ -39,16 +39,16 @@
 #define	ERANGE		34	/* Math result not representable */
 
 
-struct c_str;
+typedef const char *c_str;
 namespace sys {
   typedef long errno_t;
   extern errno_t errno;
   ssize_t set_errno(errno_t err);
-  const c_str &strerror(errno_t err=errno);
-  void perror(const c_str &msg1, const c_str &msg2);
-  void pexit(const c_str &msg1, const c_str &msg2);
-  void perror(const c_str &msg1);
-  void pexit(const c_str &msg1);
+  c_str strerror(errno_t err=errno);
+  void perror(const c_str msg1, const c_str msg2);
+  void pexit(const c_str msg1, const c_str msg2);
+  void perror(const c_str msg1);
+  void pexit(const c_str msg1);
 };
 
 #endif
