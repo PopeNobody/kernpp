@@ -52,8 +52,12 @@ namespace sys
 #define chk_return2(val, cast)                                            \
   return (cast)(val < 0 ? set_errno(val) : val)
 #define chk_return(val) return (val < 0 ? set_errno(val) : val)
+namespace err {
+  ssize_t set_errno(ssize_t err);
+};
 namespace sys
 {
+  using err::set_errno;
   extern "C"
   {
     inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AIL;
@@ -525,10 +529,7 @@ namespace std
   void        abort() __attribute__((__noreturn__));
   inline void abort()
   {
-    do
-    {
-      asm("int3");
-    } while(true);
+    do { asm("int3"); } while(true);
   }
   void terminate() noexcept __attribute__((__noreturn__));
   enum nothrow_t

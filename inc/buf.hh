@@ -3,6 +3,7 @@
 
 #include <dbg.hh>
 #include <fmt.hh>
+#include <algo.hh>
 
 namespace buf_ns
 {
@@ -26,7 +27,7 @@ namespace buf_ns
     {
       if(arg==0)
         arg="(null)";
-      return __write(arg,true_n(arg));
+      return __write(arg,algo::len(arg));
     };
     ssize_t write(char &arg)
     {

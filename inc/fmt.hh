@@ -195,10 +195,11 @@ namespace fmt {
         buf[pos--]=0;
         fmt(val);
       };
-    c_str get() const
+     
+    auto get() const
     {
       static size_t maxlen=0;
-      c_str res(&buf[pos], &end[0]);
+      c_str::c_str res(&buf[pos], &end[0]);
       if( maxlen < res.len() )
         maxlen=res.len();
       return res;

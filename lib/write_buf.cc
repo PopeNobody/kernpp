@@ -26,7 +26,7 @@ class isprint_t
 const isprint_t isprint;
 
 void doit() {
-  write_buf<1,4096>buf(88);
+  write_buf::write_buf<1,4096>buf(88);
   buf.close();
   buf.flush();
 };

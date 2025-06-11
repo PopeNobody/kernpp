@@ -105,13 +105,6 @@ namespace std {
 };
 using std::strong_ordering;
 template<class it>
-int true_n(const it b){
-  it e(b);
-  while(*e)
-    ++e;
-  return e-b;
-};
-template<class it>
 strong_ordering seq_cmp(it s1, it s2, unsigned n)
 {
   while(n--){

@@ -1,4 +1,6 @@
 #include <syscall.hh>
+#include <fatal.hh>
+#include <fmt.hh>
 using sys::write;
 using sys::read;
 using sys::exit;
@@ -10,18 +12,11 @@ static void die(int res,const char *msg) {
   exit(res);
 };
 static char buf[65535];
-int copy(const char *path,int ofd){
-  int ifd = open(path,sys::o_rdonly);
-  if(ifd<0){
-    write(2,"error: open: ");
-    write(2,path);
-    write(2,"\n");
-    return 1;
-  }
+int copy(fd_t ifd, fd_t ofd){
   while(int nr=read(ifd,buf,sizeof(buf))){
     if(nr<0){
       write(2,"error: read: ");
-      write(2,path);
+      fmt::write_dec(2,ifd);
       write(2,"\n");
       sys::close(ifd);
       return 1;
@@ -31,17 +26,26 @@ int copy(const char *path,int ofd){
       nw=write(ofd,buf+i,nr-i);
       if(nw<0) {
         write(2,"error: write: ");
-        write(2,path);
+        fmt::write_dec(2,ofd);
         write(2,"\n");
         sys::close(ifd);
         return 1;
       };
     };
   };
+  return 0;
+};
+int copy(const char *path,int ofd){
+  int ifd=fatal::open(path,sys::o_rdonly);
+  return copy(ifd,ofd);
 };
 int main(int argc, const char**argv, const char **envp) {
-  while(*++argv){
-    copy(*argv,1);
+  if(*++argv) {
+    while(*argv){
+      copy(*argv++,1);
+    };
+  } else {
+    copy(fd_t(0),fd_t(1));
   };
   return 0;
 };

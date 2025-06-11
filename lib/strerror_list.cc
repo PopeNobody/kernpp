@@ -3,8 +3,7 @@
 #include <c_str.hh>
 
 
-
-static c_str strerror_v[]={
+static c_str::c_str strerror_v[]={
 
   "Unknown Error(###)",
 
@@ -146,7 +145,10 @@ static c_str strerror_v[]={
 
 
 static size_t strerror_c = sizeof(strerror_v)/sizeof(strerror_v[0]);
-namespace sys {
+namespace err {
+  using c_str::c_str;
+  using err::errno_t;
+
   c_str no_err(L("No Error"));
   const c_str &strerror(errno_t err) {
     if(!err)

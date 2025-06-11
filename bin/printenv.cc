@@ -1,6 +1,7 @@
 #include <syscall.hh>
 #include <itr.hh>
 #include <cmp.hh>
+#include <algo.hh>
 using sys::write;
 using sys::full_write;
 using sys::exit;
@@ -30,14 +31,15 @@ class is_zero {
     return val==0;
   };
 };
+using algo::len;
 size_t write_vec_1(int fd,const char **&b, const char *d) {
   static char buffer[8*1024];
   if(!b)
     die(2,"null pointer in write_str");
   ssize_t n = 0;
-  size_t dl=true_n(d);
+  size_t dl=len(d);
   while(*b) {
-    size_t bl=true_n(*b);
+    size_t bl=len(*b);
     if(dl+bl+n<n)
       break;
     if(n)
@@ -64,7 +66,7 @@ struct write_vec_t {
   size_t write(const char *beg, const char *end=0) {
     size_t n=0;
     if(!end)
-      end=beg+true_n(beg);
+      end=beg+len(beg);
     size_t len=end-beg;
     if(pos>buf && pos+len>=buf+sizeof(buf)) {
       n=full_write(fd,buf,pos-buf);
@@ -72,7 +74,7 @@ struct write_vec_t {
       set(buf,xend(buf),0);
     };
     if(len>sizeof(buf)) {
-      return n+full_write(fd,beg,true_n(beg));
+      return n+full_write(fd,beg,algo::len(beg));
     };
     char *tmp=copy(pos,buf+sizeof(buf),beg,end);
     n+=(tmp-pos);

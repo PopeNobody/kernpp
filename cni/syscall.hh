@@ -1,7 +1,6 @@
-#ifndef syscall_hh
+friend #ifndef syscall_hh
 #define syscall_hh syscall_hh
 
-#include <errno.hh>
 #include <types.hh>
 
 #if 1
@@ -53,6 +52,7 @@ namespace sys
 #define chk_return2(val, cast)                                            \
   return (cast)(val < 0 ? set_errno(val) : val)
 #define chk_return(val) return (val < 0 ? set_errno(val) : val)
+#define chk_result(val) if(val<0) set_errno(val);
 namespace sys
 {
   extern "C"
