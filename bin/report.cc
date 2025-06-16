@@ -31,7 +31,8 @@ namespace fatal {
     pid_t res = sys::fork();
     if(res<0)
       sys::pexit("fork");
-    write(2,"forked %d\n");
+    else if (res)
+      write(2,"forked %d\n");
     return res;
   };
   inline auto wait(int *status) {
@@ -46,19 +47,6 @@ namespace fatal {
     sys::pexit("execve");
   };
 }
-static char def_txt[]={
-  "/bin/echo\0\n"
-    "You neglected to give me any program to run, so I\n"
-    "have enlisted echo to tell you so.  My prediction\n"
-    "\n\n\0\n\n"
-    "is that it will probably return zero.  but you never\n"
-    "know!\n\n\0\0"
-};
-static char *def_cmd[3]={
-  def_txt,
-  def_txt,
-  0
-};
 struct fmt_int {
   char buf[16];
   char *pos;
@@ -67,7 +55,11 @@ struct fmt_int {
   fmt_int(int val)
     : buf{ "" }, pos(buf+sizeof(buf)-1)
   {
-    *pos=0;
+    *pos--=0;
+    do {
+     *--pos='0'+(val%10);
+     val/=10 ;
+    } while(val);
   };
 };
 template<class iitr, class oitr>
@@ -89,11 +81,12 @@ itr_t find_end(itr_t end){
 };
 int main(int argc, char* const* argv, char * const *envp)
 {
-  if(!*++argv) {
-    def_cmd[0]=def_txt;
-    def_cmd[1]=find_end(def_cmd[0])+1;
-    def_cmd[2]=find_end(def_cmd[1])+1;
-    argv=(char*const*)def_cmd;
+  char *pos;
+  ++argv;
+  argc--;
+  if(!*argv) {
+    write(2,"oops\n");
+    exit(1);
   };
   pid_t pid=fatal::fork();
   if(!pid) {
@@ -102,27 +95,45 @@ int main(int argc, char* const* argv, char * const *envp)
   };
 
   status_t res;
-  //     sys::sleep(10);
   fatal::wait(res);
 
-  char *pos;
   for(pos=(char*)argv[0]; pos<argv[argc-1] || *pos; pos++)
     if(!*pos)
-      *pos=' ';
+      *pos++=' ';
   *pos++='\n';
   write(2,argv[0],pos-argv[0]);
-  int num=res.sig();
-  const char *desc = " returned ";
-  if(num) {
-    desc=" killed with ";
-  } else {
-    num=res.ret();
-  };
   fmt_int pid_f=pid;
-  fmt_int num_f=num;
-  static char buf[64];
-  pos=buf;
-  pos=copy(pid_f.beg(), pid_f.end(), pos, buf+63);
-  write(2,buf,pos-buf);  
+  write(2, pid_f.beg(),pid_f.end());
+  if(res.ret()) {
+    const char *desc = " returned ";
+    write(2,desc);
+    fmt_int ret_f=res.ret();;
+    write(2, ret_f.beg(),ret_f.end());
+  } else if (res.sig()) {
+    const char *desc = " killed with ";
+    write(2,desc);
+    fmt_int sig_f=res.sig();;
+    write(2, sig_f.beg(),sig_f.end());
+  } else {
+    write(2," exited normally");
+  };
+  write(2,"\n\n\n");
+
+
+//     write(2,pid_f.beg(),pid_f.end()-pid_f.beg());
+//     write(2,pid_f.beg(),pid_f.end()-pid_f.beg());
+//     *pid_f
+//     write(2,"\n");
+//     write(2,pid_f.beg(),pid_f.end()-pid_f.beg());
+//     write(2,"\n");
+//     write(2,pid_f.beg(),pid_f.end()-pid_f.beg());
+//     write(2,"\n");
+//     write(2,pid_f.beg(),pid_f.end()-pid_f.beg());
+//     write(2,"\n");
+//     if(num) {
+//       desc=" killed with ";
+//     } else {
+//       num=res.ret();
+//     };
   exit(res.res);
 };

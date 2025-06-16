@@ -1,14 +1,28 @@
 #include <syscall.hh>
 using sys::write;
 
-int main(int argc, char**argv,char **envp) {
-  ++argv;
-  if(*argv)
-    write(1, *argv++);
-  while(*argv) {
-    write(1,L(" "));
-    write(1, *argv++);
+bool str_eq(const char *lhs,int len, const char *rhs) {
+  for(int i=0;i<len;i++){
+    if(lhs[i]!=rhs[i])
+      return false;
   };
-  write(1, L("\n"));
+  return true;
+};
+int main(int argc, char**argv,char **envp) {
+  while(*envp){
+    if(str_eq(*envp,5,"PATH=")){
+      char *pos;
+      for(pos=5+*envp;*pos;pos++){
+        if(*pos==':')
+          *pos='\n';
+      };
+      *pos='\n';
+      *pos=0;
+      write(2,*envp+5);
+      return 0;
+    } else {
+      envp++;
+    };
+  };
   return 0;
 };
