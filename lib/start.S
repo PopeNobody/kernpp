@@ -14,17 +14,6 @@ loop_check:
 
 envp_found:
   add $8, %rdx       # Increment rdx (now points to envp)
-  push %rbp;
-  push %rsi;
-  push %rdi
-  push %rdx;
-  push %rax;
-  call libc_init
-  pop %rax;
-  pop %rdx;
-  pop %rdi
-  pop %rsi;
-  pop %rbp;
   call main
   movq %rax,%rdi
   call exit

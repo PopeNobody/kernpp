@@ -1,6 +1,11 @@
 #include <errno.hh>
 #include <syscall.hh>
 
+extern "C" {
+  void exit(int code) {
+    sys::exit(code);
+  };
+};
 namespace sys {
   errno_t errno;
   ssize_t set_errno(ssize_t err)
