@@ -21,3 +21,5 @@ bin/lspath
 *.aa
 *.S
 *.orig
+*.SS
+*.log
