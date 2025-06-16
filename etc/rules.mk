@@ -13,8 +13,14 @@ $(c++/SS): %.SS: %.ii  etc/cxxflags
 $(c++/oo): %.oo: %.SS  etc/asmflags
 	as -o "$@" $< @etc/asmflags
 
+$(tst/c++): %: %.cc.oo etc/ld_flags $(lib/lib)
+	ld -o "$@" $< $(lib/lib)
+
 $(bin/c++): %: %.cc.oo etc/ld_flags $(lib/lib)
 	ld -o "$@" $< $(lib/lib)
+
+$(tst/asm): %: %.S.o
+	ld -o "$@" $<
 
 $(bin/asm): %: %.S.o
 	ld -o "$@" $<
