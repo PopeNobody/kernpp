@@ -7,7 +7,7 @@ include etc/resolve.mk
 include etc/rules.mk
 clean_asm:=$(filter-out $(all/src/asm),$(all/mod/c++:=.S))
 clean:
-	rm -f */*.ii */*.oo */*.aa */*.d */*.o
+	rm -f */*.ii */*.oo */*.aa */*.d */*.o */*.SS 
 	
 
 all:
