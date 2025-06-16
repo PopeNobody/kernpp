@@ -1,9 +1,9 @@
 
 $(lib/lib): $(lib/obj)
-	ar -r "$@" $(lib/obj) $(lib/xxx)
+	ar -r "$@"  $(lib/obj) 
 
 %: %.oo etc/ld_flags $(lib/lib)
-	ld -o "$@" $< $(lib/lib)
+	g++ -o "$@" -Wl,--start-group $< $(lib/obj) @etc/ld_flags -Wl,--end-group
 
 %.ii: %.cc  etc/cppflags
 	rm -f $*.ii $*.oo $*.S

@@ -1,4 +1,4 @@
-MAKEFLAGS+= -rR
+MAKEFLAGS+= -rR -j1
 SHELL:=/bin/bash
 all: lib bin tst
 

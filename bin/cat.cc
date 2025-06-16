@@ -9,7 +9,7 @@ static void die(int res,const char *msg) {
   write(2,msg);
   exit(res);
 };
-static char buf[65535];
+static char buf[64];//*1024];
 int copy(const char *path,int ofd){
   int ifd = open(path,sys::o_rdonly);
   if(ifd<0){
