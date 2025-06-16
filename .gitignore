@@ -20,3 +20,4 @@ bin/lspath
 *.oo
 *.aa
 *.S
+*.orig
