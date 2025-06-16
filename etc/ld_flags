@@ -1,11 +1,10 @@
---freestanding
--Bdynamic
 -Llib
 -O0
+-Wl,--verbose
 -ffreestanding
 -fno-exceptions
 -fno-stack-protector
--ggdb3 -O0
+-ggdb3
 -nodefaultlibs
 -nolibc
 -nostartfiles

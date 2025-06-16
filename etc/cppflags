@@ -1,4 +1,7 @@
 -nostdinc++
-
 -Iinc
 -g
+-ffreestanding
+-fno-exceptions
+-ggdb3 -O0
+-fno-stack-protector
