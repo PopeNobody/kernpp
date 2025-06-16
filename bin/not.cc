@@ -1,13 +1,5 @@
 #include <errno.hh>
 #include <syscall.hh>
-#include <getopt.hh>
-
-
-char def1[]="/bin/echo";
-char def2[]="/bin/sh";
-char *defs[] = { 
-  def1, def2, 0
-};
 #define wifexited(res) (wtermsig(res)==0)
 #define wtermsig(res) (res&0x7f)
 #define wexitstatus(res) ((res&0xff00)>>8)
