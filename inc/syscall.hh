@@ -112,11 +112,12 @@ namespace sys
   // __NR_close=3
   inline int close(fd_t fd)
   {
+    ssize_t res;
     asm("syscall\n"
         : "=a"(fd) 
-        : "0"(3), "D"(fd) 
+        : "0"(3), "D"(res) 
         : "rcx", "r11", "memory");
-    chk_return(fd);
+    chk_return(res);
   }
   // __NR_stat=4
   inline int stat(const char* pathname, struct stat_t* statbuf)
@@ -165,9 +166,10 @@ namespace sys
     map_anon     = 0x20,
     map_anonymous= map_anon,
     map_growsdown= 0x00100,
+    map_locked=    0x02000,
     map_noreserve= 0x04000,
-    map_nonblock = 0x10000,
     map_populate = 0x08000,
+    map_nonblock = 0x10000,
     map_stack    = 0x20000,
   };
   // __NR_mmap=9
@@ -198,6 +200,15 @@ namespace sys
 
     chk_return2(res, char*);
   }
+  // __NR_munmap = 11
+  inline int munmap(void *ptr, size_t size) {
+    int res;
+    asm("syscall\n"
+        : "=a"(res)
+        : "a"(4), "D"(ptr), "S"(size)
+        : "rcx", "r11", "memory");
+    chk_return(res);
+  };
   // __NR_sigaction = 13
   inline int rt_sigaction(int sig, sigaction_p act, sigaction_p oact)
   {

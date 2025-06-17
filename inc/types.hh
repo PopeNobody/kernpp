@@ -179,7 +179,19 @@ typedef int errno_t;
 typedef int64_t intptr_t;
 typedef uint64_t uintptr_t;
 typedef int64_t off64_t;
-typedef uint32_t fd_t;
+struct fd_t {
+  uint32_t fd;
+  fd_t(uint32_t fd)
+    : fd(fd)
+  {
+  };
+  operator uint32_t &() {
+    return fd;
+  };
+  operator uint32_t () const {
+    return fd;
+  };
+};
 typedef fd_t* fd_p;
 struct pollfd_t {
   fd_t   fd;

@@ -12,4 +12,8 @@ namespace std {
 	new_handler set_new_handler (new_handler handler) throw();
 	new_handler get_new_handler () noexcept;
 }
+namespace sys {
+  void free(void *);
+  void malloc(size_t sz);
+};
 
