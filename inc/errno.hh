@@ -1,7 +1,7 @@
 #ifndef errno_hh
 #define errno_hh errno_hh
 
-#include <types.hh>
+#include "types.hh"
 
 #define	EPERM		 1	/* Operation not permitted */
 #define	ENOENT		 2	/* No such file or directory */

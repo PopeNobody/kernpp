@@ -1,8 +1,8 @@
 #ifndef syscall_hh
 #define syscall_hh syscall_hh
 
-#include <errno.hh>
-#include <types.hh>
+#include "errno.hh"
+#include "types.hh"
 
 #if 1
 #define AIL __attribute__((__always_inline__))
@@ -459,7 +459,7 @@ namespace sys
     __asm__ volatile(
              "\tsyscall;\n"
              : "=a"(res)
-             : "0"(200), "D"(dfd), "S"(filename), "d"(utimes), "g"(flags)
+             : "0"(280), "D"(dfd), "S"(filename), "d"(utimes), "g"(flags)
              : "rcx", "memory", "r8", "r9");
 
     chk_return(res);

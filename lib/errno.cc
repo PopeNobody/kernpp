@@ -22,10 +22,15 @@ namespace sys {
     static c_str null;
     perror(null,msg);
   };
-  void pexit(const c_str &msg)
+  void pexit(int err, const c_str &msg1, const c_str &msg2)
+  {
+    perror(msg1,msg2);
+    exit(err);
+  };
+  void pexit(int err, const c_str &msg)
   {
     perror(msg);
-    exit(1);
+    exit(err);
   };
   void perror(const c_str &msg1, const c_str &msg2)
   {

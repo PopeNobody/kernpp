@@ -34,7 +34,7 @@ asm/obj:=$(src/asm:.S=.oo)
 asm/lib:=$(filter lib/%,$(asm/obj))
 lib: $(asm/lib)
 
-lib/libkernpp.aa: $(asm/lib) $(c++/lib)
+$(lib/lib): $(asm/lib) $(c++/lib)
 	ar r $@ $(asm/lib) $(c++/lib)
 
 all/obj:= $(c++/obj) $(asm/obj)
@@ -42,7 +42,21 @@ all/obj:= $(c++/obj) $(asm/obj)
 $(asm/obj): %.oo: %.S etc/asmflags
 	as -o $@ $< @etc/asmflags
 
+
+#    lib/abi.cc
+#    lib/c_str.cc
+#    lib/dbg.cc
+#    lib/errno.cc
+#    lib/getopt.cc
+#    lib/init_array.cc
+#    lib/search_path.cc
+#    lib/strerror_list.cc
+#    lib/unistd.cc
+#    lib/write_buf.cc
+#$(warning c++/obj)
+
 $(c++/obj): %.oo: %.cc  etc/cxxflags etc/cppflags
+	echo "cxx/obj:+ $(c++/obj)"
 	g++  -o $@ -c $< @etc/cxxflags @etc/cppflags
 
 all: $(c++/obj)
