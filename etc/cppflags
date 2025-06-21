@@ -3,5 +3,7 @@
 -g
 -ffreestanding
 -fno-exceptions
--ggdb3 -O0
+-ggdb3
+ -O0
 -fno-stack-protector
+-std=c++20
