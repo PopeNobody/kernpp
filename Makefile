@@ -12,7 +12,7 @@ clean_asm:=$(filter-out $(src/asm),$(all/asm))
 clean:
 	rm -f $(tgt/all)
 
-all:
+all: $(tgt/all)
 	@echo made all
 
 deps= $(sort $(wildcard */*.ii.d))

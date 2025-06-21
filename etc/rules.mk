@@ -1,26 +1,21 @@
 
-$(lib/lib): $(lib/obj)
-	sbin/ar $@ $(lib/obj) $(lib/xxx)
+$(tgt/lib): $(lib/obj)
+	sbin/ar $@ $(lib/obj)
 
-$(all/exe): %: %.cc.oo etc/ld_flags $(lib/lib)
-	sbin/ld $@ $< $(lib/lib)
+$(tgt/exe): %: %.cc.oo etc/ld_flags $(lib/lib)
+	sbin/ld $@ $< $(lib/lib) @etc/ldflags
 
-$(all/cpp): %.cc.ii: %.cc  etc/cppflags
-	sbin/g++ $@ $< @etc/cppflags -MD -MT $@ -MF $@.dd
+$(tgt/cpp): %.cc.ii: %.cc  etc/cppflags
+	sbin/g++ $@ $< @etc/cppflags 
 
-$(gen/asm): %.SS: %.ii  etc/cxxflags
-	sbin/g++ $@ $< @etc/cxxflags -MD -MT $@ -MF $@.dd
+$(tgt/asm): %.SS: %.ii  etc/cxxflags
+	sbin/g++ $@ $< @etc/cxxflags
 
-$(all/obj): %.oo: %.SS  etc/asmflags
+$(tgt/obj): %.oo: %.SS  etc/asmflags
 	sbin/as $@ $< @etc/asmflags
 
-
-%/run: %
-	./$<
-
-%: %.c
-	gcc -o $@ $<
 
 /dev/null:;
 %.mk:;
 Makefile:;
+$(wildcard etc/*flags):
