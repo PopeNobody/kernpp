@@ -17,3 +17,6 @@ hide
 !tst/test3.t.SS
 arc
 *.log
+*.d
+*.dd
+

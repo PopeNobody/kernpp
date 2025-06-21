@@ -3,13 +3,8 @@
 
 #include "errno.hh"
 #include "types.hh"
+#include "attrs.hh"
 
-#if 1
-#define AIL __attribute__((__always_inline__))
-#define NOR  __attribute__((__noreturn__))
-#else
-#define AIL
-#endif
 
 namespace sys
 {
@@ -538,7 +533,7 @@ namespace std
   typedef void (*new_handler)();
 }
 
-#undef AIL
+#include "attrs.hh"
 #define _GLIBCXX_NOEXCEPT noexcept
 #ifndef _GLIBCXX_NOTHROW
 #define _GLIBCXX_NOTHROW

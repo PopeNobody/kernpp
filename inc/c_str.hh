@@ -122,10 +122,8 @@ class c_str {
   friend auto operator==(const c_str &lhs, const c_str &rhs){
     return cmp(lhs,rhs)==(0<=>0);
   };
+  friend ssize_t write(fd_t fd, const c_str &str);
 };
 
-inline ssize_t write(fd_t fd, const c_str &str) {
-  return sys::sys_write(fd, str.begin(), str.size());
-};
 
 #endif

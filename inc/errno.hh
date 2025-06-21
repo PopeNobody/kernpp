@@ -40,14 +40,19 @@
 
 
 struct c_str;
+#include "attrs.hh"
 namespace sys {
   typedef int errno_t;
   extern errno_t errno;
   ssize_t set_errno(long err);
   const c_str &strerror(errno_t err=errno);
   void perror(const c_str &msg1, const c_str &msg2);
-  void pexit(int res, const c_str &msg1, const c_str &msg2);
   void perror(const c_str &msg1);
+
+
+  void pexit(int res, const c_str &msg1, const c_str &msg2) NOR;
+  void pexit(int res, const c_str &msg1) NOR;
+  void pexit(int res, const c_str &msg1, const c_str &msg2);
   void pexit(int res, const c_str &msg1);
 //     inline void perror(const c_str &msg1, const c_str &msg2) {
 //       perror(errno msg1,msg2);
@@ -64,5 +69,6 @@ namespace sys {
 //       pexit(errno,msg1,msg2);
 //     };
 };
-
+#include "attrs.hh"
+#include "c_str.hh"
 #endif

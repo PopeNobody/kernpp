@@ -1,5 +1,4 @@
 #define NDEBUG
-#include <assert.h>
 
 #ifndef debug_hh
 #define debug_hh debug_hh

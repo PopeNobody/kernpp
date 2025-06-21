@@ -1,46 +1,78 @@
 #include <syscall.hh>
+#include <fmt.hh>
 #include <getopt.hh>
 
 
 using sys::write;
 using sys::nanosleep;
+using sys::exit;
+using namespace fmt;
+using namespace getopt_ns;
 
-const static unsigned long million=1000000;
-const static unsigned long billion=1000*million;
+void too_many() {
+  write(2,L("too many!\n\n"));
+  exit(1);
+};
+const static int million=1000000;
+const static int billion=1000*million;
 extern "C" {
   int main(int argc, char**argv, char **envp);
 };
-bool atoi(const char *str, long &res){
-  while(*str){
-    res*=10;
-    res+=(*str-'0');
-    str++;
-  };
-  return res;
-};
+getopt_t getopt(0,0,0);
 int main(int argc, char**argv, char **envp)
 {
   int opt;
   ++argv;
   --argv; 
   size_t mul=0;
-  timespec tm;
-  if(argc>3) {
-    write(2,"too many args\n");
-    sys::exit(1);
-  } else if(argc>2) {
-    atoi(argv[1],tm.tv_sec);
-    atoi(argv[2],tm.tv_nsec);
-  } else if(argc>1) {
-    atoi(argv[1],tm.tv_nsec);
-    if(tm.tv_nsec >= billion*10){
-      tm.tv_sec=tm.tv_nsec/(billion*10);
-      tm.tv_nsec=tm.tv_nsec%(billion*10);
+  while ((opt = getopt(argv)) != -1) {
+    write(1,L("main: got '"));
+    char ch=opt;
+    write(1,&ch,1);
+    write(1,L("\n"));
+    switch(opt) {
+      case 'n':
+        if(mul)
+          too_many();
+        write(2,L("nanoseconds\n"));
+        mul=1;
+        break;
+
+
+      case 'u':
+        if(mul)
+          too_many();
+        write(2,L("microseconds\n"));
+        mul=1000;
+        break;
+
+      case 's':
+        if(mul)
+          too_many();
+        write(2,L("seconds\n"));
+        mul=1000000000;
+        break;
+
+
+      default:
+        write(2,L("bad option\n"));
+        return 1;
+        break;
+
     };
-  } else {
-    tm.tv_sec=1;
-    tm.tv_nsec=0;
   };
+  timespec tm;
+//     if(getopt.ind()<argc) {
+//       tm.tv_nsec=atoi(argv[getind++]);
+//       if(tm.tv_nsec >= billion){
+//         tm.tv_sec=tm.tv_nsec/billion;
+//         tm.tv_nsec=tm.tv_nsec%billion;
+//       };
+//     } else {
+//       tm.tv_sec=1;
+//       tm.tv_nsec=0;
+//     };
+  write_tm(2,tm);write(2,L("\n"));
   nanosleep(&tm,0);
   return 0;
 };

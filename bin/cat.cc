@@ -1,5 +1,5 @@
 extern "C" {
-  int main(int, char **, char **);
+  int main(int argc, char **argv, char **argv);
 };
 #include "syscall.hh"
 #include "c_str.hh"
@@ -18,10 +18,12 @@ void cat(const char *file) {
     pos+=nw;
   };
 };
+extern "C" {
 int main(int argc, char **argv, char **envp) {
   for(int i=1;i<argc;i++){
     cat(argv[i]);
   };
   return 0;
+};
 };
 
