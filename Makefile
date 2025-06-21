@@ -13,16 +13,13 @@ deps:= $(sort $(wildcard */*.dd))
 cxxs:= $(sort $(wildcard */*.cc))
 objs:= $(sort $(wildcard */*.oo))
 
-$(warning $(words $(deps)) deps)
-$(warning $(words $(objs)) objs)
 
 src/c++:=$(wildcard */*.cc)
-c++/obj:=$(src/c++:.cc=.oo)
-c++/ebj:=$(filter bin/% tst/%,$(c++/obj))
-c++/exe:=$(c++/ebj:.oo=)
+c++/obj:=$(src/c++:.cc=.cc.oo)
+c++/exe:=$(filter bin/%,$(c++/obj:.cc.oo=))
 c++/lib:=$(filter lib/%,$(c++/obj))
 
-all: $(c++/exe) $(asm/exe)
+all: $(c++/exe) $(asm/exe) $(lib/lib)
 
 src/asm:=$(wildcard */*.S)
 asm/obj:=$(src/asm:.S=.oo)
@@ -41,20 +38,19 @@ $(asm/obj): %.oo: %.S etc/asmflags
 	as -o $@ $< @etc/asmflags
 
 
-$(c++/obj): %.oo: %.cc  etc/cxxflags etc/cppflags
-	g++  -o $@ -c $< @etc/cxxflags @etc/cppflags -MM -MT $@ -MF $@.dd
+$(c++/obj): %.cc.oo: %.cc  etc/cxxflags etc/cppflags
+	g++  -o $@ -c $< @etc/cxxflags @etc/cppflags -MD
 
 all: $(c++/obj)
 
 
-$(c++/exe): %: %.oo etc/ld_flags lib
+$(c++/exe): %: %.cc.oo etc/ld_flags lib
 	g++ -o $@ $< $(lib/lib) @etc/ld_flags
 
 
 /dev/null:;
 %.mk:;
 Makefile:;
-$(wildcard etc/*flags):
 
 clean:
 	rm -f $(tgt/all)
