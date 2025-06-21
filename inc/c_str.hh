@@ -78,6 +78,12 @@ class c_str {
   char operator*() const {
     return *body.beg;
   };
+  const char *beg() const {
+    return body.beg;
+  };
+  char *beg() {
+    return body.beg;
+  };
   const char *begin() const {
     return body.beg;
   };

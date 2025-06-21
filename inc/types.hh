@@ -245,7 +245,9 @@ struct iovec {
 
 typedef timespec* timespec_p;
 
+#ifndef NULL
 #define NULL nullptr
+#endif
 //#define offsetof(type, field)	((long) &((type *)0)->field)
 #define offsetof(TYPE, MEMBER) __builtin_offsetof (TYPE, MEMBER)
 
