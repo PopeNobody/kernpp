@@ -1,12 +1,11 @@
 MAKEFLAGS+= -rR -j1
-SHELL:=/bin/bash
+export override PATH:=$(PWD)/sbin:$(PATH)
+SHELL:=/bin/bash -xe
 all: lib bin tst
 
 lib/lib:=lib/libkernpp.aa
 include etc/resolve.mk
 include etc/rules.mk
-$(warning $(all/dep))
-$(warning $(wildcard $(all/dep)))
 include $(wildcard $(all/dep))
 clean_asm:=$(filter-out $(src/asm),$(all/asm))
 clean:
