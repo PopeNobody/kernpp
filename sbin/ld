@@ -1,4 +1,19 @@
-#!/bin/bash
+#!/usr/bin/perl
+# vim: ts=2 sw=2 ft=perl
+eval 'exec perl -x -wS $0 ${1+"$@"}'
+  if 0;
+$|++;
+use common::sense;
+use autodie;
+use Nobody::Util;
+use Nobody::PP;
+our(@VERSION) = qw( 0 1 0 );
 
-echo "${BASH_SOURCE}">&2
-exec /usr/bin/ld "$@"
+my ($of)=shift;
+my ($if)=shift;
+my ($ru)=shift;
+$ru =~ s,^@,,;
+die unless 3==(grep { defined } $of,$if,$ru );
+
+exec "/usr/bin/ld", "-o", $of, $if, "@$ru";
+

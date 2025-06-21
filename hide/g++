@@ -1,0 +1,44 @@
+#!/bin/bash
+set -ex
+case "$1" in
+  (*.*) ob=${1%%\.*}; oe=.${1##*.};;
+  (*) ob="$1" oe=""
+esac
+of="$ob$oe"
+printf 'ob=%s oe=%s\n'
+shift
+case "$1" in
+  (*.*) ib=${1%%\.*}; ie=.${1##*.};;
+  (*) ib="$1" ie="";;
+esac
+shift
+echo $ib $ie
+case "$ie" in
+  (.cc) MM=" -MM -MD -MT $of -MF $of.dd";;
+esac
+case "$oe" in
+  (.ii) flag="-E";;
+  (.oo) flag="-c";;
+  (.SS) flag="-S";;
+esac
+/usr/bin/g++ -o "$ob$oe" "$flag" "$ib$ie" $MM "$@"
+#    shift
+#    if test "$1" == "*.*"; then
+#      ib=${1%.*}
+#      ie=.${2#*.}
+#    else
+#      ib="$1"
+#      ie="$2"
+#    fi
+#    shift
+#    if test "$oe" == .ii; then
+#      f="-E"
+#    elif test "$oe" == .oo; then
+#      f="-c"
+#    else
+#      f="  "
+#    fi
+#    echo >&2 "ob=$ob oe=$oe ib=$ib ie=$ie"
+#    
+#    echo >&2 exec /usr/bin/g++ -o "$1$2" "$2" "$3" "$@" -MM -MD -MT -MF
+#    exit 1

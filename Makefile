@@ -19,3 +19,6 @@ deps= $(sort $(wildcard */*.ii.d))
 cxxs= $(sort $(wildcard */*.cc))
 cpps= $(cxxs:.cc=.ii)
 include /dev/null  $(filter-out $(xtra),$(wildcard */*.dd))
+
+$(tgt/obj/c++): %.cc.oo: %.cc.SS
+	sbin/g++ $@ $< etc/cxxflags
