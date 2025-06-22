@@ -24,23 +24,28 @@ static fd_t run_xxd() {
 };
 struct buf_t {
   char buf[61];
-  char end[1];
+  char nul[1];
   char off;
-  char len;
-  static buf_t bufs[1024];
-  buf_t()
-    : buf{},end{},off(end-buf),len(0)
+  void format(unsigned long val, int base, bool neg) {
+    nul[0]=0;
+    off=(nul-buf);
+    do {
+      buf[--off]=digits[val%base];
+      val/=base;
+    } while(val);
+  };
+  buf_t(unsigned long val,int base=10,bool neg=false)
     {
+      format(val,base,neg);
+    };
+  buf_t(unsigned long val,bool neg=false)
+    {
+      format(val,10,neg);
     };
   operator c_str() const {
-    return c_str(&buf[off],len);
+    return c_str(buf+off,nul-buf-off);
   };
-  buf_t &itoa(unsigned long val) {
-    static int idx=0;
-    buf_t &buf=bufs[idx++];
-    buf=buf_t();
-    return buf;  
-  };
+  static constexpr const char digits[]="0123456789abcdef";
 };
 
 size_t str_len(const char *str) {
@@ -53,9 +58,12 @@ int main(int argc, char**argv, char**envp) {
   envv=envp;
   char *beg=argv[0];
   char *end=envp[0];
-//     write(itoa
-//     {
-//       return sys::sys_write(fd, str.begin(), str.size());
-//     };
+  while(beg!=end) {
+    if(!*beg)
+      *beg=' ';
+    beg++;
+  }
+  *--beg='\n';
+  write(1,argv[0],end-argv[0]);
   return 0;
 };
