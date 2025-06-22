@@ -11,3 +11,4 @@ report
 runrep
 string_view
 touch
+vpty
