@@ -72,7 +72,8 @@ int main(int argc, char**argv, char **envp)
 //       tm.tv_sec=1;
 //       tm.tv_nsec=0;
 //     };
-  write_tm(2,tm);write(2,L("\n"));
+//     write_tm(2,tm);write(2,L("\n"));
+
   nanosleep(&tm,0);
   return 0;
 };

@@ -44,11 +44,19 @@ namespace sys
   }
 } // namespace sys
 
-#define chk_return2(val, cast)                                            \
-  return (cast)(val < 0 ? set_errno(val) : val)
-#define chk_return(val) return (val < 0 ? set_errno(val) : val)
+//   #define chk_return2(val, cast)                                            \
+//     return (cast)(val < 0 ? set_errno(val) : val)
+//   #define chk_return(val) return (val < 0 ? set_errno(val) : val)
+
 namespace sys
 {
+  template<typename val_t>
+    inline val_t chk_return(const val_t &val) {
+      if(uint64_t(val)>uint64_t(-4095))
+        sys::errno=int32_t(val&0xffff);
+      return val;
+    };
+  extern "C"
   extern "C"
   {
     inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AIL;
@@ -76,21 +84,17 @@ namespace sys
         : "=a"(res)
         : "a"(0), "D"(fd), "S"(buf), "d"(len)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR_write=1
   inline ssize_t sys_write(fd_t fd, const char* buf, size_t len)
   {
     long res;
-    if(!buf) {
-      buf="<null>";
-      len=6;
-    };
     asm("syscall\n"
         : "=a"(res)
         : "a"(1), "D"(fd), "S"(buf), "d"(len)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR_open=2
   inline fd_t open(const char* pathname,
@@ -102,7 +106,7 @@ namespace sys
         : "=a"(fd)
         : "0"(2), "D"(pathname), "S"(flags), "d"(mode)
         : "rcx", "r11", "memory");
-    chk_return(fd);
+    return chk_return(fd_t(fd));
   }
   // __NR_close=3
   inline int close(fd_t fd)
@@ -111,7 +115,7 @@ namespace sys
         : "=a"(fd) 
         : "0"(3), "D"(fd) 
         : "rcx", "r11", "memory");
-    chk_return(fd);
+    return chk_return(fd);
   }
   // __NR_stat=4
   inline int stat(const char* pathname, struct stat_t* statbuf)
@@ -121,7 +125,7 @@ namespace sys
         : "=a"(res)
         : "a"(4), "D"(pathname), "S"(statbuf)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR__ lseek = 8
   // inline int lseek(fd_t fd, off_t offset, unsigned origin)
@@ -138,7 +142,7 @@ namespace sys
         : "=a"(res)
         : "0"(8), "D"(fd), "S"(off), "d"(origin)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
 
 
@@ -191,7 +195,7 @@ namespace sys
                "g"(long(off))
              : "r11", "rcx", "memory", "r10", "r8", "r9");
 
-    chk_return2(res, char*);
+    return (char*)chk_return(res);
   }
   // __NR_sigaction = 13
   inline int rt_sigaction(int sig, sigaction_p act, sigaction_p oact)
@@ -205,7 +209,7 @@ namespace sys
         : "0"(13), "D"(sig), "S"(act), "d"(oact), "g"(sizeof(sigset_t))
         : "r11", "rcx", "memory");
 
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR_sigprocmask=14
   inline int rt_sigprocmask(int how, sigset_p nset, sigset_p oset)
@@ -217,26 +221,39 @@ namespace sys
         : "0"(14), "D"(how), "S"(nset), "d"(oset), "g"(sizeof(sigset_t))
         : "r11", "rcx", "memory");
 
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR_sigreturn=15
-  inline void rt_sigreturn()
+  inline long rt_sigreturn()
   {
-    int res= -1;
-    asm("syscall\n" : "=a"(res) : "0"(15) : "rcx", "r11", "memory");
-    if(res < 0)
-      set_errno(res);
+    errno=ENOSPC;
+    return -1;
+//       int res= -1;
+//       asm("syscall\n" : "=a"(res) : "0"(15) : "rcx", "r11", "memory");
+//       if(res < 0)
+//         errno=res;
+  }
+  inline long ioctl( uint32_t fd, uint32_t cmd, uint64_t arg ) AIL;
+  // __NR__ ioctl = 16
+  //
+  inline long ioctl( uint32_t fd, uint32_t cmd, uint64_t arg ) {
+    long res;
+    asm("syscall\n"
+        : "=a"(res)
+        : "a"(1), "D"(fd), "S"(cmd), "d"(arg)
+        : "rcx", "r11", "memory");
+    return chk_return(res);
   }
   // __NR__ pipe = 22 
 
-  inline int pipe(fd_p fds)
+  inline int pipe(fd_t (&fds)[2])
   {
     time_t res= -1;
     asm("syscall\n"
         : "=a"(res)
         : "a"(22), "D"(fds)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   //     }
   //     inline char *mmap(
@@ -259,7 +276,7 @@ namespace sys
              : "0"(23), "D"(n), "S"(inp), "d"(outp), "g"(exp), "g"(tvp)
              : "rcx", "memory", "r8", "r9");
 
-    chk_return(res);
+    return chk_return(res);
   }
 
   // __NR_dup = 32
@@ -270,7 +287,7 @@ namespace sys
         : "=a"(res)
         : "0"(32), "D"(fd)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
 
   // __NR_dup = 33
@@ -281,7 +298,7 @@ namespace sys
         : "=a"(res)
         : "a"(33), "D"(ofd), "S"(nfd)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR_nanosleep = 35
   inline int nanosleep(timespec_p rqtp, timespec_p rmtp)
@@ -291,7 +308,7 @@ namespace sys
         : "=a"(res)
         : "0"(35), "D"(rqtp), "S"(rmtp)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
 
   inline int sleep(time_t secs)
@@ -307,7 +324,7 @@ namespace sys
         : "=a"(res)
         : "0"(35), "D"(&rqtp), "S"(&rmtp)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR_alarm = 37
   inline int alarm(unsigned long delay)
@@ -317,21 +334,21 @@ namespace sys
         : "=a"(res)
         : "0"(37), "D"(delay)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR_getpid = 39
   inline int getpid()
   {
     int res= -1;
     asm("syscall\n" : "=a"(res) : "0"(39) : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR__ fork = 57 
   inline int fork()
   {
     int res= -1;
     asm("syscall\n" : "=a"(res) : "0"(57) : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NO__ execve = 59
   inline int execve(const char * fn, char *const * argv, char *const * envp)
@@ -341,7 +358,7 @@ namespace sys
         : "=a"(res)
         : "a"(59), "D"(fn), "S"(argv), "d"(envp)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
 
   }
   // __NR_exit = 60
@@ -368,7 +385,7 @@ namespace sys
              : "0"(61), "D"(upid), "S"(stat_p), "d"(opt), "g"(ru)
              : "rcx", "memory", "r8", "r9");
 
-    chk_return(res);
+    return chk_return(res);
   }
   inline int waitpid(pid_t pid, int32_p wstat, int opt)
   {
@@ -387,7 +404,7 @@ namespace sys
         : "=a"(res)
         : "0"(62), "D"(pid), "S"(sig)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
 
   // __NR__ uname = 63 
@@ -399,7 +416,7 @@ namespace sys
         : "=a"(res)
         : "a"(63), "D"(name)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
 
   // __NR__ rename = 82
@@ -410,7 +427,7 @@ namespace sys
         : "=a"(res)
         : "0"(82), "D"(oldname), "S"(newname)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   //#define __NR_time 201
   inline time_t time(time_t* buf)
@@ -420,7 +437,7 @@ namespace sys
         : "=a"(res)
         : "a"(201), "D"(buf)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR_getdents = 217
   inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len)
@@ -430,7 +447,7 @@ namespace sys
         : "=a"(res)
         : "a"(217), "D"(fd), "S"(buf), "d"(len)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR__ pipe2 = 293 
 
@@ -441,7 +458,7 @@ namespace sys
         : "=a"(res)
         : "0"(293), "D"(fds), "S"(flags)
         : "rcx", "r11", "memory");
-    chk_return(res);
+    return chk_return(res);
   }
   // __NR__ utimensat = 280 
 //   //     inline int wait4(pid_t upid, int32_p stat_p, int opt, rusage_p ru)
@@ -457,7 +474,7 @@ namespace sys
              : "0"(280), "D"(dfd), "S"(filename), "d"(utimes), "g"(flags)
              : "rcx", "memory", "r8", "r9");
 
-    chk_return(res);
+    return chk_return(res);
   }
 } // namespace sys
 
@@ -484,7 +501,6 @@ namespace sys
       ++end;
     return sys_write(fd, buf, end - buf);
   }
-
   inline ssize_t full_write(int fd, const char* const beg, size_t len)
     AIL;
   inline const char* full_write(int               fd,
