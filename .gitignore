@@ -20,3 +20,5 @@ arc
 *.d
 *.dd
 
+*.i
+git
