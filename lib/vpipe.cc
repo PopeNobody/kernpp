@@ -1,3 +1,7 @@
+namespace vpipe {
+void setup_term_and_pty(bool use_vt) {
+}
+}
 //   #include <vpipe.hxx>
 //   #include <vterm.hxx>
 //   #include <calls.hxx>
@@ -68,7 +72,6 @@
 //     execve(argv[0],argv,envp);
 //     pexit("execve");
 //   }
-void setup_term_and_pty(bool use_vt) {
 //     dprintf(2,"%s\n",__PRETTY_FUNCTION__);
 //     if(isatty(0)) {
 //       forkex("/bin/stty","sane");
@@ -100,7 +103,7 @@ void setup_term_and_pty(bool use_vt) {
 //       dprintf(2,"\rrows: %d cols: %d\n", rows, cols);
 //       vterm = vterm_new(rows,cols);
 //     }
-}
+//   }
 //   int skip;
 //   void x::vpipe(void (*cb)()) {
 //     dprintf(2,"%s\n",__PRETTY_FUNCTION__);
