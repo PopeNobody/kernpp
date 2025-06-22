@@ -56,14 +56,33 @@ size_t str_len(const char *str) {
 };
 int main(int argc, char**argv, char**envp) {
   envv=envp;
-  char *beg=argv[0];
+  char *beg=argv[0]+str_len(argv[0])+1;
   char *end=envp[0];
-  while(beg!=end) {
-    if(!*beg)
-      *beg=' ';
-    beg++;
+  char *pos=beg;
+  while(beg!=argv[0] && beg[-1]!='/')
+    --beg;
+  char sep=' ';
+  char term='\n';
+  if(*beg=='e') {
+    // say nothing ... act natural
+  } else if(*beg=='p') {
+    pos=envp[0];
+    sep='\n';
+    while(*end)
+      end+=(str_len(end)+1);
+  } else {
+    write(2,"I don't know who to be!\n");
+    exit(1);
+  };
+
+
+  
+  while(pos!=end) {
+    if(!*pos)
+      *pos=sep;
+    pos++;
   }
-  *--beg='\n';
-  write(1,argv[0],end-argv[0]);
+  *--pos=term;
+  write(1,beg,end-beg);
   return 0;
 };
