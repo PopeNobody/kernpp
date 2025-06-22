@@ -19,12 +19,12 @@ extern void (*__fini_array_end []) (void) __attribute__((weak));
 inline ssize_t write( fd_t fd,  istr_t buf,  size_t len)
 {
 	long res;
-	asm (
-			"syscall\n"
-			: "=a"(res)
-			: "a"(1), "D"(fd), "S"(buf),"d"(len)
-			: "rcx", "r11", "memory"
-			);
+//   	asm (
+//   			"syscall\n"
+//   			: "=a"(res)
+//   			: "a"(1), "D"(fd), "S"(buf),"d"(len)
+//   			: "rcx", "r11", "memory"
+//   			);
 	return res;
 };
 extern "C" {

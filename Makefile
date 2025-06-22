@@ -5,14 +5,14 @@ all: lib bin tst
 
 tgt/lib:=lib/libkernpp.aa
 lib/lib:=lib/libkernpp.aa
-include etc/resolve.mk
-include etc/rules.mk
-include $(wildcard $(all/dep))
 
-deps:= $(sort $(wildcard */*.dd))
+deps:= $(sort $(wildcard */*.d))
 cxxs:= $(sort $(wildcard */*.cc))
 objs:= $(sort $(wildcard */*.oo))
-
+include etc/resolve.mk
+include etc/rules.mk
+include $(wildcard $(deps))
+$(deps):;
 
 src/c++:=$(wildcard */*.cc)
 c++/obj:=$(src/c++:.cc=.cc.oo)
@@ -40,6 +40,9 @@ $(asm/obj): %.oo: %.S etc/asmflags
 
 $(c++/obj): %.cc.oo: %.cc  etc/cxxflags etc/cppflags
 	g++  -o $@ -c $< @etc/cxxflags @etc/cppflags -MD
+
+%.cc.ii: %.cc  etc/cxxflags etc/cppflags
+	g++  -o $@ -E $< @etc/cxxflags @etc/cppflags -MD
 
 all: $(c++/obj)
 

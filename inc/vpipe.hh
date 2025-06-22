@@ -2,4 +2,6 @@
 
 namespace vpipe {
   void setup_term_and_pty(bool);
+  int get_term_size(fd_t fd, uint16_t &rows, uint16_t &cols);
+  int set_term_size(fd_t fd, uint16_t rows, uint16_t cols);
 };

@@ -22,31 +22,6 @@ static fd_t run_xxd() {
   execve(argv[0],(char*const*)argv,envv);
   pexit(3,"exec:xxd");
 };
-struct buf_t {
-  char buf[61];
-  char nul[1];
-  char off;
-  void format(unsigned long val, int base, bool neg) {
-    nul[0]=0;
-    off=(nul-buf);
-    do {
-      buf[--off]=digits[val%base];
-      val/=base;
-    } while(val);
-  };
-  buf_t(unsigned long val,int base=10,bool neg=false)
-    {
-      format(val,base,neg);
-    };
-  buf_t(unsigned long val,bool neg=false)
-    {
-      format(val,10,neg);
-    };
-  operator c_str() const {
-    return c_str(buf+off,nul-buf-off);
-  };
-  static constexpr const char digits[]="0123456789abcdef";
-};
 
 size_t str_len(const char *str) {
   const char *pos=str;

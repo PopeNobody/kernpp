@@ -5,6 +5,10 @@
 #include <dbg.hh>
 #include <cmp.hh>
 #include <itr.hh>
+class c_str;
+namespace sys {
+  ssize_t write(fd_t, const c_str &);
+};
 class c_str {
   struct body_t {
     char *beg;
@@ -122,7 +126,7 @@ class c_str {
   friend auto operator==(const c_str &lhs, const c_str &rhs){
     return cmp(lhs,rhs)==(0<=>0);
   };
-  friend ssize_t write(fd_t fd, const c_str &str);
+  friend ssize_t sys::write(fd_t fd, const c_str &str);
 };
 
 
