@@ -37,11 +37,11 @@ typedef void* void_p;
 
 struct iocb;
 typedef long int __fd_mask;
-struct fd_set
+struct fdset_t
 {
   __fd_mask fds_bits[1024 / (8 * (int) sizeof (__fd_mask))];
 };
-typedef fd_set* fd_set_p;
+typedef fdset_t* fdset_p;
 struct sigaction_t {
 	void (*sa_handler) (int);
 	unsigned long sa_flags;

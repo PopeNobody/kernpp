@@ -1,7 +1,8 @@
 #include "syscall.hh"
 #include "vpipe.hh"
 constexpr static int TCGETS=0x5401;
-constexpr static int TCSETS=0x5302;
+constexpr static int TCSETS=0x5402;
+constexpr static int TCSETSW=0x5403;
 constexpr static int TIOCGWINSZ=0x5413;
 constexpr static int TIOCSWINSZ=0x5414;
 
@@ -29,7 +30,7 @@ union trans_t {
   uint32_t uints[32];
   struct termios data;
 };
-trans_t cooked = {
+trans_t sane = {
   { 
     0x0045, 0x0000, 0x0500, 0x0000, 0xbf00, 0x0000, 0x3b8a, 0x0000,
     0x0003, 0x1c7f, 0x1504, 0x0001, 0x0011, 0x131a, 0x0012, 0x0f17,
@@ -38,8 +39,8 @@ trans_t cooked = {
   }
 };
 
-int term_set_cooked(int fd) {
-  return sys::ioctl(fd,TCSETS,(uint64_t)&cooked.data);
+int vpipe::term_set_sane(fd_t fd) {
+  return sys::ioctl(fd,TCSETSW,(uint64_t)&sane.data);
 };
 trans_t raw = {
   {
@@ -49,7 +50,7 @@ trans_t raw = {
     0x0000, 0x0000, 0x0f00, 0x0000, 0x0f00, 0x0000, 
   }
 };
-int term_set_raw(int fd) {
+int vpipe::term_set_raw(fd_t fd) {
   return sys::ioctl(fd,TCSETS,(uint64_t)&raw.data);
 };
 //   RAW:
@@ -72,6 +73,17 @@ int vpipe::get_term_size(fd_t fd, uint16_t &ws_row, uint16_t &ws_col){
   ws_row=winsize.ws_row;
   ws_col=winsize.ws_col;
   return res;
+};
+int vpipe::isatty(fd_t fd) {
+  uint16_t r,c;
+  if(get_term_size(fd,r,c)){
+    using sys::errno;
+    if(errno!=EBADF)
+      errno=ENOTTY;
+    return 0;
+  } else {
+    return 1;
+  };
 };
 int vpipe::set_term_size(fd_t fd, uint16_t ws_row, uint16_t ws_col){
   winsize.ws_row=ws_row;

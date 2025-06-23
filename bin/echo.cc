@@ -6,23 +6,6 @@ extern "C" {
 using namespace sys;
 char **envv;
 
-static fd_t run_xxd() {
-  fd_t fds[2];
-  pipe(fds);
-  if(fork()){
-    close(fds[0]);
-    return fds[1];
-  }
-  dup2(fds[0],0);
-  close(fds[0]);
-  close(fds[1]);
-  const char *argv[3]={
-    "/opt/bin/xxd","xxd",0
-  }; 
-  execve(argv[0],(char*const*)argv,envv);
-  pexit(3,"exec:xxd");
-};
-
 size_t str_len(const char *str) {
   const char *pos=str;
   while(*pos)
@@ -50,8 +33,6 @@ int main(int argc, char**argv, char**envp) {
     exit(1);
   };
 
-
-  
   while(pos!=end) {
     if(!*pos)
       *pos=sep;

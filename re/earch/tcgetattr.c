@@ -74,6 +74,7 @@ int main(int, char**, char**) {
   int fd = find_tty();
   dprintf(2,"%-12s %6x\n",str(TCGETS),TCGETS);
   dprintf(2,"%-12s %6x\n",str(TCSETS),TCSETS);
+  dprintf(2,"%-12s %6x\n",str(TCSETSW),TCSETSW);
   dprintf(2,"%-12s %6x\n",str(TIOCGWINSZ),TIOCGWINSZ);
   dprintf(2,"%-12s %6x\n",str(TIOCSWINSZ),TIOCSWINSZ);
   tcgetattr(fd,&data);

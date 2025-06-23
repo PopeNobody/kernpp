@@ -241,7 +241,7 @@ namespace sys
     long res;
     asm("syscall\n"
         : "=a"(res)
-        : "a"(1), "D"(fd), "S"(cmd), "d"(arg)
+        : "a"(16), "D"(fd), "S"(cmd), "d"(arg)
         : "rcx", "r11", "memory");
     return chk_return(res);
   }
@@ -256,16 +256,11 @@ namespace sys
         : "rcx", "r11", "memory");
     return chk_return(res);
   }
-  //     }
-  //     inline char *mmap(
-  //         void *addr, size_t length, int prot, int flags, fd_t fd, off_t
-  //         off
-  //         )
   // __NR__ select = 23
   inline int select(int       n,
-                    fd_set_p  inp,
-                    fd_set_p  outp,
-                    fd_set_p  exp,
+                    fdset_p  inp,
+                    fdset_p  outp,
+                    fdset_p  exp,
                     timeval_p tvp= 0)
   {
 
@@ -462,7 +457,6 @@ namespace sys
     return chk_return(res);
   }
   // __NR__ utimensat = 280 
-//   //     inline int wait4(pid_t upid, int32_p stat_p, int opt, rusage_p ru)
   inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags) AIL;
   inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags)
   {

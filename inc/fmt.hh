@@ -24,10 +24,19 @@ namespace fmt {
         buf[--off]=digits[val%base];
         val/=base;
       } while(val);
+      if(neg)
+        buf[--off]='-';
     };
     fmt_t(uint64_t val,int base)
     {
       format(val,base,false);
+    };
+    fmt_t(int32_t val, int base)
+    {
+      if(val<0)
+        format(-val,base,true);
+      else
+        format(val,base,false);
     };
     fmt_t(uint64_t val,bool neg)
     {
@@ -38,6 +47,8 @@ namespace fmt {
       format(val,10,false);
     };
     fmt_t(const timeval &rhs);
+    fmt_t(const timespec &rhs);
+    fmt_t(const fdset_t &rhs);
     operator c_str() const {
       return c_str(buf+off,nul-buf-off);
     };

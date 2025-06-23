@@ -15,6 +15,7 @@ uint64_t atoi(const char *pos){
   while(*pos>='0' && *pos<='9') {
     res*=10;
     res+=(*pos-'0');
+    ++pos;
   };
   return res;
 };
