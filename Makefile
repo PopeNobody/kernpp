@@ -26,7 +26,7 @@ src/asm:=$(wildcard */*.S)
 asm/obj:=$(src/asm:.S=.oo)
 asm/lib:=$(filter lib/%,$(asm/obj))
 
-
+obj: $(c++/obj)
 lib: $(lib/lib)
 
 $(lib/lib): $(asm/lib) $(c++/lib)
@@ -40,16 +40,16 @@ $(asm/obj): %.oo: %.S etc/asmflags
 
 
 $(c++/obj): %.cc.oo: %.cc  etc/cxxflags etc/cppflags
-	$(CXX)  -o $@ -c $< @etc/cxxflags @etc/cppflags -MD
+	$(CXX)  -o $@ -c $< @etc/cxxflags @etc/cppflags
 
 %.cc.ii: %.cc  etc/cxxflags etc/cppflags
-	$(CXX)  -o $@ -E $< @etc/cxxflags @etc/cppflags -MD
+	$(CXX)  -o $@ -E $< @etc/cxxflags @etc/cppflags
 
 all: $(c++/obj)
 
 
 $(c++/exe): %: %.cc.oo etc/ld_flags lib
-	$(CXX) -o $@ $< $(lib/lib) @etc/ld_flags
+	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) @etc/ld_flags -Wl,--end-group
 
 
 /dev/null:;
