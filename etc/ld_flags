@@ -8,3 +8,6 @@
 -nostartfiles
 -nostdlib
 -static
+-v
+-Wl,--verbose
+-Wl,--print-map

@@ -20,12 +20,13 @@ int touch(const char *path){
   
   return 0;  
 };
-int main(int argc, char**argv,char**envp) 
-{
-  int ch, longidx;
-  for(int i=1;i<argc;i++)
-    touch(argv[i]);
-  return 0;
-};
+extern "C" {
+  int main(int argc, char**argv,char**envp) 
+  {
+    int ch, longidx;
+    for(int i=1;i<argc;i++)
+      touch(argv[i]);
+    return 0;
+  };
 
-
+}

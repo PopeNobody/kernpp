@@ -550,3 +550,6 @@ namespace std
 #define _GLIBCXX_NOTHROW
 #endif
 #endif
+extern "C" {
+  int main(int, char **, char **);
+};

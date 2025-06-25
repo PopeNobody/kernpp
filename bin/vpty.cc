@@ -3,7 +3,7 @@
 #include <fmt.hh>
 using namespace sys;
 using vpipe::setup_term_and_pty;
-int main(int argc, char **argv)
+int main(int argc, char **argv, char**envp)
 {
 //     setup_term_and_pty(false);
 
