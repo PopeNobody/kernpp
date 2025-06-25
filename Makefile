@@ -1,8 +1,9 @@
 MAKEFLAGS+= -rR -j1
 #export override PATH:=$(PWD)/sbin:$(PATH)
+DISTCC_HOSTS:=localhost/1 10.1.3.102/24
 SHELL:=/bin/bash -xe
 all: lib bin tst
-
+CXX:=$(HOME)/bin/dist-clang++
 tgt/lib:=lib/libkernpp.aa
 lib/lib:=lib/libkernpp.aa
 
@@ -39,16 +40,16 @@ $(asm/obj): %.oo: %.S etc/asmflags
 
 
 $(c++/obj): %.cc.oo: %.cc  etc/cxxflags etc/cppflags
-	g++  -o $@ -c $< @etc/cxxflags @etc/cppflags -MD
+	$(CXX)  -o $@ -c $< @etc/cxxflags @etc/cppflags -MD
 
 %.cc.ii: %.cc  etc/cxxflags etc/cppflags
-	g++  -o $@ -E $< @etc/cxxflags @etc/cppflags -MD
+	$(CXX)  -o $@ -E $< @etc/cxxflags @etc/cppflags -MD
 
 all: $(c++/obj)
 
 
 $(c++/exe): %: %.cc.oo etc/ld_flags lib
-	g++ -o $@ $< $(lib/lib) @etc/ld_flags
+	$(CXX) -o $@ $< $(lib/lib) @etc/ld_flags
 
 
 /dev/null:;
@@ -56,7 +57,9 @@ $(c++/exe): %: %.cc.oo etc/ld_flags lib
 Makefile:;
 
 clean:
-	rm -f $(tgt/all)
+	rm -f $(c++/exe) $(asm/exe) $(lnk/exe)
+	rm -f $(c++/obj) $(asm/obj)
 
 all: $(tgt/all)
 	@echo made all
+	@printf '%s\n' $(bin/exe) | sort bin/.gitignore -u -o bin/.gitignore -

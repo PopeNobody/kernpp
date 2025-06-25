@@ -5,7 +5,6 @@
 -fno-stack-protector
 -ggdb3
 -nodefaultlibs
--nolibc
 -nostartfiles
 -nostdlib
 -static

@@ -8,7 +8,7 @@ int main(int, char**){
     pexit(3,"open:.");
   ssize_t size;
   char buf[16*1024];
-  while(size=getdents(fd,(linux_dirent64*)buf,sizeof(buf))){
+  while((size=getdents(fd,(linux_dirent64*)buf,sizeof(buf)))>0){
     if(size<0)
       pexit(1,"getdents");
 

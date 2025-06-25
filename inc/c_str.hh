@@ -44,7 +44,7 @@ class c_str {
   };
   template<size_t n>
     c_str(char(b)[n], bool i)
-    :body(b,b+n-i?0:1)
+    :body(b,b+n-(i?0:1))
     {
     }
   c_str(const c_str &lhs)

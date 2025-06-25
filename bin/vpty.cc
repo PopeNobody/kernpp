@@ -1,11 +1,35 @@
 #include "syscall.hh"
 #include "vpipe.hh"
+#include <fmt.hh>
 using namespace sys;
 using vpipe::setup_term_and_pty;
 int main(int argc, char **argv)
 {
-  setup_term_and_pty(false);
+//     setup_term_and_pty(false);
 
+  const int TIOCGPTPEER = 0x5441;
+  const char mname[]="/dev/pts/ptmx";
+  const char sname[]="             ";
+  int mpty=open(mname,o_rdwr);
+  int opty=-1;
+  int spty=ioctl(mpty,TIOCGPTPEER,(uint64_t)&opty);
+
+  using fmt::fmt_t;
+  write(1,"mpty: ");
+  write(1,fmt_t(mpty));
+  write(1,"opty: ");
+  write(1,fmt_t(opty));
+  write(1,"spty: ");
+  write(1,fmt_t(spty));
+  for(int i=0;i<sizeof(mname);i++){
+    write(opty,mname+i,1);
+    read(mpty,(char*)&sname[i],1);
+  };
+//     for(int i=0;i<sizeof(mname);i++){
+//       write(opty,mname+i,1);
+//       int j=read(mpty,(char*)sname+i,1);
+//       write(0,sname,i);
+//     }
   return 0;
 };
 
