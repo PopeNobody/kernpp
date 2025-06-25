@@ -1,0 +1,12 @@
+-Iinc
+-O0
+-ffreestanding
+-fno-exceptions
+-fno-stack-protector
+-g
+-ggdb3
+-nodefaultlibs
+-nostdinc
+-nostdinc++
+-static
+-std=c++20
