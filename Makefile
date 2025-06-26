@@ -23,7 +23,7 @@ c++/lib:=$(filter lib/%,$(c++/obj))
 all: $(c++/exe) $(asm/exe) $(lib/lib)
 
 src/asm:=$(wildcard */*.S)
-asm/obj:=$(src/asm:.S=.oo)
+asm/obj:=$(src/asm:.S=.S.oo)
 asm/lib:=$(filter lib/%,$(asm/obj))
 
 obj: $(c++/obj)
@@ -35,14 +35,14 @@ $(lib/lib): $(asm/lib) $(c++/lib)
 
 all/obj:= $(c++/obj) $(asm/obj)
 
-$(asm/obj): %.oo: %.S etc/asmflags
+$(asm/obj): %.S.oo: %.S etc/asmflags
 	as -o $@ $< @etc/asmflags
 
 
 $(c++/obj): %.cc.oo: %.cc  etc/cxxflags etc/cppflags
 	$(CXX)  -o $@ -c $< @etc/cxxflags @etc/cppflags
 
-%.cc.ii: %.cc  etc/cxxflags etc/cppflags
+$(c++/cpp): %.cc.ii: %.cc  etc/cxxflags etc/cppflags
 	$(CXX)  -o $@ -E $< @etc/cxxflags @etc/cppflags
 
 all: $(c++/obj)
