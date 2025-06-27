@@ -1,9 +1,8 @@
 MAKEFLAGS+= -rR -j1
 #export override PATH:=$(PWD)/sbin:$(PATH)
-DISTCC_HOSTS:=localhost/1 10.1.3.102/24
-SHELL:=/bin/bash -xe
+SHELL:=/bin/bash -e
 all: lib bin tst
-CXX:=$(HOME)/bin/dist-clang++
+CXX:=/opt/bin/clang++
 tgt/lib:=lib/libkernpp.aa
 lib/lib:=lib/libkernpp.aa
 
@@ -18,6 +17,7 @@ $(deps):;
 src/c++:=$(wildcard */*.cc)
 c++/obj:=$(src/c++:.cc=.cc.oo)
 c++/exe:=$(filter bin/%,$(c++/obj:.cc.oo=))
+c++/tst:=$(filter tst/%,$(c++/obj:.cc.oo=))
 c++/lib:=$(filter lib/%,$(c++/obj))
 
 all: $(c++/exe) $(asm/exe) $(lib/lib)
@@ -25,6 +25,12 @@ all: $(c++/exe) $(asm/exe) $(lib/lib)
 src/asm:=$(wildcard */*.S)
 asm/obj:=$(src/asm:.S=.S.oo)
 asm/lib:=$(filter lib/%,$(asm/obj))
+
+c++/obj: $(c++/obj)
+
+asm/obj: $(asm/obj)
+
+tst/obj: $(tst/obj)
 
 obj: $(c++/obj)
 lib: $(lib/lib)
@@ -35,21 +41,20 @@ $(lib/lib): $(asm/lib) $(c++/lib)
 
 all/obj:= $(c++/obj) $(asm/obj)
 
-$(asm/obj): %.S.oo: %.S etc/asmflags
-	as -o $@ $< @etc/asmflags
+all/exe:=$(c++/exe) $(c++/tst) $(asm/exe)
 
+all: $(all/exe)
 
-$(c++/obj): %.cc.oo: %.cc  etc/cxxflags etc/cppflags
-	$(CXX)  -o $@ -c $< @etc/cxxflags @etc/cppflags
+#    include etc/one-step.mk
+include etc/multi.mk
 
-$(c++/cpp): %.cc.ii: %.cc  etc/cxxflags etc/cppflags
-	$(CXX)  -o $@ -E $< @etc/cxxflags @etc/cppflags
+bin/_start: lib/lib:=
 
-all: $(c++/obj)
-
+$(c++/tst): %: %.cc.oo etc/ld_flags lib
+	$(CXX) -o $@ $< -Wl,--start-group $(lib/lib) @etc/ld_flags -Wl,--end-group
 
 $(c++/exe): %: %.cc.oo etc/ld_flags lib
-	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) @etc/ld_flags -Wl,--end-group
+	$(CXX) -o $@ $< -Wl,--start-group $(lib/lib) @etc/ld_flags -Wl,--end-group
 
 
 /dev/null:;
@@ -59,7 +64,7 @@ Makefile:;
 clean:
 	rm -f $(c++/exe) $(asm/exe) $(lnk/exe)
 	rm -f $(c++/obj) $(asm/obj)
-
-all: $(tgt/all)
-	@echo made all
-	@printf '%s\n' $(bin/exe) | sort bin/.gitignore -u -o bin/.gitignore -
+$(warning $(all/exe))
+all: $(all/exe) $(tgt/all)
+	echo made all
+	printf '%s\n' $(all/exe) | sort .gitignore -u -o .gitignore -

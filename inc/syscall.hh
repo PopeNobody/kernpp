@@ -13,6 +13,7 @@ namespace sys
   {
     o_default= 0664
   };
+  // these are octal, not hex, dont panic
   enum open_flags
   {
     o_rdonly   = 0000,
@@ -535,6 +536,7 @@ namespace std
   extern const nothrow_t nothrow;
   typedef void (*new_handler)();
 }
+
 
 #include "attrs.hh"
 #define _GLIBCXX_NOEXCEPT noexcept

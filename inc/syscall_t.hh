@@ -1,5 +1,6 @@
 // syscall_t.hpp - Struct-based advanced syscall abstraction for your t++ system
 
+#define SYSCALL_T_HPP
 #ifndef SYSCALL_T_HPP
 #define SYSCALL_T_HPP
 
