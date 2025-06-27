@@ -1,3 +1,4 @@
+extern "C" { int main(int argc,char *const*argv,char *const*envp); };
 #include "syscall.hh"
 #include "vpipe.hh"
 #include "fmt.hh"
@@ -19,7 +20,7 @@ uint64_t atoi(const char *pos){
   };
   return res;
 };
-int main(int argc, char**argv, char**envp){
+ int main(int argc,char *const*argv,char *const*envp) {
   uint16_t rows;
   uint16_t cols;
   if(argc==1) {

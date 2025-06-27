@@ -15,17 +15,29 @@ namespace sys {
     c_str text=fmt;
     return write(fd, text.beg(), text.len());
   };
+  struct set_bool {
+    bool &val;
+    set_bool(bool &val)
+      : val(val)
+    {
+      val=true;
+    }
+    ~set_bool()
+    {
+      val=false;
+    };
+  };
   ssize_t set_errno(ssize_t err)
   {
     if(err>=0)
       return err;
     {
+      static bool recurse=false;
+      if(recurse)
+        return -1;
+      set_bool setter(recurse);
       sys::write(2,"setting error to: ");
       sys::write(2,fmt::fmt_t(err));
-//         buf_ns::buf_t<80> buf(2);
-      // XXX why is 11 a special case?
-      if(err!=11)
-        write(2,"setting error to=",err);
     };
     errno=-err;
     return -1;

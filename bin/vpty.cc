@@ -1,3 +1,4 @@
+extern "C" { int main(int argc,char *const*argv,char *const*envp); };
 #include "syscall.hh"
 #include "vpipe.hh"
 #include <fmt.hh>
@@ -7,11 +8,7 @@ const int TIOCGPTPEER = 0x5441;
 const int  TIOCSPTLCK = 0x40045431;
 using fmt::fmt_t;
 
-extern "C" {
-int main(int argc, const char **argv, const char**envp);
-}
-int main(int argc, const char **argv, const char**envp)
-{
+int main(int argc,char *const*argv,char *const*envp) {
   const char mname[]="/dev/pts/ptmx";
   const char sname[]="             ";
   fd_t opty,mpty,spty;

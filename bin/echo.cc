@@ -1,8 +1,6 @@
-#include <syscall.hh>
+extern "C" { int main(int argc,char *const*argv,char *const*envp); };
+#include "syscall.hh"
 
-extern "C" {
-  int main(int argc, char**argv, char**envp);
-};
 using namespace sys;
 char **envv;
 
@@ -12,11 +10,11 @@ size_t str_len(const char *str) {
     ++pos;
   return pos-str;
 };
-int main(int argc, char**argv, char**envp) {
-  envv=envp;
-  char *beg=argv[0]+str_len(argv[0])+1;
-  char *end=envp[0];
-  char *pos=beg;
+ int main(int argc,char *const*argv,char *const*envp) {
+  envv=(char**)envp;
+  const char *beg=argv[0]+str_len(argv[0])+1;
+  const char *end=envp[0];
+  char *pos=(char*)beg;
   while(beg!=argv[0] && beg[-1]!='/')
     --beg;
   char sep=' ';
@@ -24,7 +22,7 @@ int main(int argc, char**argv, char**envp) {
   if(*beg=='e') {
     // say nothing ... act natural
   } else if(*beg=='p') {
-    pos=envp[0];
+    pos=(char*)envp[0];
     sep='\n';
     while(*end)
       end+=(str_len(end)+1);

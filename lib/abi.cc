@@ -16,4 +16,10 @@ extern "C" {
   {
   };
   void * __dso_handle=(void*)&__dso_handle;
+  void *memset(void *i, unsigned char v, size_t num){
+    char *p((char*)i);
+    for(size_t i=0;i<num;i++)
+      p[i]=v;
+    return i;
+  };
 }

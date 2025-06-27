@@ -26,13 +26,13 @@ int __kernpp_main_adapter(int argc, char **argv, char **envp) {
 
 // Weak aliases for all valid C main signatures:
 __attribute__((weak, alias("__kernpp_main_adapter")))
-int main(void);
+ int main(int argc,char *const*argv,char *const*envp) ;
 
 __attribute__((weak, alias("__kernpp_main_adapter")))
-int main(int, char **);
+ int main(int argc,char *const*argv,char *const*envp) ;
 
 __attribute__((weak, alias("__kernpp_main_adapter")))
-int main(int, char **, char **);
+ int main(int argc,char *const*argv,char *const*envp) ;
 
 // Your freestanding _start implementation
 void _start(void) {

@@ -1,3 +1,4 @@
+extern "C" { int main(int argc,char *const*argv,char *const*envp); };
 #include "syscall.hh"
 #include "vpipe.hh"
 #include "fmt.hh"
@@ -12,7 +13,7 @@ uint64_t atoi(const char *pos){
   };
   return res;
 };
-int main(int argc, char**argv, char**envp){
+ int main(int argc,char *const*argv,char *const*envp) {
   using namespace vpipe;
   if(isatty(0)){
     dup2(0,1);

@@ -1,6 +1,3 @@
-extern "C" {
-  int main(int argc, char **argv, char **envp);
-};
 #include "syscall.hh"
 #include "c_str.hh"
 
@@ -26,10 +23,12 @@ void cat(const char *file) {
     };
   };
 };
-int main(int argc, char **argv, char **envp) {
-  for(int i=1;i<argc;i++){
-    cat(argv[i]);
+extern "C" {
+ int main(int argc,char *const*argv,char *const*envp) {
+    for(int i=1;i<argc;i++){
+      cat(argv[i]);
+    };
+    return 0;
   };
-  return 0;
-};
+}
 
