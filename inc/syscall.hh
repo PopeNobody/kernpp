@@ -48,16 +48,8 @@ namespace sys
 #define chk_return2(val, cast)                                            \
   (cast)(val < 0 ? set_errno(val) : val)
 #define chk_return(val) (val < 0 ? set_errno(val) : val)
-
 namespace sys
 {
-//     template<typename val_t>
-//       inline val_t chk_return(const val_t &val) {
-//         if(uint64_t(val)>uint64_t(-4095))
-//           sys::errno=int32_t(val&0xffff);
-//         return val;
-//       };
-//     extern "C"
   extern "C"
   {
     inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AIL;
@@ -476,15 +468,15 @@ namespace sys
 namespace sys
 {
 
-  inline ssize_t write(int fd, const char* buf, size_t len) AIL;
-  inline ssize_t write(int fd, const char* buf, const char* end) AIL;
+  inline ssize_t write(fd_t fd, const char* buf, size_t len) AIL;
+  inline ssize_t write(fd_t fd, const char* buf, const char* end) AIL;
   inline ssize_t write(fd_t fd, const char* buf) AIL;
 
-  inline ssize_t write(int fd, const char* buf, size_t len)
+  inline ssize_t write(fd_t fd, const char* buf, size_t len)
   {
     return sys_write(fd, buf, len);
   }
-  inline ssize_t write(int fd, const char* buf, const char* end)
+  inline ssize_t write(fd_t fd, const char* buf, const char* end)
   {
     return sys_write(fd, buf, end - buf);
   }
@@ -496,7 +488,7 @@ namespace sys
       ++end;
     return sys_write(fd, buf, end - buf);
   }
-  inline ssize_t full_write(int fd, const char* const beg, size_t len)
+  inline ssize_t full_write(fd_t fd, const char* const beg, size_t len)
     AIL;
   inline const char* full_write(int               fd,
                                 const char* const beg,
@@ -517,7 +509,7 @@ namespace sys
     }
     return pos;
   }
-  inline ssize_t full_write(int fd, const char* const beg, size_t len)
+  inline ssize_t full_write(fd_t fd, const char* const beg, size_t len)
   {
     return full_write(fd, beg, beg + len) - beg;
   }
@@ -550,6 +542,3 @@ namespace std
 #define _GLIBCXX_NOTHROW
 #endif
 #endif
-extern "C" {
-  int main(int, char **, char **);
-};

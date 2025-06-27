@@ -3,33 +3,42 @@
 #include <fmt.hh>
 using namespace sys;
 using vpipe::setup_term_and_pty;
-int main(int argc, char **argv, char**envp)
-{
-//     setup_term_and_pty(false);
+const int TIOCGPTPEER = 0x5441;
+const int  TIOCSPTLCK = 0x40045431;
+using fmt::fmt_t;
 
-  const int TIOCGPTPEER = 0x5441;
+extern "C" {
+int main(int argc, const char **argv, const char**envp);
+}
+int main(int argc, const char **argv, const char**envp)
+{
   const char mname[]="/dev/pts/ptmx";
   const char sname[]="             ";
-  int mpty=open(mname,o_rdwr);
-  int opty=-1;
-  int spty=ioctl(mpty,TIOCGPTPEER,(uint64_t)&opty);
+  fd_t opty,mpty,spty;
 
-  using fmt::fmt_t;
-  write(1,"mpty: ");
-  write(1,fmt_t(mpty));
-  write(1,"opty: ");
-  write(1,fmt_t(opty));
-  write(1,"spty: ");
-  write(1,fmt_t(spty));
-  for(int i=0;i<sizeof(mname);i++){
-    write(opty,mname+i,1);
-    read(mpty,(char*)&sname[i],1);
-  };
-//     for(int i=0;i<sizeof(mname);i++){
-//       write(opty,mname+i,1);
-//       int j=read(mpty,(char*)sname+i,1);
-//       write(0,sname,i);
-//     }
+  opty=0;
+  mpty=open(mname,o_rdwr|o_noctty|o_cloexec);
+  opty=ioctl(mpty,TIOCSPTLCK,uint64_t(&opty));
+  spty=ioctl(mpty,TIOCGPTPEER,(size_t)opty);
+  fmt_t s_spty(spty);
+  fmt_t s_opty(opty);
+  fmt_t s_mpty(mpty);
+  opty=o_rdwr|o_noctty|o_cloexec;
+  pid_t pid=getpid();
+  if(fork() || fork()){
+    char buf[1];
+    dup2(mpty,getpid()==pid);
+    while(read(0,buf,1)){
+      write(1,buf,1);
+    };
+  } else {
+    dup2(spty,0);
+    dup2(spty,1);
+    dup2(spty,2);
+    char const *args[]={"/bin/bash",0};
+    execve(args[0],(char *const *)args,(char *const*)envp);
+  }
+
   return 0;
 };
 

@@ -194,7 +194,6 @@ typedef int32_t pid_t;
 //   typedef int64_t blksize_t;
 //   typedef int64_t fsword_t;
 //   typedef int64_t intmax_t;
-typedef int errno_t;
 typedef int64_t intptr_t;
 typedef uint64_t uintptr_t;
 typedef int64_t off64_t;

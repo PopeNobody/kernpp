@@ -3,42 +3,49 @@
 
 #include "types.hh"
 
-#define	EPERM		 1	/* Operation not permitted */
-#define	ENOENT		 2	/* No such file or directory */
-#define	ESRCH		 3	/* No such process */
-#define	EINTR		 4	/* Interrupted system call */
-#define	EIO		 5	/* I/O error */
-#define	ENXIO		 6	/* No such device or address */
-#define	E2BIG		 7	/* Argument list too long */
-#define	ENOEXEC		 8	/* Exec format error */
-#define	EBADF		 9	/* Bad file number */
-#define	ECHILD		10	/* No child processes */
-#define	EAGAIN		11	/* Try again */
-#define	ENOMEM		12	/* Out of memory */
-#define	EACCES		13	/* Permission denied */
-#define	EFAULT		14	/* Bad address */
-#define	ENOTBLK		15	/* Block device required */
-#define	EBUSY		16	/* Device or resource busy */
-#define	EEXIST		17	/* File exists */
-#define	EXDEV		18	/* Cross-device link */
-#define	ENODEV		19	/* No such device */
-#define	ENOTDIR		20	/* Not a directory */
-#define	EISDIR		21	/* Is a directory */
-#define	EINVAL		22	/* Invalid argument */
-#define	ENFILE		23	/* File table overflow */
-#define	EMFILE		24	/* Too many open files */
-#define	ENOTTY		25	/* Not a typewriter */
-#define	ETXTBSY		26	/* Text file busy */
-#define	EFBIG		27	/* File too large */
-#define	ENOSPC		28	/* No space left on device */
-#define	ESPIPE		29	/* Illegal seek */
-#define	EROFS		30	/* Read-only file system */
-#define	EMLINK		31	/* Too many links */
-#define	EPIPE		32	/* Broken pipe */
-#define	EDOM		33	/* Math argument out of domain of func */
-#define	ERANGE		34	/* Math result not representable */
+#define ERR_LIST(X) \
+X(  EPERM,    1,   "Operation_not_permitted"              ) \
+X(  ENOENT,   2,   "No_such_file_or_directory"            ) \
+X(  ESRCH,    3,   "No_such_process"                      ) \
+X(  EINTR,    4,   "Interrupted_system_call"              ) \
+X(  EIO,      5,   "I/O_error"                            ) \
+X(  ENXIO,    6,   "No_such_device_or_address"            ) \
+X(  E2BIG,    7,   "Argument_list_too_long"               ) \
+X(  ENOEXEC,  8,   "Exec_format_error"                    ) \
+X(  EBADF,    9,   "Bad_file_number"                      ) \
+X(  ECHILD,   10,  "No_child_processes"                   ) \
+X(  EAGAIN,   11,  "Try_again"                            ) \
+X(  ENOMEM,   12,  "Out_of_memory"                        ) \
+X(  EACCES,   13,  "Permission_denied"                    ) \
+X(  EFAULT,   14,  "Bad_address"                          ) \
+X(  ENOTBLK,  15,  "Block_device_required"                ) \
+X(  EBUSY,    16,  "Device_or_resource_busy"              ) \
+X(  EEXIST,   17,  "File_exists"                          ) \
+X(  EXDEV,    18,  "Cross-device_link"                    ) \
+X(  ENODEV,   19,  "No_such_device"                       ) \
+X(  ENOTDIR,  20,  "Not_a_directory"                      ) \
+X(  EISDIR,   21,  "Is_a_directory"                       ) \
+X(  EINVAL,   22,  "Invalid_argument"                     ) \
+X(  ENFILE,   23,  "File_table_overflow"                  ) \
+X(  EMFILE,   24,  "Too_many_open_files"                  ) \
+X(  ENOTTY,   25,  "Not_a_typewriter"                     ) \
+X(  ETXTBSY,  26,  "Text_file_busy"                       ) \
+X(  EFBIG,    27,  "File_too_large"                       ) \
+X(  ENOSPC,   28,  "No_space_left_on_device"              ) \
+X(  ESPIPE,   29,  "Illegal_seek"                         ) \
+X(  EROFS,    30,  "Read-only_file_system"                ) \
+X(  EMLINK,   31,  "Too_many_links"                       ) \
+X(  EPIPE,    32,  "Broken_pipe"                          ) \
+X(  EDOM,     33,  "Math_argument_out_of_domain_of_func"  ) \
+X(  ERANGE,   34,  "Math_result_not_representable"        )
 
+#define X(s,n,m) s = n, \
 
+enum errno_t {
+ERR_LIST(X)
+};
+#undef X
+#undef ERR_LIST
 struct c_str;
 #include "attrs.hh"
 namespace sys {

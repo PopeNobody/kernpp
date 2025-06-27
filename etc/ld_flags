@@ -1,5 +1,6 @@
 -Llib
 -O0
+-g3
 -ffreestanding
 -fno-exceptions
 -fno-stack-protector
@@ -8,6 +9,3 @@
 -nostartfiles
 -nostdlib
 -static
--v
--Wl,--verbose
--Wl,--print-map
