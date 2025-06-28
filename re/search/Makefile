@@ -22,6 +22,7 @@ xx:= $(oo:.oo=)
 
 xx: $(xx)
 x: $(x)
+.PRECIOUS: %
 
 show= $(warning $(eval $1=$$($1)))
 
@@ -30,11 +31,18 @@ show= $(warning $(eval $1=$$($1)))
 $(o): %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@ -c
 
+%: %.o
+	$(CC) -o $@ $< $(LDFLAGS)
+
+
+%.a: %.oo
+	ar r $@ $<
+
 %.oo: %.cc
 	$(CXX) $(CXXFLAGS) $< -o $@ -c
 
-%: %.oo
-	$(CXX) -o $@ $< $(LDFLAGS)
+%: %.a
+	$(CXX) -o $@ $< $(LDFLAGS) 
 
 
 
