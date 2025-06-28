@@ -1,6 +1,44 @@
-all: tcgetattr
+MAKEFLAGS:= -rR -j20
 
-CFLAGS:=-dMDNIU
+all: tcgetattr isprint
 
-tcgetattr.i: tcgetattr.c
+all:
+#CPPFLAGS:=-dMDNIU
+CFLAGS:= -ggdb3 -g3 -ggdb -O0 
+CXXFLAGS:= $(CFLAGS) -std=c++23
+CC:=clang
+CXX:= clang++
+
+c:= $(wildcard *.c)
+cc:= $(wildcard *.cc)
+
+o:= $(c:.c=.o)
+oo:=$(cc:.cc=.oo)
+
+rvalue-ref: rvalue-ref.oo
+
+x:= $(o:.o=)
+xx:= $(oo:.oo=)
+
+xx: $(xx)
+x: $(x)
+
+show= $(warning $(eval $1=$$($1)))
+
+# $(warning $(xx) $(oo) $(cc) )
+
+$(o): %.o: %.c
+	$(CC) $(CFLAGS) $< -o $@ -c
+
+%.oo: %.cc
+	$(CXX) $(CXXFLAGS) $< -o $@ -c
+
+%: %.oo
+	$(CXX) -o $@ $< $(LDFLAGS)
+
+
+
+%.i: %.c
 	$(CC) -E -o $@ $< $(CFLAGS)
+
+all: $(x) $(xx)

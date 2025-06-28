@@ -98,7 +98,7 @@ void pty() {
   dprintf(2,"sfd: %d\n", sfd);
 
 };
-int main(int, char**, char**) {
+int main(int argc, char**argv, char**envp) {
   int fd = find_tty();
   dprintf(2,"%-12s %16x\n",str(TIOCGPTPEER), TIOCGPTPEER);
   dprintf(2,"%-12s %16x\n",str(TCGETS),TCGETS);
