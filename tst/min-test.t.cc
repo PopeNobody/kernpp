@@ -5,7 +5,7 @@
 //#include <concepts>
 
 // Base case for two arguments with constraint
-#include "tmplate_glue.hh"
+#include "template-glue.hh"
 //   template <typename T, typename U>
 //   requires requires (T&& a, U&& b) { { b < a } -> std::convertible_to<bool>; }
 //   constexpr auto min(T&& a, U&& b) -> decltype(auto) {
@@ -25,8 +25,10 @@
 //       return min(std::forward<T>(a), min(std::forward<Ts>(args)...));
 //   }
 
-int main() {
-//       int x = 5, y = 3, z = 7;
-//       auto& r = min(x, y, z); // returns reference to y
+extern "C" {
+  int main(int, char**, char**) {
+    //       int x = 5, y = 3, z = 7;
+    //       auto& r = min(x, y, z); // returns reference to y
     return 0; // returns 3
-}
+  }
+};

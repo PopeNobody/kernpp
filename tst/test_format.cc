@@ -7,9 +7,7 @@ using sys::write;
 char *format_integer_msb_first(char *buf,char *end, int_t val, int base,
     int width=1, char fill='0')
 {
-  auto fmt=fmt::fmt_t(val,base,width,fill);
-  c_str str=fmt;
-  return str.copy(buf,end);
+  return ((str::c_str)fmt::fmt_t(val,base,width,fill)).copy(buf,end);
 };
 
 int main() {
