@@ -89,7 +89,6 @@ namespace std {
     operator<=>(__cmp_cat::__unspec, strong_ordering __v) noexcept
     { return strong_ordering(__cmp_cat::_Ord(-__v._M_value)); }
   };
-
   // valid values' definitions
   inline constexpr strong_ordering
   strong_ordering::less(__cmp_cat::_Ord::less);
@@ -102,26 +101,24 @@ namespace std {
 
   inline constexpr strong_ordering
   strong_ordering::greater(__cmp_cat::_Ord::greater);
-};
-using std::strong_ordering;
-template<class it>
-int true_n(const it b){
-  it e(b);
-  while(*e)
-    ++e;
-  return e-b;
-};
-template<class it>
-strong_ordering seq_cmp(it s1, it s2, unsigned n)
-{
-  while(n--){
-    auto r=(s1<=>s2);
-    if(r!=(0<=>0))
-      return r;
-  }
-  return 0<=>0;
 }
-template<class t>
-auto min(t l, t r){
-  return l<r ? l : r;
+namespace cmp_ns {
+  using namespace std;
+  template<class it>
+    int true_n(const it b){
+      it e(b);
+      while(*e)
+        ++e;
+      return e-b;
+    };
+  template<class it>
+    strong_ordering seq_cmp(it s1, it s2, unsigned n)
+    {
+      while(n--){
+        auto r=(s1<=>s2);
+        if(r!=(0<=>0))
+          return r;
+      }
+      return 0<=>0;
+    }
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+namespace test_ns {
 template<class it>
 class range_t {
   struct body_t {
@@ -30,4 +31,5 @@ it set(it l, it r, vt v)
   while(l<r)
     *l++=v;
   return l;
+}
 }

@@ -1,7 +1,11 @@
 #pragma once
 #include "types.hh"
+#include "c_str.hh"
 namespace sys {
   struct timeval;
+  inline ssize_t write(fd_t fd, const c_str &str){
+    return write(fd,str.begin(),str.end());
+  };
 };
 namespace fmt {
   struct int_t {
@@ -52,29 +56,64 @@ namespace fmt {
     char buf[50];
     char nul[1];
     char off;
-    void format(unsigned long val, int base, int width, bool neg) {
+    void format(int_t wrap, int base, int width, char fill) {
+      unsigned long val=wrap.abs;
+      unsigned long neg=wrap.neg;
+      if(width>=sizeof(buf)){
+        sys::write(2,"Error: width > ");
+        sys::write(2,fmt_t(sizeof(buf)));
+        sys::write(2,"\n");
+        width=sizeof(buf);
+      };
       nul[0]=0;
       off=(nul-buf);
       do {
         buf[--off]=digits[val%base];
         val/=base;
       } while(val);
+      while(off>(nul-buf)-width)
+        buf[--off]='0';
       if(neg)
         buf[--off]='-';
       if(nul[0])
         sys::exit(1);
     };
-    fmt_t(const int_t &val,int base=10)
+    fmt_t(const int_t &val,int base=10, int width=1, char fill='0')
     {
-      format(val.abs,base,1,val.neg);
+      format(val.abs,base,width,val.neg);
     };
     fmt_t(const timeval &rhs);
     fmt_t(const timespec &rhs);
     fmt_t(const fdset_t &rhs);
-    operator c_str() const {
-      return c_str(buf+off,nul-buf-off);
+    operator str::c_str() const {
+      return str::c_str(buf+off,nul-buf-off);
     };
     static constexpr const char digits[]="0123456789abcdef";
   };
+  inline bool isspace(int i){
+    switch(i){
+      case 9:
+      case 10:
+      case 11:
+      case 12:
+      case 13:
+      case 14:
+      case 32:
+        return true;
+      default:
+        return false;
+    }
+  };
+  inline uint64_t atoi(const char *pos){
+    uint64_t res=0;
+    while(isspace(*pos))
+      pos++;
+    while(*pos>='0' && *pos<='9') {
+      res*=10;
+      res+=(*pos-'0');
+      ++pos;
+    };
+    return res;
+  }
 }
 

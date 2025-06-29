@@ -1,81 +1,19 @@
-#ifndef syscall_hh
-#define syscall_hh syscall_hh
-
-#include "errno.hh"
-#include "types.hh"
-#include "attrs.hh"
-
-
-namespace sys
+#include "syscall.hh"
+namespace die
 {
-#define linux_dirent64 linux_dirent
-  enum open_mode
-  {
-    o_default= 0664
-  };
-  // these are octal, not hex, dont panic
-  enum open_flags
-  {
-    o_rdonly   = 0000,
-    o_wronly   = 0001,
-    o_rdwr     = 0002,
-    o_mask     = 0003,
-    o_creat    = 00000100,
-    o_excl     = 00000200,
-    o_noctty   = 00000400,
-    o_trunc    = 00001000,
-    o_append   = 00002000,
-    o_nonblock = 00004000,
-    o_dsync    = 00010000,
-    o_fasync   = 00020000,
-    o_direct   = 00040000,
-    o_largefile= 00100000,
-    o_directory= 00200000,
-    o_nofollow = 00400000,
-    o_noatime  = 01000000,
-    o_cloexec  = 02000000,
-  };
-  inline open_flags operator|(open_flags lhs, open_flags rhs)
-  {
-    return open_flags(int(lhs) | int(rhs));
-  }
-  inline open_flags operator&(open_flags lhs, open_flags rhs)
-  {
-    return open_flags(int(lhs) & int(rhs));
-  }
-  extern "C" {
-    void set_errno(uint64_t val);
-  };
+  using sys::open_flags;
+  using sys::open_mode;
+  void throw_errno(unsigned long res) __attribute__((__noreturn__));
   template<class res_t>
-    res_t chk_return(uint64_t val)
-    {
-      if(val>uint64_t(-4096))
-        set_errno(val);
-      return res_t(val);
+    res_t chk_return(unsigned long res){
+      if(res>uint64_t(-4096))
+        throw_errno(res);
+      return (res_t)res;
     };
-  extern "C"
-  {
-    inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AIL;
-    inline int     close(fd_t fd) AIL;
-    inline int     stat(const char* pathname, struct stat_t* statbuf) AIL;
-    inline fd_t    open(const char* pathname,
-                        open_flags  flags,
-                        open_mode   mode) AIL;
-    inline time_t  time(time_t*) AIL;
-    inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len) AIL;
-    inline ssize_t read(fd_t fd, char* buf, size_t len) AIL;
-    inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AIL;
-    constexpr auto UTIME_NOW = (((1<<30)-1));
-    constexpr auto UTIME_OMIT = (((1<<30)-2));
-    constexpr auto AT_FDCWD=-100;
-    inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags) AIL;
-  }
-  inline void    exit(int res) NOR;
-
   // __NR_read=0
   inline ssize_t read(fd_t fd, char* buf, size_t len)
   {
-    uint64_t res;
+    long res;
     asm("syscall"
         : "=a"(res)
         : "a"(0), "D"(fd), "S"(buf), "d"(len)
@@ -83,9 +21,9 @@ namespace sys
     return chk_return<ssize_t>(res);
   }
   // __NR_write=1
-  inline ssize_t sys_write(fd_t fd, const char* buf, size_t len)
+  inline ssize_t write(fd_t fd, const char* buf, size_t len)
   {
-    uint64_t res;
+    long res;
     asm("syscall\n"
         : "=a"(res)
         : "a"(1), "D"(fd), "S"(buf), "d"(len)
@@ -95,29 +33,28 @@ namespace sys
   // __NR_open=2
   inline fd_t open(const char* pathname,
                    open_flags  flags,
-                   open_mode   mode= o_default)
+                   open_mode   mode=sys::o_default)
   {
-    uint64_t res;
+    int fd= -1;
     asm("syscall\n"
-        : "=a"(res)
+        : "=a"(fd)
         : "0"(2), "D"(pathname), "S"(flags), "d"(mode)
         : "rcx", "r11", "memory");
-    return chk_return<fd_t>(res);
+    return chk_return<fd_t>(fd_t(fd));
   }
   // __NR_close=3
   inline int close(fd_t fd)
   {
-    uint64_t res;
     asm("syscall\n"
-        : "=a"(res) 
+        : "=a"(fd) 
         : "0"(3), "D"(fd) 
         : "rcx", "r11", "memory");
-    return chk_return<int>(res);
+    return chk_return<int>(fd);
   }
   // __NR_stat=4
   inline int stat(const char* pathname, struct stat_t* statbuf)
   {
-    uint64_t res;
+    int res= -1;
     asm("syscall\n"
         : "=a"(res)
         : "a"(4), "D"(pathname), "S"(statbuf)
@@ -134,12 +71,12 @@ namespace sys
   };
   inline off_t lseek(fd_t fd, off_t off, origin_t origin)
   {
-    uint64_t res;
+    off_t res;
     asm("syscall\n"
         : "=a"(res)
         : "0"(8), "D"(fd), "S"(off), "d"(origin)
         : "rcx", "r11", "memory");
-    return chk_return<off_t>(res);
+    return chk_return<int>(res);
   }
 
 
@@ -211,7 +148,7 @@ namespace sys
   // __NR_sigprocmask=14
   inline int rt_sigprocmask(int how, sigset_p nset, sigset_p oset)
   {
-    uint64_t res;
+    int res= -1;
     asm("\tmovq %5,%%r10 ;\n"
         "\tsyscall;\n"
         : "=a"(res)
@@ -223,19 +160,20 @@ namespace sys
   // __NR_sigreturn=15
   inline long rt_sigreturn()
   {
-    set_errno(-ENOSPC);
+    sys::errno=ENOSPC;
     return -1;
+//       int res= -1;
+//       asm("syscall\n" : "=a"(res) : "0"(15) : "rcx", "r11", "memory");
+//       if(res < 0)
+//         errno=res;
   }
-  inline long ioctl( uint32_t fd, uint32_t cmd, uint64_t arg ) AIL;
-  // __NR__ ioctl = 16
-  //
   inline long ioctl( uint32_t fd, uint32_t cmd, uint64_t arg ) {
-    uint64_t res;
+    long res;
     asm("syscall\n"
         : "=a"(res)
         : "a"(16), "D"(fd), "S"(cmd), "d"(arg)
         : "rcx", "r11", "memory");
-    return chk_return<long>(res);
+    return chk_return<int>(res);
   }
   // __NR__ pipe = 22 
 
@@ -325,31 +263,31 @@ namespace sys
     return chk_return<int>(res);
   }
   // __NR_getpid = 39
-  inline pid_t getpid()
+  inline int getpid()
   {
     int res= -1;
     asm("syscall\n" : "=a"(res) : "0"(39) : "rcx", "r11", "memory");
-    return chk_return<pid_t>(res);
+    return chk_return<int>(res);
   }
   // __NR__ fork = 57 
-  inline pid_t fork()
+  inline int fork()
   {
     int res= -1;
     asm("syscall\n" : "=a"(res) : "0"(57) : "rcx", "r11", "memory");
-    return chk_return<pid_t>(res);
+    return chk_return<int>(res);
   }
   // __NO__ execve = 59
   inline int execve(const char * fn, char *const * argv, char *const * envp)
   {
-    uint64_t res;
+    long res;
     asm("syscall"
         : "=a"(res)
         : "a"(59), "D"(fn), "S"(argv), "d"(envp)
         : "rcx", "r11", "memory");
     return chk_return<int>(res);
+
   }
   // __NR_exit = 60
-  inline void exit(int res) NOR; 
   inline void exit(int res)
   {
     asm("syscall\n"
@@ -404,7 +342,7 @@ namespace sys
         : "=a"(res)
         : "a"(63), "D"(name)
         : "rcx", "r11", "memory");
-    return chk_return<time_t>(res);
+    return chk_return<int>(res);
   }
 
   // __NR__ rename = 82
@@ -425,17 +363,17 @@ namespace sys
         : "=a"(res)
         : "a"(201), "D"(buf)
         : "rcx", "r11", "memory");
-    return chk_return<time_t>(res);
+    return chk_return<int>(res);
   }
   // __NR_getdents = 217
   inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len)
   {
-    uint64_t res;
+    long res;
     asm("syscall"
         : "=a"(res)
         : "a"(217), "D"(fd), "S"(buf), "d"(len)
         : "rcx", "r11", "memory");
-    return chk_return<ssize_t>(res);
+    return chk_return<int>(res);
   }
   // __NR__ pipe2 = 293 
 
@@ -449,7 +387,6 @@ namespace sys
     return chk_return<int>(res);
   }
   // __NR__ utimensat = 280 
-  inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags) AIL;
   inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags)
   {
 
@@ -464,82 +401,3 @@ namespace sys
     return chk_return<int>(res);
   }
 } // namespace sys
-
-namespace sys
-{
-
-  inline ssize_t write(fd_t fd, const char* buf, size_t len) AIL;
-  inline ssize_t write(fd_t fd, const char* buf, const char* end) AIL;
-  inline ssize_t write(fd_t fd, const char* buf) AIL;
-
-  inline ssize_t write(fd_t fd, const char* buf, size_t len)
-  {
-    return sys_write(fd, buf, len);
-  }
-  inline ssize_t write(fd_t fd, const char* buf, const char* end)
-  {
-    return sys_write(fd, buf, end - buf);
-  }
-
-  inline ssize_t write(fd_t fd, const char* buf)
-  {
-    const char* end= buf;
-    while(*end)
-      ++end;
-    return sys_write(fd, buf, end - buf);
-  }
-  inline ssize_t full_write(fd_t fd, const char* const beg, size_t len)
-    AIL;
-  inline const char* full_write(int               fd,
-                                const char* const beg,
-                                const char*       end)
-    AIL;
-
-  inline const char* full_write(int               fd,
-                                const char* const beg,
-                                const char*       end)
-  {
-    const char* pos= beg;
-    while(pos != end)
-    {
-      ssize_t res= sys_write(fd, pos, end - pos);
-      if(res < 0)
-        return nullptr;
-      pos+= res;
-    }
-    return pos;
-  }
-  inline ssize_t full_write(fd_t fd, const char* const beg, size_t len)
-  {
-    return full_write(fd, beg, beg + len) - beg;
-  }
-} // namespace sys
-
-#define L(x) x, sizeof(x) - 1
-
-
-namespace std
-{
-  void        abort() __attribute__((__noreturn__));
-  inline void abort()
-  {
-    do
-    {
-      asm("int3");
-    } while(true);
-  }
-  void terminate() noexcept __attribute__((__noreturn__));
-  enum nothrow_t
-  {
-  };
-  extern const nothrow_t nothrow;
-  typedef void (*new_handler)();
-}
-
-
-#include "attrs.hh"
-#define _GLIBCXX_NOEXCEPT noexcept
-#ifndef _GLIBCXX_NOTHROW
-#define _GLIBCXX_NOTHROW
-#endif
-#endif
