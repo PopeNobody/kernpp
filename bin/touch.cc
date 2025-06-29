@@ -21,7 +21,7 @@ int touch(const char *path){
   return 0;  
 };
 extern "C" {
- int main(int argc,char *const*argv,char *const*envp) {
+int main(int argc,char *const*argv,char *const*envp) {
     int ch, longidx;
     for(int i=1;i<argc;i++)
       touch(argv[i]);

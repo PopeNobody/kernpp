@@ -9,7 +9,7 @@ void write_strs(char *const*strs) {
   };
 };
 extern "C" {
- int main(int argc,char *const*argv,char *const*envp) {
+int main(int argc,char *const*argv,char *const*envp) {
   write(1,"ARGV:\n");
   write_strs(argv);
   write(1,"\n\nENVV:\n");

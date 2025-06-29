@@ -20,7 +20,7 @@ constexpr auto min(T&& a, Ts&&... args) -> decltype(auto) {
     return min(std::forward<T>(a), min(std::forward<Ts>(args)...));
 }
 
-int main() {
+int main(int argc,char *const*argv,char *const*envp) {
     int x = 5, y = 3, z = 7;
     auto& r1 = min(x, y, z); // returns reference to y
 

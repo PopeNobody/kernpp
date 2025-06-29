@@ -10,7 +10,7 @@ size_t str_len(const char *str) {
     ++pos;
   return pos-str;
 };
- int main(int argc,char *const*argv,char *const*envp) {
+int main(int argc,char *const*argv,char *const*envp) {
   envv=(char**)envp;
   const char *beg=argv[0]+str_len(argv[0])+1;
   const char *end=envp[0];

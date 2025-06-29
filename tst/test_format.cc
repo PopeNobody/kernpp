@@ -10,7 +10,7 @@ char *format_integer_msb_first(char *buf,char *end, int_t val, int base,
   return ((str::c_str)fmt::fmt_t(val,base,width,fill)).copy(buf,end);
 };
 
-int main() {
+int main(int argc,char *const*argv,char *const*envp) {
     char buf[8] = {}; // intentionally small for testing
     uint64_t val = 123456789;
 

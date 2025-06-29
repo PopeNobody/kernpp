@@ -1,6 +1,6 @@
 extern "C" { int main(int argc,char *const*argv,char *const*envp); };
 #include <syscall.hh>
- int main(int argc,char *const*argv,char *const*envp) {
+int main(int argc,char *const*argv,char *const*envp) {
   return 0;
 };
 
@@ -30,7 +30,7 @@ void ignore_eexist_handler(int err, std::source_location loc = std::source_locat
     (void)loc;
 }
 
- int main(int argc,char *const*argv,char *const*envp) {
+int main(int argc,char *const*argv,char *const*envp) {
     const char *test_dir = "tst/syscall_raii_test_dir";
     
     try {

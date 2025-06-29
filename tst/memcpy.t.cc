@@ -4,7 +4,7 @@
 
 using namespace abi;
 
-int main(int, char**) {
+int main(int argc,char *const*argv,char *const*envp) {
 //     char msg[]="This is a test";
 //     char txt[sizeof(msg)*20];
 //     copy_n(txt,msg,sizeof(msg)-1);

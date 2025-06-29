@@ -8,7 +8,7 @@ extern istr_t *environ;
 static char full[16*1024];
 using shell_ns::search_path;
 extern "C" {
-  int main(int argc, char *const * argv, char *const * envp) {
+int main(int argc,char *const*argv,char *const*envp) {
     char *path=0;
     bool abs=true;
     if(!argv[1]) {

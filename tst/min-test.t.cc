@@ -26,7 +26,7 @@
 //   }
 
 extern "C" {
-  int main(int, char**, char**) {
+int main(int argc,char *const*argv,char *const*envp) {
     //       int x = 5, y = 3, z = 7;
     //       auto& r = min(x, y, z); // returns reference to y
     return 0; // returns 3

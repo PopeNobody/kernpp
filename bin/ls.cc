@@ -3,7 +3,7 @@ extern "C" { int main(int argc,char *const*argv,char *const*envp); };
 using namespace sys;
 
 
-int main(int argc,char *const*argv,char *const*envp){
+int main(int argc,char *const*argv,char *const*envp) {
   int fd=open(".",o_directory|o_rdonly);
   if(fd<0)
     pexit(3,"open:.");

@@ -7,7 +7,7 @@
 //   __attribute__((weak, alias("__kernpp_main_adapter")))
 //    int main(int argc,char *const*argv,char *const*envp) ;
 extern "C" {
-  int main(int, char *const *argv, char *const *envp);
+int main(int argc,char *const*argv,char *const*envp) ;
   void _start(void);
 };
 void _start(void) {
