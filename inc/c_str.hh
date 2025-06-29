@@ -135,8 +135,10 @@ namespace str {
     char *copy(char *beg, char *end){
       if(beg+size()<end)
         end=beg+size(); 
-      else
+      else {
+        *beg=0;
         return 0;
+      };
       char *pos=this->beg();
       while(beg!=end)
         *beg++=*pos++;

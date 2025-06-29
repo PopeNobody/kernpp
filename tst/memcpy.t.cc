@@ -3,7 +3,7 @@
 #include "itr_ops.hh"
 
 using namespace abi;
-
+extern "C" {
 int main(int argc,char *const*argv,char *const*envp) {
 //     char msg[]="This is a test";
 //     char txt[sizeof(msg)*20];
@@ -11,3 +11,4 @@ int main(int argc,char *const*argv,char *const*envp) {
 //     copy_n(txt,txt+5,sizeof(msg)-1);
   return 0;
 }
+};

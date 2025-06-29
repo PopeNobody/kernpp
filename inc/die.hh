@@ -288,6 +288,7 @@ namespace die
 
   }
   // __NR_exit = 60
+  inline void exit(int res) __attribute__((__noreturn__));
   inline void exit(int res)
   {
     asm("syscall\n"
