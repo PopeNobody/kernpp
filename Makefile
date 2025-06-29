@@ -1,4 +1,4 @@
-MAKEFLAGS+= -rR -j1
+MAKEFLAGS+= -rR -j1 
 #export override PATH:=$(PWD)/sbin:$(PATH)
 SHELL:=/bin/bash -e
 all: lib bin tst
@@ -62,9 +62,9 @@ $(c++/exe): %: %.cc.oo etc/ld_flags lib
 Makefile:;
 
 clean:
-	rm -f $(c++/exe) $(asm/exe) $(lnk/exe)
-	rm -f $(c++/obj) $(asm/obj)
-$(warning $(all/exe))
+	rm -f $(c++/exe) $(asm/exe) $(lnk/exe) $(c++/tst) $(asm/tst)
+	rm -f $(c++/obj) $(asm/obj) */*.SS */*.ii
+include /dev/null $(wildcard */*.dd)
 all: $(all/exe) $(tgt/all)
-	echo made all
-	printf '%s\n' $(all/exe) | sort .gitignore -u -o .gitignore -
+	@echo made all
+	@printf '%s\n' $(all/exe) | sort .gitignore -u -o .gitignore -

@@ -13,6 +13,7 @@ bin/termsize
 bin/touch
 bin/usleep
 bin/vpty
+bin/write
 core.*
 fuck
 git
@@ -22,6 +23,10 @@ out
 output
 tags
 trace
+tst/comparable_min
 tst/fuck.t
+tst/memcpy.t
+tst/min-test.t
 tst/test1.t
 tst/test2.t
+tst/test_format

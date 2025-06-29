@@ -16,10 +16,18 @@ extern "C" {
   {
   };
   void * __dso_handle=(void*)&__dso_handle;
-  void *memset(void *i, unsigned char v, size_t num){
-    char *p((char*)i);
-    for(size_t i=0;i<num;i++)
-      p[i]=v;
-    return i;
+  void *memcpy(char *d, char *s, size_t n){
+    if(d<s) { 
+      for(int i=0;i<n;i++)
+        d[i]=s[i];
+    } else {
+      for(int i=0;i<n;i++)
+        d[n-i-1]=s[n-i-1];
+    }
+    return d;
+  };
+  void memset(char *b, char v, size_t n){
+    for(int i=0;i<n;i++)
+      b[n]=v;
   };
 }

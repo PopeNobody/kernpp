@@ -2,25 +2,31 @@ extern "C" { int main(int argc,char *const*argv,char *const*envp); };
 #include "syscall.hh"
 #include "vpipe.hh"
 #include "fmt.hh"
+#include "c_str.hh"
+using str::c_str;
 using fmt::fmt_t;
-namespace sys {
-  inline ssize_t write(fd_t fd, const c_str &fmt) {
-    return write(fd,(c_str)fmt);
+using fmt::atoi;
+namespace std {
+  template<class T>
+  class vector {
+    struct body_t {
+      T *vec;
+      size_t len;
+    } body;
+    public:
+    const T *data() const;
+    size_t size() const;
   };
-  inline ssize_t write(fd_t fd, const fmt_t &fmt) {
-    return write(fd,(c_str)fmt);
-  };
-}
-uint64_t atoi(const char *pos){
-  uint64_t res=0;
-  while(*pos>='0' && *pos<='9') {
-    res*=10;
-    res+=(*pos-'0');
-    ++pos;
-  };
-  return res;
 };
- int main(int argc,char *const*argv,char *const*envp) {
+namespace sys {
+  template<class ... Ts>
+    ssize_t write(fd_t fd, Ts ... args) {
+      std::vector<iovec> vec;
+      return sys::write(fd,vec.data(),vec.size()); 
+    };
+};
+
+int main(int argc,char *const*argv,char *const*envp) {
   uint16_t rows;
   uint16_t cols;
   if(argc==1) {

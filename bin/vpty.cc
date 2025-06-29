@@ -1,18 +1,40 @@
 extern "C" { int main(int argc,char *const*argv,char *const*envp); };
-#include "syscall.hh"
+#include "die.hh"
 #include "vpipe.hh"
 #include <fmt.hh>
-using namespace sys;
 using vpipe::setup_term_and_pty;
 const int TIOCGPTPEER = 0x5441;
 const int  TIOCSPTLCK = 0x40045431;
 using fmt::fmt_t;
 
+struct fd_set;
+struct fd_act {
+  typedef void(*act_t)(fd_t &);
+  act_t act;
+  fd_t fd;
+  bool operator()(const fd_set &set);
+};
+//     {
+//       if(set.is_set(fd)){
+//         act(fd);
+//         return true;
+//       } else {
+//         return false;
+//       }
+//     }:
+
+using enum sys::open_flags;
+using sys::ioctl;
+using die::read;
+using die::write;
+using sys::close;
+using sys::dup2;
+using sys::getpid;
+
 int main(int argc,char *const*argv,char *const*envp) {
   const char mname[]="/dev/pts/ptmx";
   const char sname[]="             ";
   fd_t opty,mpty,spty;
-
   opty=0;
   mpty=open(mname,o_rdwr|o_noctty|o_cloexec);
   opty=ioctl(mpty,TIOCSPTLCK,uint64_t(&opty));
@@ -22,20 +44,12 @@ int main(int argc,char *const*argv,char *const*envp) {
   fmt_t s_mpty(mpty);
   opty=o_rdwr|o_noctty|o_cloexec;
   pid_t pid=getpid();
-  if(fork() || fork()){
+
     char buf[1];
     dup2(mpty,getpid()==pid);
     while(read(0,buf,1)){
       write(1,buf,1);
     };
-  } else {
-    dup2(spty,0);
-    dup2(spty,1);
-    dup2(spty,2);
-    char const *args[]={"/bin/bash",0};
-    execve(args[0],(char *const *)args,(char *const*)envp);
-  }
-
   return 0;
 };
 

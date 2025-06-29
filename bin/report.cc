@@ -1,31 +1,10 @@
-#include <syscall.hh>
+#include "syscall.hh"
 #include <search_path.hh>
+#include "fmt.hh"
 using shell_ns::search_path;
 using namespace sys;
 char **envp;
-template<typename val_t>
-void fmt(fd_t fd, val_t val);
-template<>
-void fmt<int>(fd_t fd, int val)
-{
-  static char buf[]="xxxxxxxxxxxxxxxx";
-  char *end=buf+sizeof(buf)-1;
-  if(val) {
-    while(val) {
-      *--end=(val%10)+'0';
-      val/=10;
-    };
-  } else {
-    *--end='0';
-  };
-  write(2,end);
-};
 extern istr_t *environ;
-template<>
-void fmt<const char*>(fd_t fd, const char * val)
-{
-  write(fd,val);
-}
 static char full[16*1024];
 using shell_ns::search_path;
 extern "C" {
@@ -48,11 +27,13 @@ extern "C" {
     if(pid) {
       int ret;
       do {
+        using fmt::fmt_t;
+        fd_t efd(2);
         res=waitpid(0,&ret,0);
-        fmt(2,"pid ");
-        fmt(2,res);
-        fmt(2,"  returned ");
-        fmt(2,ret);
+        write(efd,"pid ");
+        write(efd,fmt_t(res));
+        write(efd,"  returned ");
+        write(efd,fmt_t(ret));
         exit(ret/256);
       } while(res>0);
     } else {

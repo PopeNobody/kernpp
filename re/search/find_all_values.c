@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <string.h>
 #include <termios.h>
 #include <signal.h>
 #include <sys/syscall.h>
@@ -17,42 +18,62 @@
 #include <linux/sockios.h>
 #include <unistd.h>
 
-#define P(name) printf("#define %s %ld\n", #name, (long)(name));
+struct pair {
+  char tag[20];
+  union {
+    uint64_t val64[1];
+    struct {
+      uint32_t pad32[1];
+      uint32_t val32[1];
+    };
+    struct {
+      uint16_t pad16[3];
+      uint16_t val16[1];
+    };
+    struct {
+      uint8_t pad8[7];
+      uint8_t val8[1];
+    };
+  };
+};
+// note:  this has to have the comma, which is weird, but
+// sometimes it is a semicolon
+#define P(name) { \
+  #name, \
+  {name} \
+},
+struct pair vals[] = {
+#include "find_all_values_list.h"
+};
+
+size_t maxlen=0;
+int display(const char *name, int64_t val){
+  long res; 
+  char buf[128];
+  const char *fmt;
+  size_t len=strlen(name);
+  if(len>maxlen)
+    maxlen=len;
+  if(val<(1llU<<8)) 
+    fmt="%s%-13s %18s"   "%3ld\n";
+  else if(val<(1llU<<16)) 
+    fmt="%s%-13s %16s"   "%5ld\n";
+  else if(val<(1llU<<32)) 
+    fmt="%s%-13s %11s"  "%10ld\n";
+  else 
+    fmt="%s%-13s %1s"   "%20ld\n";
+  printf(fmt," ",name," ",val);
+  return write(1,buf,res); 
+};
 
 int main() {
-    /* termios */
-    P(ICANON); P(ECHO); P(ISIG); P(ICRNL); P(INPCK); P(ISTRIP); P(OPOST);
-    P(VINTR); P(VQUIT); P(VERASE); P(VKILL); P(VEOF); P(VTIME); P(VMIN);
-    P(TCSANOW);
 
-    /* ioctl */
-    P(TCGETS); P(TCSETS); P(TIOCGWINSZ); P(TIOCSWINSZ);
+// note:  this has to have the semicolon, which is weird, but
+// sometimes it is a comma
 
-    /* fcntl */
-    P(O_RDONLY); P(O_WRONLY); P(O_RDWR); P(O_NONBLOCK); P(O_APPEND); P(O_CREAT); P(O_EXCL); P(O_TRUNC);
+#define P(name) display(#name,(name));
 
-    /* syscall numbers */
-    P(SYS_read); P(SYS_write); P(SYS_open); P(SYS_close); P(SYS_stat); P(SYS_fstat); P(SYS_lseek); P(SYS_mmap); P(SYS_munmap); P(SYS_brk); P(SYS_exit); P(SYS_fork);
-
-    /* signal */
-    P(SIGINT); P(SIGTERM); P(SIGKILL); P(SIGQUIT); P(SIGCHLD); P(SIGPIPE);
-
-    /* socket */
-    P(AF_INET); P(AF_INET6); P(AF_UNIX); P(SOCK_STREAM); P(SOCK_DGRAM); P(SOCK_RAW);
-    P(SOL_SOCKET); P(SO_REUSEADDR); P(SO_KEEPALIVE); P(SO_RCVBUF); P(SO_SNDBUF);
-    P(IPPROTO_TCP); P(IPPROTO_UDP); P(TCP_NODELAY);
-
-    /* stat */
-    P(S_IFREG); P(S_IFDIR); P(S_IRUSR); P(S_IWUSR); P(S_IXUSR); P(S_IRGRP); P(S_IWGRP); P(S_IXGRP); P(S_IROTH); P(S_IWOTH); P(S_IXOTH);
-
-    /* poll/epoll */
-    P(POLLIN); P(POLLOUT); P(POLLERR); P(POLLHUP); P(EPOLLIN); P(EPOLLOUT); P(EPOLLERR); P(EPOLLHUP); P(EPOLLET);
-
-    /* net/if */
-    P(IFF_UP); P(IFF_BROADCAST); P(IFF_RUNNING); P(IFF_MULTICAST);
-
-    /* linux tun */
-    P(IFF_TUN); P(IFF_TAP); P(IFF_NO_PI);
-
-    return 0;
+#include "find_all_values_list.h"
+ dprintf(2,"%10lu\n",maxlen);
+  return 0;
 }
