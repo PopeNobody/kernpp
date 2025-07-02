@@ -1,13 +1,13 @@
 
 **.[aiodS][aiodS]
-*.d
-*.i
+*.[iod]
 *.log
 *.out
 .gdb_history
 arc
 bin/cat
 bin/echo
+bin/false
 bin/ls
 bin/malloc
 bin/report
@@ -15,6 +15,7 @@ bin/runrep
 bin/termctrl
 bin/termsize
 bin/touch
+bin/true
 bin/usleep
 bin/vpty
 bin/write
