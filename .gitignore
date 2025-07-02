@@ -6,6 +6,7 @@ arc
 bin/cat
 bin/echo
 bin/ls
+bin/malloc
 bin/report
 bin/runrep
 bin/termctrl
@@ -24,9 +25,12 @@ output
 tags
 trace
 tst/comparable_min
+tst/format
 tst/fuck.t
+tst/max_width
 tst/memcpy.t
 tst/min-test.t
 tst/test1.t
 tst/test2.t
 tst/test_format
+tst/tuple

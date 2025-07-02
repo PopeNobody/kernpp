@@ -50,10 +50,10 @@ include etc/multi.mk
 
 bin/_start: lib/lib:=
 
-$(c++/tst): %: %.cc.oo etc/ld_flags lib
+$(c++/tst): %: %.cc.oo etc/ld_flags lib $(lib/lib)
 	$(CXX) -o $@ $< -Wl,--start-group $(lib/lib) @etc/ld_flags -Wl,--end-group
 
-$(c++/exe): %: %.cc.oo etc/ld_flags lib
+$(c++/exe): %: %.cc.oo etc/ld_flags lib $(lib/lib)
 	$(CXX) -o $@ $< -Wl,--start-group $(lib/lib) @etc/ld_flags -Wl,--end-group
 
 
