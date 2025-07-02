@@ -1,8 +1,6 @@
 #include "syscall.hh"
 namespace die
 {
-  using sys::open_flags;
-  using sys::open_mode;
   void throw_errno(unsigned long res) __attribute__((__noreturn__));
   template<class res_t>
     res_t chk_return(unsigned long res){
@@ -32,8 +30,8 @@ namespace die
   }
   // __NR_open=2
   inline fd_t open(const char* pathname,
-                   open_flags  flags,
-                   open_mode   mode=sys::o_default)
+                   sys::open_flags  flags,
+                   sys::open_mode   mode=sys::o_default)
   {
     int fd= -1;
     asm("syscall\n"

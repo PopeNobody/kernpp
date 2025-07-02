@@ -1,5 +1,4 @@
 #include "c_str.hh"
-#include "cmp.hh"
 const char str::c_str::null_str[1]="";
 const char str::c_str::colon[2]=":";
 const char str::c_str::newline[2]="\n";

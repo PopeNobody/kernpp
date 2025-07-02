@@ -37,10 +37,12 @@ typedef void* void_p;
 
 struct iocb;
 typedef long int __fd_mask;
+
 struct fdset_t
 {
   __fd_mask fds_bits[1024 / (8 * (int) sizeof (__fd_mask))];
 };
+
 typedef fdset_t* fdset_p;
 struct sigaction_t {
 	void (*sa_handler) (int);
@@ -76,7 +78,8 @@ typedef sigset_t *sigset_p;
 struct iovec;
 typedef iovec* iovec_p;
 struct timeval;
-typedef timeval* timeval_p;
+typedef timeval timeval_t;
+typedef timeval_t* timeval_p;
 struct sockaddr;
 typedef sockaddr* sockaddr_p;
 struct shmid_ds;

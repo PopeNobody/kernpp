@@ -10,12 +10,14 @@ namespace itr {
     return beg;
   };
   template<class dst_t, class src_t>
-  inline dst_t rcopy_n(dst_t db, src_t sb,size_t n){
+  inline dst_t rcopy_n(dst_t db, src_t sb,size_t N){
+    size_t n(N);
     db+=n;
+    *db=0;
     sb+=n;
     while(n--)
       *--db=*--sb;
-    return db;
+    return db+N;
   };
   template<class dst_t, class src_t>
   inline dst_t fcopy_n(dst_t db, src_t sb,size_t n){
@@ -36,7 +38,14 @@ namespace itr {
     return copy_n(db,sb,min(se-sb,de-db));
   };
   using str::c_str;
-  char *copy(char *db, char *de, c_str str);
+  inline char *copy(char *db, char *de, void *sb, size_t sl)
+  {
+    return copy(db,de,(char*)sb,((char*)sb)+sl);
+  };
+  inline char *copy(char *db, char *de, c_str str);
+  inline char *copy(char *db, char *de, iovec vec) {
+    return copy(db,de,vec.iov_base,vec.iov_len);
+  };
   template<class itr_t, class val_t>
     inline auto find_val(itr_t db, itr_t de, val_t val){
       while(db!=de)

@@ -52,8 +52,9 @@ namespace fmt {
     }
   };
   using sys::timeval;
-  struct fmt_t {
-    char buf[50];
+  struct fmt_t
+  {
+    char buf[68];
     char nul[1];
     char off;
     void format(int_t wrap, int base, int width, char fill) {
@@ -78,15 +79,35 @@ namespace fmt {
       if(nul[0])
         sys::exit(1);
     };
+    void format(float val, int width, int base, char fill=' ');
     fmt_t(const int_t &val,int base=10, int width=1, char fill='0')
     {
-      format(val.abs,base,width,val.neg);
+      format(val,base,width,fill);
     };
-    fmt_t(const timeval &rhs);
-    fmt_t(const timespec &rhs);
-    fmt_t(const fdset_t &rhs);
-    operator str::c_str() const {
-      return str::c_str(buf+off,nul-buf-off);
+    fmt_t(float f)
+    {
+    };
+    fmt_t(const timeval_t &val)
+    {
+      fmt_t fsec(val.tv_sec);
+      str::c_str sec=(iovec)fsec;
+      fmt_t fusec(val.tv_nsec);
+      str::c_str usec=(iovec)fusec;
+      char *pos=buf;
+      char *end=&nul[0];
+      pos=itr::copy(pos,end,"timeval_t{");
+      assert(!*pos);
+      pos=itr::copy(pos,end,sec.beg(),sec.end());
+      assert(!*pos);
+      pos=itr::copy(pos,end,",");
+      assert(!*pos);
+      pos=itr::copy(pos,end,usec.beg(),usec.end());
+      assert(!*pos);
+      pos=itr::copy(pos,end,"}");
+      assert(!*pos);
+    };
+    operator iovec() const {
+      return { (void*)(buf+off), (size_t)(nul-buf-off) };
     };
     static constexpr const char digits[]="0123456789abcdef";
   };
@@ -115,5 +136,11 @@ namespace fmt {
     };
     return res;
   }
+  struct form_t : public iovec {
+    form_t(void *base, size_t len)
+      : iovec{base,len}
+    {
+    }
+  };
 }
 

@@ -31,3 +31,11 @@ extern "C" {
       b[n]=v;
   };
 }
+namespace std {
+  void *memcpy(void *d, void *s, size_t n){
+    return ::memcpy((char*)d,(char*)s,n);
+  };
+  void memset(void *b, char v, size_t n){
+    return ::memset((char*)b,v,n);
+  };
+}

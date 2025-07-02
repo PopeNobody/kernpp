@@ -4,16 +4,22 @@
 #include "syscall.hh"
 #include "template-glue.hh"
 #include "dbg.hh"
-#include "cmp.hh"
 #include "itr_ops.hh"
 namespace str {
   class c_str {
     struct body_t {
       char *beg;
       char *end;
-      body_t(char *beg, char*end)
-        :beg(beg),end(end)
+      body_t(char *beg, char*xend)
+        :beg(beg),end(xend)
       {
+        if(end)
+          return;
+        if(!beg)
+          return;
+        end=beg;
+        while(*end)
+          end++;
       };
       body_t(char *beg, size_t len)
         : beg(beg),end(beg+len)
@@ -56,6 +62,9 @@ namespace str {
     c_str(const c_str &lhs)
       : body(lhs.body.beg,lhs.body.end)
     {
+    };
+    operator iovec() const {
+      return iovec{ (void*)beg(), size() };
     };
     size_t len() const
     {
@@ -106,46 +115,31 @@ namespace str {
     char *end() {
       return body.end;
     };
-    friend auto cmp(const c_str &lhs, const c_str &rhs)
-    {
-      auto msize=std::min(lhs.size(),rhs.size());
-      auto r=cmp_ns::seq_cmp(lhs.begin(),rhs.begin(),msize);
-      return r!=(0<=>0) ? r : (lhs.size()<=>rhs.size());
-    };
+//       friend auto cmp(const c_str &lhs, const c_str &rhs)
+//       {
+//         auto msize=std::min(lhs.size(),rhs.size());
+//         auto r=cmp_ns::seq_cmp(lhs.begin(),rhs.begin(),msize);
+//         return r!=(0<=>0) ? r : (lhs.size()<=>rhs.size());
+//       };
     friend bool lt(const c_str &lhs, const c_str &rhs) {
-      auto msize=cmp_ns::min(lhs.size(),rhs.size());
+      auto msize=std::min(lhs.size(),rhs.size());
       for(auto i=0*msize;i<msize;i++){
         if(lhs[i]!=rhs[i])
           return lhs[i]<rhs[i]?true:false;
       };
       return lhs.size()<rhs.size();
     };
-    friend auto operator<=>(const c_str &lhs, const char *rhs){
-      return cmp(lhs,rhs);
-    };
-    friend auto operator<=>(const char *lhs, const c_str &rhs){
-      return cmp(lhs,rhs);
-    };
-    friend auto operator<=>(const c_str &lhs, const c_str &rhs){
-      return cmp(lhs,rhs);
-    };
-    friend auto operator==(const c_str &lhs, const c_str &rhs){
-      return cmp(lhs,rhs)==(0<=>0);
-    };
-    char *copy(char *beg, char *end){
-      if(beg+size()<end)
-        end=beg+size(); 
-      else {
-        *beg=0;
-        return 0;
-      };
-      char *pos=this->beg();
-      while(beg!=end)
-        *beg++=*pos++;
-      *beg=0;
-      return beg;      
-    };
   };
 }
+namespace itr {
+  inline char *copy(char *db, char *de, c_str str) {
+    if(db+str.len()>=de)
+      return 0;
+    for(int i=0;i<str.len();i++)
+      *db++=str[i];
+    return db;
+  };
+  char *copy(char *db, char *de, iovec vec);
+};
 
 #endif

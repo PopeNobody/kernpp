@@ -43,9 +43,7 @@ namespace sys
   {
     return open_flags(int(lhs) & int(rhs));
   }
-  extern "C" {
-    void set_errno(uint64_t val);
-  };
+  void set_errno(uint64_t val);
   template<class res_t>
     res_t chk_return(uint64_t val)
     {
@@ -53,23 +51,20 @@ namespace sys
         set_errno(val);
       return res_t(val);
     };
-  extern "C"
-  {
-    inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AIL;
-    inline int     close(fd_t fd) AIL;
-    inline int     stat(const char* pathname, struct stat_t* statbuf) AIL;
-    inline fd_t    open(const char* pathname,
-                        open_flags  flags,
-                        open_mode   mode) AIL;
-    inline time_t  time(time_t*) AIL;
-    inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len) AIL;
-    inline ssize_t read(fd_t fd, char* buf, size_t len) AIL;
-    inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AIL;
-    constexpr auto UTIME_NOW = (((1<<30)-1));
-    constexpr auto UTIME_OMIT = (((1<<30)-2));
-    constexpr auto AT_FDCWD=-100;
-    inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags) AIL;
-  }
+  inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AIL;
+  inline int     close(fd_t fd) AIL;
+  inline int     stat(const char* pathname, struct stat_t* statbuf) AIL;
+  inline fd_t    open(const char* pathname,
+      open_flags  flags,
+      open_mode   mode) AIL;
+  inline time_t  time(time_t*) AIL;
+  inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len) AIL;
+  inline ssize_t read(fd_t fd, char* buf, size_t len) AIL;
+  inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AIL;
+  constexpr auto UTIME_NOW = (((1<<30)-1));
+  constexpr auto UTIME_OMIT = (((1<<30)-2));
+  constexpr auto AT_FDCWD=-100;
+  inline int utimensat(fd_t dfd, istr_t filename, timespec_p utimes, int flags) AIL;
   inline void    exit(int res) NOR;
 
   // __NR_read=0
@@ -237,6 +232,16 @@ namespace sys
         : "rcx", "r11", "memory");
     return chk_return<long>(res);
   }
+  // __NR__ writev = 20
+  inline ssize_t writev(fd_t fd, const iovec *vec, size_t vlen)
+  {
+    uint64_t res;
+    asm("syscall\n"
+        : "=a"(res)
+        : "a"(20), "D"(fd), "S"(vec), "d"(vlen)
+        : "rcx", "r11", "memory");
+    return chk_return<long>(res);
+  };
   // __NR__ pipe = 22 
 
   inline int pipe(fd_t (&fds)[2])
@@ -480,6 +485,14 @@ namespace sys
   {
     return sys_write(fd, buf, end - buf);
   }
+  inline ssize_t write(fd_t fd, iovec val)
+  {
+    return sys_write(fd, (const char*)val.iov_base, val.iov_len);
+  }
+  inline ssize_t write(fd_t fd, bool val)
+  {
+    return sys_write(fd, val?"true ":"false",5);
+  }
 
   inline ssize_t write(fd_t fd, const char* buf)
   {
@@ -513,6 +526,7 @@ namespace sys
   {
     return full_write(fd, beg, beg + len) - beg;
   }
+  void assert_fail(const char *, const char *, unsigned) NOR;
 } // namespace sys
 
 #define L(x) x, sizeof(x) - 1
@@ -542,4 +556,14 @@ namespace std
 #ifndef _GLIBCXX_NOTHROW
 #define _GLIBCXX_NOTHROW
 #endif
+namespace std {
+  void *memcpy(void *d, char *s, size_t n);
+  void memset(void *b, char v, size_t n);
+  size_t strlen(const char *);
+};
+#define assert(x) do{\
+  if(!(x)){\
+    sys::assert_fail(#x,__FILE__,__LINE__);\
+  }\
+} while(0)
 #endif

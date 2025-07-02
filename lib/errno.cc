@@ -3,9 +3,6 @@
 #include "errno.hh"
 #include "fmt.hh"
 #include "itr_ops.hh"
-char *itr::copy(char *beg, char *end, c_str str){
-  return copy(beg,end,str.beg(),str.end());
-};
 struct set_bool {
   bool &val;
   set_bool(bool &val)
@@ -69,7 +66,6 @@ namespace sys {
   };
   void perror(const c_str &msg1, const c_str &msg2)
   {
-//       buf_ns::buf_t<256> buf(2);
     if(msg1) {
       write(2,msg1);
       write(2,":");
@@ -83,6 +79,15 @@ namespace sys {
   void pexit(const c_str &msg1, const c_str &msg2)
   {
     perror(msg1,msg2);
+    exit(1);
+  };
+  void assert_fail(const char *cond, const char *file, unsigned line){
+    write(2,file);
+    write(2,":");
+    write(2,fmt::fmt_t(line));
+    write(2,": assertion (");
+    write(2,cond);
+    write(2,") failed");
     exit(1);
   };
 };
