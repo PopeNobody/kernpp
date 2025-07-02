@@ -1,11 +1,8 @@
+//   #include "fmt.hh"
 #include "syscall.hh"
-
-extern "C" {
-  int main(int, char**,char**) {
-    sys::write(1,"Hello, World!\n");     
-    return 0;
-  };
-}
+#include "c_str.hh"
+#include "itr_ops.hh"
+#include "array.hh"
 
 template<class T, size_t N>
 size_t countof(T (&str)[N]){
