@@ -1,38 +1,58 @@
-#/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 use autodie qw(:all);
-use Data::Dumper;
-$|++;
 use FindBin;
 use lib "$FindBin::Bin";
 
-
-our(%calls);
-require "syscall.pl" or die "$@";
+our (%calls);
+require "syscall.pl";
 
 sub code_sort {
-	return $calls{$a}{code} <=> $calls{$b}{code};
-};
-$\="\n";
-$,=" ";
+    return $calls{$a}{code} <=> $calls{$b}{code};
+}
 
-print q(#file __FILE__);
-print q(#line __LINE__);
-print q(extern "C" {);
-for my $name (sort {code_sort} keys %calls) {
-	our(%call);
-	local *call=$calls{$name};
-	next unless $call{impl};
-	my @args = @{$call{args}};
-	for(@args) {
-		$_=join(" ",@$_);
-	};
-	@args=join(", ", @args);
-	my $rtype=$call{ret};
-        print "// __NR__", $call{name}, "=", $call{code}, "\n";
-	print "inline $rtype $name(@args)";
-	print "  __attribute__((__always_inline__));";
-};
-print q(});
+say q(#file __FILE__);
+say q(#line __LINE__);
+say q(extern "C" {);
+
+for my $name (sort { code_sort } keys %calls) {
+    our (%call);
+    local *call = $calls{$name};
+    next unless $call{impl};
+
+    my @args = @{ $call{args} };
+    my @decl_args = map { join(" ", @$_) } @args;
+    push @decl_args, "errhand_t hand=err_log";
+
+    my $args_str = join(", ", @decl_args);
+    my $rtype = $call{ret};
+    my $code = $call{code};
+    my $sysname = $call{name};
+
+    say "// __NR__ $sysname = $code";
+    say "inline $rtype $name($args_str) __attribute__((__always_inline__));";
+
+    say "inline $rtype $name($args_str) {";
+    say "  uint64_t res = 0xfeebdaed;";
+    say "  asm(\"\\tsyscall;\\n\"";
+    say "      : \"=a\"(res)";
+
+    my @regs = ('D', 'S', 'd', 'r10', 'r8', 'r9');
+    my @arg_regs;
+    for my $i (0 .. $#args) {
+        my $reg = $regs[$i] // "";
+        my $argname = $args[$i][1];
+        push @arg_regs, "\"$reg\"($argname)" if $reg;
+    }
+    unshift @arg_regs, "\"0\"($code)";
+    my $inputs = join(", ", @arg_regs);
+
+    say "      : $inputs";
+    say "      : \"rcx\", \"r11\", \"memory\");";
+    say "  return chk_return<$rtype>(res, hand);";
+    say "}";
+}
+
+say q(});
