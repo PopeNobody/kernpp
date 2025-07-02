@@ -60,7 +60,7 @@ namespace sys
   inline time_t  time(time_t*) AIL;
   inline ssize_t getdents(fd_t fd, linux_dirent64* buf, size_t len) AIL;
   inline ssize_t read(fd_t fd, char* buf, size_t len) AIL;
-  inline ssize_t sys_write(fd_t fd, const char* buf, size_t len) AIL;
+  inline ssize_t write(fd_t fd, const char* buf, size_t len) AIL;
   constexpr auto UTIME_NOW = (((1<<30)-1));
   constexpr auto UTIME_OMIT = (((1<<30)-2));
   constexpr auto AT_FDCWD=-100;
@@ -78,7 +78,7 @@ namespace sys
     return chk_return<ssize_t>(res);
   }
   // __NR_write=1
-  inline ssize_t sys_write(fd_t fd, const char* buf, size_t len)
+  inline ssize_t write(fd_t fd, const char* buf, size_t len)
   {
     uint64_t res;
     asm("syscall\n"
@@ -477,21 +477,17 @@ namespace sys
   inline ssize_t write(fd_t fd, const char* buf, const char* end) AIL;
   inline ssize_t write(fd_t fd, const char* buf) AIL;
 
-  inline ssize_t write(fd_t fd, const char* buf, size_t len)
-  {
-    return sys_write(fd, buf, len);
-  }
   inline ssize_t write(fd_t fd, const char* buf, const char* end)
   {
-    return sys_write(fd, buf, end - buf);
+    return write(fd, buf, end - buf);
   }
   inline ssize_t write(fd_t fd, iovec val)
   {
-    return sys_write(fd, (const char*)val.iov_base, val.iov_len);
+    return write(fd, (const char*)val.iov_base, val.iov_len);
   }
   inline ssize_t write(fd_t fd, bool val)
   {
-    return sys_write(fd, val?"true ":"false",5);
+    return write(fd, val?"true ":"false",5);
   }
 
   inline ssize_t write(fd_t fd, const char* buf)
@@ -499,7 +495,7 @@ namespace sys
     const char* end= buf;
     while(*end)
       ++end;
-    return sys_write(fd, buf, end - buf);
+    return write(fd, buf, end - buf);
   }
   inline ssize_t full_write(fd_t fd, const char* const beg, size_t len)
     AIL;
@@ -515,7 +511,7 @@ namespace sys
     const char* pos= beg;
     while(pos != end)
     {
-      ssize_t res= sys_write(fd, pos, end - pos);
+      ssize_t res= write(fd, pos, end - pos);
       if(res < 0)
         return nullptr;
       pos+= res;
@@ -556,11 +552,11 @@ namespace std
 #ifndef _GLIBCXX_NOTHROW
 #define _GLIBCXX_NOTHROW
 #endif
-namespace std {
-  void *memcpy(void *d, char *s, size_t n);
+extern "C" {
+  void *memcpy(void *d, void *s, size_t n);
   void memset(void *b, char v, size_t n);
   size_t strlen(const char *);
-};
+}
 #define assert(x) do{\
   if(!(x)){\
     sys::assert_fail(#x,__FILE__,__LINE__);\

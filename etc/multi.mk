@@ -1,7 +1,4 @@
 
-$(asm/obj): %.S.oo: %.S etc/asmflags
-	$(CXX)  @etc/asmflags -o $@ -c $<
-
 $(c++/obj): %.cc.oo: %.cc.SS  etc/asmflags etc/cppflags
 	$(CXX)  @etc/asmflags -o $@ -c $<
 

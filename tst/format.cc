@@ -29,14 +29,6 @@ struct small_string {
     size_t size() const { return len; }
 };
 
-void *memcpy(void *vdst, const void *vsrc, size_t n){
-  char *dst=(char*)vdst;
-  const char *src=(const char *)vsrc;
-  for(int i=0;i<n;i++){
-    dst[i]=src[i];
-  };
-  return vdst;
-}
 
 template <typename T>
 char* format_integer_msb_first(T val, char* b, char* e) {

@@ -47,19 +47,12 @@ all: $(all/exe)
 include etc/multi.mk
 
 $(asm/obj): %.S.oo: %.S etc/asmflags
-	as -o $@ $< @etc/asmflags
+	$(CXX) -o $@ $< @etc/aflags -c
 
 $(asm/exe): %: %.S.oo etc/ld_flags $(lib/lib)
 	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) @etc/ld_flags -Wl,--end-group
 #    	$< $(lib/lib) @etc/ld_flags 
 
-
-
-$(c++/obj): %.cc.oo: %.cc  etc/cxxflags etc/cppflags
-	$(CXX)  -o $@ -c $< @etc/cxxflags @etc/cppflags
-
-$(c++/cpp): %.cc.ii: %.cc  etc/cxxflags etc/cppflags
-	$(CXX)  -o $@ -E $< @etc/cxxflags @etc/cppflags
 
 all: $(c++/obj)
 

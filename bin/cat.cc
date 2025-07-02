@@ -1,6 +1,4 @@
 #include "syscall.hh"
-#include "c_str.hh"
-using str::c_str;
 using namespace sys;
 void cat(const char *file) {
   int fd=open(file,o_rdonly);

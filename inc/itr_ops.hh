@@ -71,4 +71,16 @@ namespace itr {
       ; // say nothing, act natural
     return i;
   };
+  inline int str_cmp(const char *lhs, const char *rhs)
+  {
+    while(*lhs && *rhs){
+      if(*lhs!=*rhs)
+        return (lhs>rhs?-1:1);
+    };
+    if(*lhs)
+      return -1;
+    if(*rhs)
+      return 1;
+    return 0;
+  };
 };

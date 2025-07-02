@@ -4,3 +4,4 @@
 -O0
 -fno-stack-protector
 -std=c++23
+-Wno-vla-cxx-extension
