@@ -233,9 +233,13 @@ typedef int64_t ptrdiff_t;
 };
 using std::ptrdiff_t;
 typedef uint32_t mode_t;
-typedef uint64_t size_t;
 typedef uint64_t* size_p;
+namespace std {
+typedef uint64_t size_t;
 typedef int64_t ssize_t;
+}
+using std::ssize_t;
+using std::size_t;
 typedef uint64_t ino64_t;
 struct timeval
 {
