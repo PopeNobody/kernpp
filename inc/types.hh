@@ -116,7 +116,7 @@ struct linux_dirent64;
 typedef linux_dirent64* linux_dirent64_p;
 struct sigevent;
 typedef sigevent* sigevent_p;
-struct timer_t;
+typedef void *timer_t;
 typedef timer_t* timer_p;
 struct timezone;
 typedef timezone* timezone_p;

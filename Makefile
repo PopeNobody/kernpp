@@ -41,7 +41,11 @@ all/obj:= $(c++/obj) $(asm/obj)
 
 all/exe:=$(c++/exe) $(c++/tst) $(asm/exe)
 
-all: $(all/exe)
+all: $(all/exe) inc/syscall.gen.hh
+
+inc/syscall.gen.hh: scr/genheaders.pl scr/syscall.pl
+	vi-perl scr/genheaders.pl > $@.new
+	mv $@.new $@
 
 #    include etc/one-step.mk
 include etc/multi.mk

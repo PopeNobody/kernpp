@@ -7,7 +7,7 @@ int main() {
     int x = 42;
     const char* msg = " | ";
     float f = 3.14159;
-    sys::write(1,x);
+    sys::write(1,fmt::fmt_t(x));
     sys::write(1,"\n");
     sys::write(1,msg); 
     sys::write(1,"\n");

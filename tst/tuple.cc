@@ -42,15 +42,15 @@ extern "C" {
   int main() {
     using sys::write;
     if constexpr(std::is_same_v<int,int>){
-      write(1,true);
+      write(1,fmt_t(true));
     } else {
-      write(1,false);
+      write(1,fmt_t(false));
     };
     write(1,"\n");
     if constexpr(std::is_same_v<int,float>){
-      write(1,true);
+      write(1,fmt_t(true));
     } else {
-      write(1,false);
+      write(1,fmt_t(false));
     };
     write(1,"\n");
     auto tup = std::make_tuple(42, 'x', 3.14);
@@ -64,19 +64,19 @@ extern "C" {
         timmy(fd,T());
         timmy(fd,elem);
         if constexpr(std::is_same_v<T,int>){
-          write(fd,true);
+          write(fd,fmt_t(true));
         } else {
-          write(fd,false);
+          write(fd,fmt_t(false));
         };
         write(fd,"\n");
         bool is_char=std::is_same_v<T,char>;
         bool is_float=std::is_same_v<T,float>;
         write(fd,pad_r("int",6));
-        write(fd,is_int);
+        write(fd,fmt_t(is_int));
         write(fd,pad_r("char",6));
-        write(fd,is_char);
+        write(fd,fmt_t(is_char));
         write(fd,pad_r("float",6));
-        write(fd,is_float);
+        write(fd,fmt_t(is_float));
         write(fd,"\n");
         }
         );
@@ -90,18 +90,18 @@ extern "C" {
         timmy(fd,T());
         timmy(fd,elem);
         if constexpr(std::is_same_v<T,int>){
-          write(fd,true);
+          write(fd,fmt_t(true));
         } else {
-          write(fd,false);
+          write(fd,fmt_t(false));
         };
         bool is_char=std::is_same_v<T,char>;
         bool is_float=std::is_same_v<T,float>;
         write(fd,"int");
-        write(fd,is_int);
+        write(fd,fmt_t(is_int));
         write(fd,"char");
-        write(fd,is_char);
+        write(fd,fmt_t(is_char));
         write(fd,"float");
-        write(fd,is_float);
+        write(fd,fmt_t(is_float));
         write(fd,"\n");
         }
         );

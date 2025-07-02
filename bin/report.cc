@@ -5,7 +5,7 @@ istr_t *environ;
 
 istr_t get_env(char const * name){
   for(istr_t *p=environ; *p; p++){
-    write(2,p);
+    write(2,*p);
     write(2,"\n");
   };
   return 0;
@@ -20,11 +20,6 @@ int main(int argc,char *const*argv,char *const*envp) {
       write(2,"No program provided\n");
       exit(2);
     };
-//       full=search_path(argv[1],"PATH");
-//       if(!full) {
-//         write(2,"not found\n");
-//         exit(97);
-//       };
     argv++;
     pid_t pid=fork();
     pid_t res;

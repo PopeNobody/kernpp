@@ -108,10 +108,14 @@ namespace sys
 #include "syscall.gen.hh"
 
 namespace sys {
+  inline fd_t open(istr_t path, open_flags flags, errhand_t hand=err_log) {
+    return open(path,flags,0,hand);
+  };
 
-  inline ssize_t write(fd_t fd, const char* buf, size_t len) AIL;
-  inline ssize_t write(fd_t fd, const char* buf, const char* end) AIL;
-  inline ssize_t write(fd_t fd, const char* buf) AIL;
+  inline pid_t waitpid(pid_t pid, int *status, int flags, errhand_t hand=err_log) AIL;
+  inline pid_t waitpid(pid_t pid, int *status, int flags, errhand_t hand) {
+    return wait4(pid,status,flags,0,hand);
+  };
 
   inline ssize_t write(fd_t fd, const char* buf, const char* end)
   {
@@ -120,10 +124,6 @@ namespace sys {
   inline ssize_t write(fd_t fd, iovec val)
   {
     return write(fd, (const char*)val.iov_base, val.iov_len);
-  }
-  inline ssize_t write(fd_t fd, bool val)
-  {
-    return write(fd, val?"true ":"false",5);
   }
 
   inline ssize_t write(fd_t fd, const char* buf)

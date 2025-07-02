@@ -19,7 +19,7 @@
     ],
     'ret' => 'ssize_t'
   },
-  'sys_write' => {
+  'write' => {
     'code' => 1,
     'name' => 'write',
     'impl' => 1,
@@ -441,15 +441,15 @@
         'n'
       ],
       [
-        'fd_set_p',
+        'fdset_p',
         'inp'
       ],
       [
-        'fd_set_p',
+        'fdset_p',
         'outp'
       ],
       [
-        'fd_set_p',
+        'fdset_p',
         'exp'
       ],
       [
@@ -1080,7 +1080,7 @@
     ],
     'ret' => 'int'
   },
-  'sys_clone' => {
+  'clone' => {
     'code' => 56,
     'name' => 'clone',
     'impl' => 1,
@@ -1109,18 +1109,19 @@
     'name' => 'fork',
     'impl' => 1,
     'args' => [],
-    'ret' => 'int'
+    'ret' => 'pid_t'
   },
   'vfork' => {
     'code' => 58,
     'name' => 'vfork',
     'impl' => 1,
     'args' => [],
-    'ret' => 'int'
+    'ret' => 'pid_t'
   },
   'execve' => {
     'code' => 59,
     'name' => 'execve',
+    'noreturn' => 1,
     'impl' => 1,
     'args' => [
       [
@@ -1138,10 +1139,11 @@
     ],
     'ret' => 'int'
   },
-  '_exit' => {
+  'exit' => {
     'code' => 60,
     'name' => 'exit',
     'impl' => 1,
+    noreturn=>1,
     'args' => [
       [
         'int',
@@ -1205,7 +1207,7 @@
   'semget' => {
     'code' => 64,
     'name' => 'semget',
-    'impl' => 1,
+    'impl' => 0,
     'args' => [
       [
         'key_t',
@@ -1225,7 +1227,7 @@
   'semop' => {
     'code' => 65,
     'name' => 'semop',
-    'impl' => 1,
+    'impl' => 0,
     'args' => [
       [
         'int',
@@ -1245,7 +1247,7 @@
   'semctl' => {
     'code' => 66,
     'name' => 'semctl',
-    'impl' => 1,
+    'impl' => 0,
     'args' => [
       [
         'int',
@@ -2424,7 +2426,7 @@
     ],
     'ret' => 'int'
   },
-  'sys_sched_setparam' => {
+  'sched_setparam' => {
     'code' => 142,
     'name' => 'sched_setparam',
     'impl' => 1,
@@ -2456,7 +2458,7 @@
     ],
     'ret' => 'int'
   },
-  'sys_sched_setscheduler' => {
+  'sched_setscheduler' => {
     'code' => 144,
     'name' => 'sched_setscheduler',
     'impl' => 1,
@@ -3378,7 +3380,7 @@
     ],
     'ret' => 'int'
   },
-  'sys_sched_setaffinity' => {
+  'sched_setaffinity' => {
     'code' => 203,
     'name' => 'sched_setaffinity',
     'impl' => 1,
@@ -3398,7 +3400,7 @@
     ],
     'ret' => 'int'
   },
-  'sys_sched_getaffinity' => {
+  'sched_getaffinity' => {
     'code' => 204,
     'name' => 'sched_getaffinity',
     'impl' => 1,
@@ -3426,7 +3428,7 @@
   'io_setup' => {
     'code' => 206,
     'name' => 'io_setup',
-    'impl' => 1,
+    'impl' => 0,
     'args' => [
       [
         'unsigned',
@@ -3442,7 +3444,7 @@
   'io_destroy' => {
     'code' => 207,
     'name' => 'io_destroy',
-    'impl' => 1,
+    'impl' => 0,
     'args' => [
       [
         'aio_context_t',
@@ -3454,7 +3456,7 @@
   'io_getevents' => {
     'code' => 208,
     'name' => 'io_getevents',
-    'impl' => 1,
+    'impl' => 0,
     'args' => [
       [
         'aio_context_t',
@@ -3478,7 +3480,7 @@
   'io_submit' => {
     'code' => 209,
     'name' => 'io_submit',
-    'impl' => 1,
+    'impl' => 0,
     'args' => [
       [
         'aio_context_t',
@@ -3498,7 +3500,7 @@
   'io_cancel' => {
     'code' => 210,
     'name' => 'io_cancel',
-    'impl' => 1,
+    'impl' => 0,
     'args' => [
       [
         'aio_context_t',
@@ -3837,6 +3839,7 @@
     'code' => 231,
     'name' => 'exit_group',
     'impl' => 1,
+    noreturn=>1,
     'args' => [
       [
         'int',
@@ -4679,15 +4682,15 @@
         'n'
       ],
       [
-        'fd_set_p',
+        'fdset_p',
         'inp'
       ],
       [
-        'fd_set_p',
+        'fdset_p',
         'outp'
       ],
       [
-        'fd_set_p',
+        'fdset_p',
         'exp'
       ],
       [
@@ -5837,9 +5840,9 @@
     ],
     'ret' => 'int'
   },
-  'stub_execveat' => {
+  'execveat' => {
     'code' => 322,
-    'name' => 'stub_execveat',
+    'name' => 'execveat',
     'impl' => 1,
     'args' => [
       [

@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 $|++;
-use strict;
-use warnings;
+use common::sense;
 use autodie qw(:all);
 use Data::Dumper;
 use FindBin;
