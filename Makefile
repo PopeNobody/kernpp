@@ -1,38 +1,36 @@
-MAKEFLAGS+= -rR -j1 
+MAKEFLAGS+= -rR -j1
 #export override PATH:=$(PWD)/sbin:$(PATH)
+DISTCC_HOSTS:=localhost/1 10.1.3.102/24
 SHELL:=/bin/bash -e
 all: lib bin tst
-CXX:=/opt/bin/clang++
-tgt/lib:=lib/libkernpp.aa
+#CXX:=/opt/bin/clang++
+CXX:=$(HOME)/bin/dist-clang++
 lib/lib:=lib/libkernpp.aa
-
-deps:= $(sort $(wildcard */*.d))
+tgt/all:=$(lib/lib)
+show= $(warning $1: $($1))
+deps:= $(sort $(wildcard */*.d) $(wildcard */*.dd))
 cxxs:= $(sort $(wildcard */*.cc))
 objs:= $(sort $(wildcard */*.oo))
-include etc/resolve.mk
-include etc/rules.mk
-include $(wildcard $(deps))
+include /dev/null $(wildcard $(deps))
 $(deps):;
 
-src/c++:=$(wildcard */*.cc)
-c++/obj:=$(src/c++:.cc=.cc.oo)
-c++/exe:=$(filter bin/%,$(c++/obj:.cc.oo=))
+c++/src:=$(wildcard */*.cc)
+c++/obj:=$(c++/src:.cc=.cc.oo)
+c++/exe:=$(filter bin/% tst/%,$(c++/src:.cc=))
 c++/tst:=$(filter tst/%,$(c++/obj:.cc.oo=))
 c++/lib:=$(filter lib/%,$(c++/obj))
+#$(foreach x,src obj exe lib,$(call show,c++/$x))
 
 all: $(c++/exe) $(asm/exe) $(lib/lib)
 
-src/asm:=$(wildcard */*.S)
-asm/obj:=$(src/asm:.S=.S.oo)
+asm/src:=$(wildcard */*.S)
+asm/obj:=$(asm/src:.S=.S.oo)
 asm/lib:=$(filter lib/%,$(asm/obj))
+asm/exe:=$(filter bin/%,$(asm/src:.S=))
 
-c++/obj: $(c++/obj)
+all: $(c++/exe) $(asm/exe) $(lib/lib)
 
-asm/obj: $(asm/obj)
-
-tst/obj: $(tst/obj)
-
-obj: $(c++/obj)
+obj: $(c++/obj) $(asm/obj)
 lib: $(lib/lib)
 
 $(lib/lib): $(asm/lib) $(c++/lib)
@@ -48,13 +46,26 @@ all: $(all/exe)
 #    include etc/one-step.mk
 include etc/multi.mk
 
-bin/_start: lib/lib:=
+$(asm/obj): %.S.oo: %.S etc/asmflags
+	as -o $@ $< @etc/asmflags
 
-$(c++/tst): %: %.cc.oo etc/ld_flags lib $(lib/lib)
-	$(CXX) -o $@ $< -Wl,--start-group $(lib/lib) @etc/ld_flags -Wl,--end-group
+$(asm/exe): %: %.S.oo etc/ld_flags $(lib/lib)
+	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) @etc/ld_flags -Wl,--end-group
+#    	$< $(lib/lib) @etc/ld_flags 
 
-$(c++/exe): %: %.cc.oo etc/ld_flags lib $(lib/lib)
-	$(CXX) -o $@ $< -Wl,--start-group $(lib/lib) @etc/ld_flags -Wl,--end-group
+
+
+$(c++/obj): %.cc.oo: %.cc  etc/cxxflags etc/cppflags
+	$(CXX)  -o $@ -c $< @etc/cxxflags @etc/cppflags
+
+$(c++/cpp): %.cc.ii: %.cc  etc/cxxflags etc/cppflags
+	$(CXX)  -o $@ -E $< @etc/cxxflags @etc/cppflags
+
+all: $(c++/obj)
+
+
+$(c++/exe): %: %.cc.oo etc/ld_flags $(lib/lib)
+	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) @etc/ld_flags -Wl,--end-group
 
 
 /dev/null:;
@@ -62,9 +73,10 @@ $(c++/exe): %: %.cc.oo etc/ld_flags lib $(lib/lib)
 Makefile:;
 
 clean:
-	rm -f $(c++/exe) $(asm/exe) $(lnk/exe) $(c++/tst) $(asm/tst)
-	rm -f $(c++/obj) $(asm/obj) */*.SS */*.ii
-include /dev/null $(wildcard */*.dd)
+	rm -f $(c++/exe) $(asm/exe) $(lib/lib)
+	rm -f $(c++/obj) $(asm/obj)
+	rm -f $(c++/asm) $(c++/cpp)
+
 all: $(all/exe) $(tgt/all)
 	@echo made all
-	@printf '%s\n' $(all/exe) | sort .gitignore -u -o .gitignore -
+	@printf '%s\n' $(asm/exe) $(c++/exe) | sort .gitignore -u -o .gitignore -
