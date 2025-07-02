@@ -1,7 +1,7 @@
 MAKEFLAGS+= -rR -j1
 #export override PATH:=$(PWD)/sbin:$(PATH)
 DISTCC_HOSTS:=localhost/1 10.1.3.102/24
-SHELL:=/bin/bash -xe
+SHELL:=/bin/bash -e
 all: lib bin tst
 CXX:=$(HOME)/bin/dist-clang++
 lib/lib:=lib/libkernpp.aa
@@ -19,13 +19,14 @@ c++/exe:=$(filter bin/% tst/%,$(c++/src:.cc=))
 c++/lib:=$(filter lib/%,$(c++/obj))
 #$(foreach x,src obj exe lib,$(call show,c++/$x))
 
+asm/src:=$(wildcard */*.S)
+asm/obj:=$(asm/src:.S=.S.o)
+asm/lib:=$(filter lib/%,$(asm/obj))
+asm/exe:=$(filter bin/%,$(asm/src:.S=))
+
 all: $(c++/exe) $(asm/exe) $(lib/lib)
 
-src/asm:=$(wildcard */*.S)
-asm/obj:=$(src/asm:.S=.S.oo)
-asm/lib:=$(filter lib/%,$(asm/obj))
-
-obj: $(c++/obj)
+obj: $(c++/obj) $(asm/obj)
 lib: $(lib/lib)
 
 $(lib/lib): $(asm/lib) $(c++/lib)
@@ -34,8 +35,13 @@ $(lib/lib): $(asm/lib) $(c++/lib)
 
 all/obj:= $(c++/obj) $(asm/obj)
 
-$(asm/obj): %.S.oo: %.S etc/asmflags
+$(asm/obj): %.S.o: %.S etc/asmflags
 	as -o $@ $< @etc/asmflags
+
+$(asm/exe): %: %.S.o etc/ld_flags $(lib/lib)
+	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) @etc/ld_flags -Wl,--end-group
+#    	$< $(lib/lib) @etc/ld_flags 
+
 
 
 $(c++/obj): %.cc.oo: %.cc  etc/cxxflags etc/cppflags
@@ -47,7 +53,7 @@ $(c++/cpp): %.cc.ii: %.cc  etc/cxxflags etc/cppflags
 all: $(c++/obj)
 
 
-$(c++/exe): %: %.cc.oo etc/ld_flags lib
+$(c++/exe): %: %.cc.oo etc/ld_flags $(lib/lib)
 	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) @etc/ld_flags -Wl,--end-group
 
 
