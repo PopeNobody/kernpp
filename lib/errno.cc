@@ -15,15 +15,22 @@ struct set_bool {
     val=false;
   };
 };
-void sys::set_errno(uint64_t err)
+void sys::err_ignore(sys::errno_t err)
+{
+};
+void sys::err_log(sys::errno_t err)
 {
   static bool recurse=false;
   if(recurse)
     return;
   set_bool setter(recurse);
   sys::write(2,"setting error to: ");
-  sys::write(2,fmt::fmt_t(err));
+  sys::write(2,fmt::fmt_t((long)err));
   sys::write(2,"\n\n");
+};
+void sys::set_errno(uint64_t err, errhand_t hand)
+{
+  errno=err;
 }
 void die::throw_errno(uint64_t err){
   sys::set_errno(err);

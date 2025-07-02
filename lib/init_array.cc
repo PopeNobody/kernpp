@@ -3,7 +3,7 @@
 typedef unsigned long size_t;
 typedef long ssize_t;
 typedef unsigned char uint8_t;
-
+using sys::write;
 extern void (*__preinit_array_start []) (void) __attribute__((weak));
 extern void (*__preinit_array_end []) (void) __attribute__((weak));
 extern void (*__init_array_start []) (void) __attribute__((weak));

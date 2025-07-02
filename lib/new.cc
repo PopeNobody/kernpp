@@ -3,10 +3,12 @@
 
 using std::align_val_t;
 using std::nothrow_t;
-
+namespace std {
+  void *malloc(size_t sz);
+};
 void* operator new(size_t sz)
 {
-	return malloc(sz);
+	return std::malloc(sz);
 }
 void* operator new(size_t sz, align_val_t align)
 {

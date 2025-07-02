@@ -1,32 +1,26 @@
+#if 0
 #include <syscall.hh>
 #include <fmt.hh>
-#include <write_buf.hh>
 
-using fmt::write_dec;
-using fmt::write_ptr;
-using fmt::write_hex;
-
+namespace nn {
+  int brk (void *addr);
+  void * sbrk (ssize_t increment);
+}
 namespace fmt {
-  inline char *fmt_sphex(unsigned long val, char *beg, char *end)
-  {
-    int i;
-    for(i=0;i<2*sizeof(val);i++){
-      *--end=hex_dig(val);
-      if((val/=0x10)==0)
-        break;
-    };
-    for(;i<2*sizeof(val);i++)
-      *--end=' ';
-    return end;
-  };
   inline int write_sphex(fd_t fd, size_t hex) {
-    char buf[sizeof(hex)*4];
-    return write(fd, fmt::fmt_sphex(hex,buf,&buf[sizeof(buf)-1]));
+    fmt::fmt_t buf(hex,16,8);
+    return sys::write(fd, buf);
+  };
+  inline int write_dec(fd_t fd, size_t dec){
+    fmt::fmt_t buf(dec,10);
+    return sys::write(fd, buf);
+  };
+  struct fmtbuf_t {
   };
 };
-using fmt::write_sphex;
-using fmt::fmt_sphex;
 using namespace sys;
+using namespace nn;
+
 class block_l {
   enum magic_t { magic = 0xdeadbeef };
   struct block_t {
@@ -54,16 +48,17 @@ class block_l {
   void *malloc(size_t size)
   {
     void *res=_malloc(size);
-    if(0){
-      write_buf<> msg(2);
-      msg.put("malloc(");
-      msg.fmt(size);
-      msg.put(") => ");
-      msg.fmtln(res);
+    if(1){
+      write(2,"malloc(");
+      write(2,size);
+      write(2,") => ");
+      write(2,res);
+      write(2,"\n");
     };
     return res;
 
   };
+
   void *_malloc(size_t size)
   {
     block_t **pos=&list;
@@ -72,22 +67,6 @@ class block_l {
       void *ptr = (void*)(blk+1);
       if( blk->magic1 != magic || blk->magic2 != magic || blk->magic3 != magic ) 
       {
-        using fmt::hex_t;
-        write_buf<> msg(2);
-        msg.put(__FILE__);
-        msg.put(":");
-        msg.fmt(__LINE__);
-        msg.put(":");
-        msg.put("free: ");
-        msg.fmtln(ptr);
-        msg.put("blk: ");
-        msg.fmtln(blk);
-        msg.put("magic1: ");
-        msg.fmtln(hex_t((unsigned long)blk->magic1));
-        msg.put("magic2: ");
-        msg.fmtln(hex_t((unsigned long)blk->magic2));
-        msg.put("magic3: ");
-        msg.fmtln(hex_t((unsigned long)blk->magic3));
       };
       if(!(*pos)->used && (*pos)->size>=size) {
         (*pos)->used=true;
@@ -115,23 +94,13 @@ class block_l {
     --blk;
     if( blk->magic1 != magic || blk->magic2 != magic || blk->magic3 != magic ) 
     {
-        using fmt::hex_t;
-      write_buf<> msg(2);
-      msg.put(__FILE__);
-      msg.put(":");
-      msg.fmt(__LINE__);
-      msg.put(":");
-      msg.put("free: ");
-      msg.fmtln(ptr);
-      msg.put("blk: ");
-      msg.fmtln(blk);
-      msg.put("magic1: ");
-      msg.fmtln(hex_t((unsigned long)blk->magic1));
-      msg.put("magic2: ");
-      msg.fmtln(hex_t((unsigned long)blk->magic2));
-      msg.put("magic3: ");
-      msg.fmtln(hex_t((unsigned long)blk->magic3));
-      msg.flush();
+      fmtbuf_t buf(
+          __FILE__, ":", __LINE__, ":", "free: ", ptr, "blk: ", blk, 
+          "magic1: ", (unsigned long)blk->magic1,
+          "magic2: ", (unsigned long)blk->magic2,
+          "magic3: ", (unsigned long)blk->magic3,
+        );
+      buf.write(2);      
     };
     if(!blk->used) {
       write(2,L("warning: double free of: "));
@@ -162,23 +131,8 @@ class block_l {
   };
 };
 block_l list;
-extern "C" {
-//     void mm_show() {
-//       list.show();
-//     };
-};
 void *malloc(size_t size) {
-#if 1
   return list.malloc(size);
-#else
-  write(2,L("malloc("));
-  write_dec(2,size);
-  write(2,L(") => "));
-  void *res=list.malloc(size);
-  write_ptr(2,res);
-  write(2,L("\n"));
-  return res;
-#endif
 };
 void *realloc(void *ptr, size_t size) {
   char *optr=(char*)ptr;
@@ -191,7 +145,7 @@ void free(void *ptr) {
   list.free(ptr);
 };
 void *__curbrk;
-
+namespace nn {
 int brk (void *addr)
 {
   char *newbrk;
@@ -242,3 +196,5 @@ void * sbrk (ssize_t increment)
 
   return oldbrk;
 }
+}
+#endif

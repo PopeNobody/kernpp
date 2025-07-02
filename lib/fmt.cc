@@ -1,6 +1,8 @@
 #include "fmt.hh"
 
 namespace fmt {
+  void fmt_t::format(float f, int width, int prec){
+  };
 //     void format(str::c_str buf,int_t wrap, int base, int width, char fill) {
 //       unsigned long val=wrap.abs;
 //       unsigned long neg=wrap.neg;
