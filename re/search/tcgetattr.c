@@ -1,4 +1,23 @@
 #include <termios.h>
+//   #ifdef __USE_XOPEN_EXTENDED
+//   /* The next four functions all take a master pseudo-tty fd and
+//      perform an operation on the associated slave:  */
+//   
+//   /* Chown the slave to the calling user.  */
+//   extern int grantpt (int __fd) __THROW;
+//   
+//   /* Release an internal lock so the slave can be opened.
+//      Call after grantpt().  */
+//   extern int unlockpt (int __fd) __THROW;
+//   
+//   /* Return the pathname of the pseudo terminal slave associated with
+//      the master FD is open on, or NULL on errors.
+//      The returned storage is good until the next call to this function.  */
+//   extern char *ptsname (int __fd) __THROW __wur;
+//   #endif
+#define _XOPEN_SOURCE
+#define __USE_XOPEN_EXTENDED
+#include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
@@ -70,14 +89,25 @@ void save(const char *name){
 //constexpr static int TCGETS=0;
 //constexpr static int TIOCGWINSZ=0;
 //constexpr static int TIOCSWINSZ=0;
-int main(int, char**, char**) {
+void pty() {
+  int mfd=open("/dev/ptmx",O_RDWR|O_NOCTTY);
+  int res=unlockpt(mfd);
+  int sfd=ioctl(mfd,TIOCGPTPEER,O_RDWR|O_NOCTTY);
+  dprintf(2,"mfd: %d\n", mfd);
+  dprintf(2,"res: %d\n", res);
+  dprintf(2,"sfd: %d\n", sfd);
+
+};
+int main(int argc, char**argv, char**envp) {
   int fd = find_tty();
-  dprintf(2,"%-12s %6x\n",str(TIOCGPTPEER), TIOCGPTPEER);
-  dprintf(2,"%-12s %6x\n",str(TCGETS),TCGETS);
-  dprintf(2,"%-12s %6x\n",str(TCSETS),TCSETS);
-  dprintf(2,"%-12s %6x\n",str(TCSETSW),TCSETSW);
-  dprintf(2,"%-12s %6x\n",str(TIOCGWINSZ),TIOCGWINSZ);
-  dprintf(2,"%-12s %6x\n",str(TIOCSWINSZ),TIOCSWINSZ);
+  dprintf(2,"%-12s %16x\n",str(TIOCGPTPEER), TIOCGPTPEER);
+  dprintf(2,"%-12s %16x\n",str(TCGETS),TCGETS);
+  dprintf(2,"%-12s %16x\n",str(TCSETS),TCSETS);
+  dprintf(2,"%-12s %16x\n",str(TCSETSW),TCSETSW);
+  dprintf(2,"%-12s %16x\n",str(TIOCGWINSZ),TIOCGWINSZ);
+  dprintf(2,"%-12s %16x\n",str(TIOCSWINSZ),TIOCSWINSZ);
+  dprintf(2,"%-12s %16x\n",str(TIOCSPTLCK),TIOCSPTLCK);
+  pty(); 
   tcgetattr(fd,&data);
   dprintf(2,"read term %s\n","data.bin");
   save("data.bin");

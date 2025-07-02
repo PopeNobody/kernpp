@@ -1,3 +1,11 @@
 data.raw
 tcgetattr
 tcgetattr.i
+*.o
+find_all_values
+isprint
+tcgetattr
+lookup
+ns_enum
+rvalue-ref
+waiting-for-problem

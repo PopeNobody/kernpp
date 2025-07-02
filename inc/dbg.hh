@@ -16,6 +16,13 @@
 namespace dbg {
   struct runtime_error
   {
+    struct body_t {
+      const char *what;
+    } body;
+    runtime_error(const char *what)
+      : body{what}
+    {
+    };
   };
   template<typename ...arg_t>
     void __xthrow(arg_t ... args);

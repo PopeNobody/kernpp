@@ -1,35 +1,45 @@
-#include "syscall.hh"
+extern "C" { int main(int argc,char *const*argv,char *const*envp); };
+#include "die.hh"
 #include "vpipe.hh"
-#include <fmt.hh>
-using namespace sys;
+#include "fmt.hh"
+#include "bitset.hh"
 using vpipe::setup_term_and_pty;
-int main(int argc, char **argv, char**envp)
-{
-//     setup_term_and_pty(false);
+const int TIOCGPTPEER = 0x5441;
+const int  TIOCSPTLCK = 0x40045431;
+using fmt::fmt_t;
 
-  const int TIOCGPTPEER = 0x5441;
+struct fd_set : public collect::bitset_t<1024> {
+  fd_set select(timeval_t);
+};
+struct fd_act {
+  typedef void(*act_t)(fd_t &);
+  act_t act;
+  fd_t fd;
+  bool operator()(const fd_set &set);
+};
+using enum sys::open_flags;
+using sys::ioctl;
+using sys::read;
+using sys::write;
+using sys::close;
+using sys::dup2;
+using sys::getpid;
+using sys::open_flags;
+int main(int argc,char *const*argv,char *const*envp) {
   const char mname[]="/dev/pts/ptmx";
   const char sname[]="             ";
-  int mpty=open(mname,o_rdwr);
-  int opty=-1;
-  int spty=ioctl(mpty,TIOCGPTPEER,(uint64_t)&opty);
-
-  using fmt::fmt_t;
-  write(1,"mpty: ");
-  write(1,fmt_t(mpty));
-  write(1,"opty: ");
-  write(1,fmt_t(opty));
-  write(1,"spty: ");
-  write(1,fmt_t(spty));
-  for(int i=0;i<sizeof(mname);i++){
-    write(opty,mname+i,1);
-    read(mpty,(char*)&sname[i],1);
-  };
-//     for(int i=0;i<sizeof(mname);i++){
-//       write(opty,mname+i,1);
-//       int j=read(mpty,(char*)sname+i,1);
-//       write(0,sname,i);
-//     }
+  fd_t mpty,spty;
+  int res;
+  open_flags flags=o_rdwr|o_noctty|o_cloexec;
+  mpty=open(mname,flags);
+  bool lock;
+  res=ioctl(mpty,TIOCSPTLCK,uint64_t(&lock));
+  spty=ioctl(mpty,TIOCGPTPEER,(size_t)flags);
+  fmt_t s_spty(spty);
+  fmt_t s_mpty(mpty);
+  fd_set rset;
+  write(1,fmt_t(sizeof(__uint128_t)));
+  
   return 0;
 };
 
@@ -37,7 +47,8 @@ void close_fds() {
   for(int i=3;i<64;i++) {
     close(i);
   };
-} 
+};
+
 //   using namespace std;
 //   using namespace x;
 //   using namespace vterm_ns;

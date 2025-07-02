@@ -1,4 +1,4 @@
-
+#if 0
 static fd_t run_xxd() {
   fd_t fds[2];
   pipe(fds);
@@ -15,4 +15,8 @@ static fd_t run_xxd() {
   execve(argv[0],(char*const*)argv,envv);
   pexit(3,"exec:xxd");
 };
+#endif
 
+int main() {
+
+};

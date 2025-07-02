@@ -15,17 +15,14 @@ void too_many() {
 };
 const static int million=1000000;
 const static int billion=1000*million;
-extern "C" {
-  int main(int argc, char**argv, char **envp);
-};
 getopt_t getopt(0,0,0);
-int main(int argc, char**argv, char **envp)
-{
+extern "C" {
+int main(int argc,char *const*argv,char *const*envp) {
   int opt;
   ++argv;
   --argv; 
   size_t mul=0;
-  while ((opt = getopt(argv)) != -1) {
+  while ((opt = getopt((char**)argv)) != -1) {
     write(1,L("main: got '"));
     char ch=opt;
     write(1,&ch,1);
@@ -76,4 +73,5 @@ int main(int argc, char**argv, char **envp)
 
   nanosleep(&tm,0);
   return 0;
+};
 };

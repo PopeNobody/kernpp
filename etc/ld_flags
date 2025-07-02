@@ -1,5 +1,6 @@
 -Llib
 -O0
+-g3
 -ffreestanding
 -fno-exceptions
 -fno-stack-protector
