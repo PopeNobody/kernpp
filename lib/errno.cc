@@ -15,7 +15,7 @@ namespace sys {
     c_str text=fmt;
     return write(fd, text.beg(), text.len());
   };
-  ssize_t set_errno(ssize_t err)
+  long set_errno(long err)
   {
     if(err>=0)
       return err;

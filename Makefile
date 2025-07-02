@@ -4,21 +4,20 @@ DISTCC_HOSTS:=localhost/1 10.1.3.102/24
 SHELL:=/bin/bash -xe
 all: lib bin tst
 CXX:=$(HOME)/bin/dist-clang++
-tgt/lib:=lib/libkernpp.aa
 lib/lib:=lib/libkernpp.aa
-
-deps:= $(sort $(wildcard */*.d))
+tgt/all:=$(lib/lib)
+show= $(warning $1: $($1))
+deps:= $(sort $(wildcard */*.d) $(wildcard */*.dd))
 cxxs:= $(sort $(wildcard */*.cc))
 objs:= $(sort $(wildcard */*.oo))
-include etc/resolve.mk
-include etc/rules.mk
-include $(wildcard $(deps))
+include /dev/null $(wildcard $(deps))
 $(deps):;
 
-src/c++:=$(wildcard */*.cc)
-c++/obj:=$(src/c++:.cc=.cc.oo)
-c++/exe:=$(filter bin/%,$(c++/obj:.cc.oo=))
+c++/src:=$(wildcard */*.cc)
+c++/obj:=$(c++/src:.cc=.cc.oo)
+c++/exe:=$(filter bin/% tst/%,$(c++/src:.cc=))
 c++/lib:=$(filter lib/%,$(c++/obj))
+#$(foreach x,src obj exe lib,$(call show,c++/$x))
 
 all: $(c++/exe) $(asm/exe) $(lib/lib)
 
@@ -57,9 +56,10 @@ $(c++/exe): %: %.cc.oo etc/ld_flags lib
 Makefile:;
 
 clean:
-	rm -f $(c++/exe) $(asm/exe) $(lnk/exe)
+	rm -f $(c++/exe) $(asm/exe) $(lib/lib)
 	rm -f $(c++/obj) $(asm/obj)
+	rm -f $(c++/asm) $(c++/cpp)
 
 all: $(tgt/all)
 	@echo made all
-	@printf '%s\n' $(bin/exe) | sort bin/.gitignore -u -o bin/.gitignore -
+	@printf '%s\n' $(asm/exe) $(c++/exe) | sort .gitignore -u -o .gitignore -
