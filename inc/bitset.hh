@@ -5,23 +5,46 @@
 namespace collect {
   template <size_t N>
     struct bitset_t {
-      typedef uint64_t word_t;
+      typedef uint16_t word_t;
       static constexpr size_t BITS = N;
       static constexpr size_t WORD_BITS = sizeof(word_t)*8;
       static constexpr size_t WORDS = (N + WORD_BITS - 1) / WORD_BITS;
 
       uint64_t vals[WORDS] = {};
 
+      void check_bit(size_t bit)const
+      {
+        if(bit<BITS)
+          return;
+        static const char ferr[]="ERROR:  bit=";
+        fmt::fmt_t fBITS = BITS;
+        static const char bits[]=" BITS=";
+        fmt::fmt_t fbit = bit;
+        static const char nl[]="\n";
+        char buf[sizeof(nl)+sizeof(bits)+sizeof(ferr)+fBITS.len+fbit.len];
+        char *pos=buf;
+        char *end=buf+sizeof(buf)-1;
+        pos=itr::copy(pos,end,ferr);
+        pos=itr::copy(pos,end,fBITS);
+        pos=itr::copy(pos,end,bits);
+        pos=itr::copy(pos,end,fbit);
+        pos=itr::copy(pos,end,nl);
+        sys::write(2,buf,pos);
+        std::abort();
+      }
       constexpr void set(size_t bit) {
-        vals[bit / WORD_BITS] |= uint64_t(1) << (bit % WORD_BITS);
+        check_bit(bit);
+        vals[bit / WORD_BITS] |= (word_t(1) << (bit % WORD_BITS));
       }
 
       constexpr void clear(size_t bit) {
-        vals[bit / WORD_BITS] &= ~(uint64_t(1) << (bit % WORD_BITS));
+        check_bit(bit);
+        vals[bit / WORD_BITS] &= ~(word_t(1) << (bit % WORD_BITS));
       }
 
       constexpr bool test(size_t bit) const {
-        return vals[bit / WORD_BITS] & (uint64_t(1) << (bit % WORD_BITS));
+        check_bit(bit);
+        return vals[bit / WORD_BITS] & (word_t(1) << (bit % WORD_BITS));
       }
 
       constexpr void reset() {

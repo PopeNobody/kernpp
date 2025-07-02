@@ -57,6 +57,7 @@ namespace fmt {
     char buf[68];
     char nul[1];
     char off;
+    char len;
     void format(int_t wrap, int base, int width, char fill) {
       unsigned long val=wrap.abs;
       unsigned long neg=wrap.neg;
@@ -76,17 +77,59 @@ namespace fmt {
         buf[--off]='0';
       if(neg)
         buf[--off]='-';
+      len=sizeof(buf)-off;
       if(nul[0])
         sys::exit(1);
     };
-    void format(float val, int width, int base, char fill=' ');
-    fmt_t(const int_t &val,int base=10, int width=1, char fill='0')
+    void format(float val, int width, int prec=6);
+    void format(void *ptr, int width=16);
+    fmt_t(unsigned long val,int base=10, int width=1, char fill='0')
     {
       format(val,base,width,fill);
     };
-    fmt_t(float f)
+    fmt_t(long val,int base=10, int width=1, char fill='0')
     {
+      format(val,base,width,fill);
     };
+    fmt_t(unsigned int val,int base=10, int width=1, char fill='0')
+    {
+      format(val,base,width,fill);
+    };
+    fmt_t(int val,int base=10, int width=1, char fill='0')
+    {
+      format(val,base,width,fill);
+    };
+    fmt_t(unsigned short val,int base=10, int width=1, char fill='0')
+    {
+      format(val,base,width,fill);
+    };
+    fmt_t(short val,int base=10, int width=1, char fill='0')
+    {
+      format(val,base,width,fill);
+    };
+    fmt_t(unsigned char val,char base=10, char width=1, char fill='0')
+    {
+      format(val,base,width,fill);
+    };
+    fmt_t(char val,char base=10, char width=1, char fill='0')
+    {
+      format(val,base,width,fill);
+    };
+    fmt_t(float f,int width=0, int prec=6, char fill=' ')
+    {
+      format(f,width,prec);
+    };
+    fmt_t(void *ptr, int width=16)
+    {
+      format(ptr,width);
+    };
+    template<class val_t>
+      fmt_t(const val_t &val)
+      {
+        char *pos=val.format(buf,nul);
+        off=0;
+        len=pos-buf;
+      };
     fmt_t(const timeval_t &val)
     {
       fmt_t fsec(val.tv_sec);
@@ -107,7 +150,7 @@ namespace fmt {
       assert(!*pos);
     };
     operator iovec() const {
-      return { (void*)(buf+off), (size_t)(nul-buf-off) };
+      return { (void*)(buf+off), (size_t)(len) };
     };
     static constexpr const char digits[]="0123456789abcdef";
   };

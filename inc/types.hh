@@ -39,10 +39,10 @@ typedef void* void_p;
 struct iocb;
 typedef long int __fd_mask;
 
-struct fdset_t
-{
-  __fd_mask fds_bits[1024 / (8 * (int) sizeof (__fd_mask))];
-};
+struct fdset_t;
+//   {
+//     __fd_mask fds_bits[1024 / (8 * (int) sizeof (__fd_mask))];
+//   };
 
 typedef fdset_t* fdset_p;
 struct sigaction_t {

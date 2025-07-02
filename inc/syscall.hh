@@ -12,6 +12,7 @@ namespace sys
   enum open_mode
   {
     o_default= 0664
+
   };
   // these are octal, not hex, dont panic
   enum open_flags
@@ -43,12 +44,15 @@ namespace sys
   {
     return open_flags(int(lhs) & int(rhs));
   }
-  void set_errno(uint64_t val);
+  void err_log(errno_t err);
+  void err_ignore(errno_t err);
+  typedef void (*errhand_t)(errno_t);
+  void set_errno(uint64_t val, errhand_t hand=err_log);
   template<class res_t>
-    res_t chk_return(uint64_t val)
+    res_t chk_return(uint64_t val, errhand_t hand=err_log)
     {
       if(val>uint64_t(-4096))
-        set_errno(val);
+        set_errno(val,hand);
       return res_t(val);
     };
   inline int     nanosleep(timespec_p rqtp, timespec_p rmtp) AIL;
@@ -422,6 +426,78 @@ namespace sys
         : "rcx", "r11", "memory");
     return chk_return<int>(res);
   }
+  // __NR__ link = 86
+  inline int link(istr_t oldname, istr_t newname)
+    __attribute__((__always_inline__));
+  inline int link(istr_t oldname, istr_t newname)
+  {
+    uint64_t res= 0xfeebdaed;
+    asm("\tsyscall;\n"
+        : "=a"(res)
+        : "0"(86), "D"(oldname), "S"(newname)
+        : "rcx", "r11", "memory");
+    return chk_return<int>(res);
+  }
+  // __NR__ unlink = 87 
+
+  inline int unlink(istr_t pathname)
+    __attribute__((__always_inline__));
+  int unlink(istr_t pathname)
+  {
+    int res= -1;
+    asm("syscall\n"
+        : "=a"(res)
+        : "a"(87), "D"(pathname)
+        : "rcx", "r11", "memory");
+    return chk_return<int>(res);
+  };
+  // __NR__ symlink = 88 
+
+  inline int symlink(istr_t oldname, istr_t newname)
+    __attribute__((__always_inline__));
+  inline int symlink(istr_t oldname, istr_t newname)
+  {
+    uint64_t res= 0xfeebdaed;
+    asm("\tsyscall;\n"
+        : "=a"(res)
+        : "0"(88), "D"(oldname), "S"(newname)
+        : "rcx", "r11", "memory");
+    return chk_return<int>(res);
+  }
+  // __NR__ readlink = 89 
+  inline int readlink(istr_t path, ostr_t buf, int bufsiz,errhand_t hand=err_log)
+    __attribute__((__always_inline__));
+  inline int readlink(istr_t path, ostr_t buf, int bufsz,errhand_t hand)
+  {
+    uint64_t res= 0xfeebdaed;
+    asm("\tsyscall;\n"
+        : "=a"(res)
+        : "0"(89), "D"(path), "S"(buf), "d"(bufsz)
+        : "rcx", "r11", "memory");
+    return chk_return<int>(res,hand);
+  }
+  // __NR__ chmod = 90 
+
+  inline int chmod(istr_t filename, mode_t mode)
+    __attribute__((__always_inline__));
+  // __NR__ fchmod = 91 
+
+  inline int fchmod(fd_t fd, mode_t mode)
+    __attribute__((__always_inline__));
+  // __NR__ chown = 92 
+
+  inline int chown(istr_t filename, uid_t user, gid_t group)
+    __attribute__((__always_inline__));
+  // __NR__ fchown = 93 
+
+  inline int fchown(fd_t fd, uid_t user, gid_t group)
+    __attribute__((__always_inline__));
+  // __NR__ lchown = 94 
+
+  inline int lchown(istr_t filename, uid_t user, gid_t group)
+    __attribute__((__always_inline__));
+  // __NR__ umask = 95 
+
   //#define __NR_time 201
   inline time_t time(time_t* buf)
   {
@@ -444,7 +520,7 @@ namespace sys
   }
   // __NR__ pipe2 = 293 
 
-  inline int pipe2(fd_p fds, int flags)
+  inline int pipe2(fd_t fds[2], int flags)
   {
     uint64_t res= 0xfeebdaed;
     asm("\tsyscall;\n"
