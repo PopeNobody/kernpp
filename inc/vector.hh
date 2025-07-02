@@ -10,7 +10,6 @@ namespace vec {
       {
       };
       vector(val_t *beg, val_t *end)
-        : arr(beg), len(end-beg)
       {
       };
       val_t &operator[](size_t n)
