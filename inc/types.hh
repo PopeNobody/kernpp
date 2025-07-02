@@ -23,6 +23,7 @@ struct wrap_t {
 typedef char* ostr_t;
 typedef const char* istr_t;
 typedef istr_t istr_v[];
+typedef istr_t *istr_p;
 typedef signed char int8_t;
 typedef unsigned char uint8_t;
 typedef int   int32_t;
