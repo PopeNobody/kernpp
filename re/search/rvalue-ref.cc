@@ -42,37 +42,36 @@ void pass_through(T&& t) {
     Tracer local = std::forward<T>(t);
     cout << "--- Leaving pass_through ---\n";
 }
+int main(int, char**, char**) {
+  cout << "---- Construct a ----\n";
+  Tracer a;
 
-int main() {
-    cout << "---- Construct a ----\n";
-    Tracer a;
+  cout << "---- Copy construct b from a ----\n";
+  Tracer b = a;  // copy constructor
 
-    cout << "---- Copy construct b from a ----\n";
-    Tracer b = a;  // copy constructor
+  cout << "---- Move construct c from a ----\n";
+  Tracer c = std::move(a);  // move constructor
 
-    cout << "---- Move construct c from a ----\n";
-    Tracer c = std::move(a);  // move constructor
+  cout << "---- Copy assign c from b ----\n";
+  c = b;  // copy assignment
 
-    cout << "---- Copy assign c from b ----\n";
-    c = b;  // copy assignment
+  cout << "---- Move assign c from b ----\n";
+  c = std::move(b);  // move assignment
 
-    cout << "---- Move assign c from b ----\n";
-    c = std::move(b);  // move assignment
+  cout << "---- Push into vector ----\n";
+  vector<Tracer> v;
 
-    cout << "---- Push into vector ----\n";
-    vector<Tracer> v;
+  cout << "---- v.push_back(a) ----\n";
+  v.push_back(a);  // copy
 
-    cout << "---- v.push_back(a) ----\n";
-    v.push_back(a);  // copy
+  cout << "---- v.push_back(move(a)) ----\n";
+  v.push_back(std::move(a));  // move
 
-    cout << "---- v.push_back(move(a)) ----\n";
-    v.push_back(std::move(a));  // move
+  cout << "---- Calling pass_through(a) ----\n";
+  pass_through(a);  // lvalue, triggers copy
 
-    cout << "---- Calling pass_through(a) ----\n";
-    pass_through(a);  // lvalue, triggers copy
+  cout << "---- Calling pass_through(move(a)) ----\n";
+  pass_through(std::move(a));  // rvalue, triggers move
 
-    cout << "---- Calling pass_through(move(a)) ----\n";
-    pass_through(std::move(a));  // rvalue, triggers move
-
-    cout << "---- End of scope ----\n";
+  cout << "---- End of scope ----\n";
 }

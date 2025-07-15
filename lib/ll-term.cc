@@ -1,11 +1,46 @@
 #include "syscall.hh"
 #include "vpipe.hh"
 #include <fmt.hh>
-constexpr static int TCGETS=0x5401;
-constexpr static int TCSETS=0x5402;
-constexpr static int TCSETSW=0x5403;
-constexpr static int TIOCGWINSZ=0x5413;
-constexpr static int TIOCSWINSZ=0x5414;
+constexpr  static  int  TCGETS       =  0x5401;
+constexpr  static  int  TCSETS       =  0x5402;
+constexpr  static  int  TCSETSW      =  0x5403;
+constexpr  static  int  TIOCGRANTPT  =  0x5403;
+constexpr  static  int  TIOCGWINSZ   =  0x5413;
+constexpr  static  int  TIOCNOTTY    =  0x5422;
+constexpr  static  int  TIOCSWINSZ   =  0x5414;
+constexpr  static  int  TIOCGPTPEER  =  0x5441;
+constexpr  static  int  TIOCSPTLCK   =  0x40045431;
+namespace sys {
+  static collect::bitset_t<128> transient = {
+    EINTR,
+    EAGAIN,
+    EWOULDBLOCK,
+  };
+  inline bool err_retry_on_transient(errno_t err) {
+    return transient.is_set(err);
+  }
+  void err_die_if_stdin_tty(sys::errno_t err) {
+    if(isatty(0))
+      pexit(3,"stdin is a tty, but can't open /dev/tty");
+  }
+  fd_t openpt(int flags, errhand_t) {
+    return (fd_t)open("/dev/ptmx",o_rdwr,err_log);
+  };
+  int unlockpt(fd_t fd,bool ilock,errhand_t hand) {
+    uint64_t lock=!ilock;
+    return ioctl(fd,TIOCSPTLCK,uint64_t(&lock),hand)<0 ? -1 : 0;
+  };
+  int grantpt(fd_t fd,errhand_t hand) {
+    return ioctl(fd,TIOCGRANTPT,0);
+  };
+  fd_t getpt_peer(fd_t fd,open_flags flags,errhand_t hand) {
+    fd_t res=ioctl(fd,TIOCGPTPEER,flags,hand);
+    return res;
+  };
+  void drop_ctty(fd_t fd, errhand_t hand){
+    fd_t res=ioctl(fd,TIOCNOTTY,0,hand);
+  };
+};
 using fmt::fmt_t;
 using sys::write;
 //   normal:
@@ -120,9 +155,10 @@ int vpipe::get_term_size(fd_t fd, uint16_t &ws_row, uint16_t &ws_col){
   ws_col=winsize.ws_col;
   return res;
 };
-int vpipe::isatty(fd_t fd) {
+bool sys::isatty(fd_t fd) {
+  using enum sys::errno_t;
   uint16_t r,c;
-  if(get_term_size(fd,r,c)){
+  if(vpipe::get_term_size(fd,r,c)){
     using sys::errno;
     if(errno!=EBADF)
       errno=ENOTTY;

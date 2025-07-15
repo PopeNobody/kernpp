@@ -3,11 +3,10 @@
 #include "c_str.hh"
 
 
+typedef char const *msg_t;
 
-static str::c_str strerror_v[]={
-
-  "Unknown Error(###)",
-
+static msg_t strerror_v[]={
+ "Unknown Error(###)",
  "Operation not permitted",
  "No such file or directory",
  "No such process",
@@ -148,13 +147,15 @@ static str::c_str strerror_v[]={
 static size_t strerror_c = sizeof(strerror_v)/sizeof(strerror_v[0]);
 namespace sys {
   c_str no_err(L("No Error"));
-  const c_str &strerror(errno_t err) {
+  c_str last_err;
+  const c_str strerror(errno_t err) {
     if(!err)
-      return no_err;
+      last_err=no_err;
     else if(err<strerror_c)
-      return strerror_v[err];
+      last_err=strerror_v[err];
     else
-      return strerror_v[0];
+      last_err=strerror_v[0];
+    return last_err;
   };  
 }
 

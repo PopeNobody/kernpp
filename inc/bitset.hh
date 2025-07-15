@@ -1,7 +1,6 @@
 #pragma once
 
-//   #include <cstddef>
-//   #include <cstdint>
+#include "fmt.hh"
 namespace collect {
   template <size_t N>
     struct bitset_t {
@@ -12,26 +11,7 @@ namespace collect {
 
       uint64_t vals[WORDS] = {};
 
-      void check_bit(size_t bit)const
-      {
-        if(bit<BITS)
-          return;
-        static const char ferr[]="ERROR:  bit=";
-        fmt::fmt_t fBITS = BITS;
-        static const char bits[]=" BITS=";
-        fmt::fmt_t fbit = bit;
-        static const char nl[]="\n";
-        char buf[sizeof(nl)+sizeof(bits)+sizeof(ferr)+fBITS.len+fbit.len];
-        char *pos=buf;
-        char *end=buf+sizeof(buf)-1;
-        pos=itr::copy(pos,end,ferr);
-        pos=itr::copy(pos,end,fBITS);
-        pos=itr::copy(pos,end,bits);
-        pos=itr::copy(pos,end,fbit);
-        pos=itr::copy(pos,end,nl);
-        sys::write(2,buf,pos);
-        std::abort();
-      }
+      void check_bit(size_t bit)const;
       constexpr void set(size_t bit) {
         check_bit(bit);
         vals[bit / WORD_BITS] |= (word_t(1) << (bit % WORD_BITS));
@@ -41,7 +21,12 @@ namespace collect {
         check_bit(bit);
         vals[bit / WORD_BITS] &= ~(word_t(1) << (bit % WORD_BITS));
       }
-
+      constexpr bool is_set(size_t bit) const {
+        return test(bit);
+      };
+      constexpr bool get(size_t bit) const {
+        return test(bit);
+      };
       constexpr bool test(size_t bit) const {
         check_bit(bit);
         return vals[bit / WORD_BITS] & (word_t(1) << (bit % WORD_BITS));
@@ -99,3 +84,13 @@ namespace collect {
       }
     };
 }
+namespace sys {
+  struct fdset_t : public collect::bitset_t<32> {
+    fdset_t select(timeval_t);
+    fdset_t( fd_t fd1=fd_t(), fd_t fd2=fd_t(), fd_t fd3=fd_t(),
+        fd_t fd4=fd_t(), fd_t fd5=fd_t(), fd_t fd6=fd_t(),
+        fd_t fd7=fd_t(), fd_t fd8=fd_t(), fd_t fd9=fd_t()
+        );
+
+  };
+};

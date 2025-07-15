@@ -16,6 +16,7 @@ o:= $(c:.c=.o)
 oo:=$(cc:.cc=.oo)
 
 rvalue-ref: rvalue-ref.oo
+	$(CXX) -o $@ $< 
 
 x:= $(o:.o=)
 xx:= $(oo:.oo=)

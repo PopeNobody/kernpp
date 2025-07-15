@@ -1,6 +1,9 @@
 #pragma once
 #include "template-glue.hh"
 #include "c_str.hh"
+namespace str {
+  struct c_str;
+};
 namespace itr {
   using std::min;
 	template<class dst_t, class val_t>
@@ -37,12 +40,11 @@ namespace itr {
   {
     return copy_n(db,sb,min(se-sb,de-db));
   };
-  using str::c_str;
   inline char *copy(char *db, char *de, void *sb, size_t sl)
   {
     return copy(db,de,(char*)sb,((char*)sb)+sl);
   };
-  inline char *copy(char *db, char *de, c_str str);
+  inline char *copy(char *db, char *de, str::c_str str);
   inline char *copy(char *db, char *de, iovec vec) {
     return copy(db,de,vec.iov_base,vec.iov_len);
   };

@@ -5,7 +5,7 @@
 //#include <concepts>
 
 // Base case for two arguments with constraint
-#include "template-glue.hh"
+//#include "template-glue.hh"
 //   template <typename T, typename U>
 //   requires requires (T&& a, U&& b) { { b < a } -> std::convertible_to<bool>; }
 //   constexpr auto min(T&& a, U&& b) -> decltype(auto) {

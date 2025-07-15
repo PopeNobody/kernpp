@@ -4,6 +4,7 @@
 *.out
 .gdb_history
 arc
+bin/array
 bin/cat
 bin/echo
 bin/false
@@ -17,6 +18,7 @@ bin/touch
 bin/true
 bin/usleep
 bin/vpty
+bin/vv
 bin/write
 core*
 fuck

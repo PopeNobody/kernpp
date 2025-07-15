@@ -1,5 +1,7 @@
-#pragma once
 #include "types.hh"
+
+#pragma once
+
 namespace std {
   template<typename _type>
     struct remove_reference {

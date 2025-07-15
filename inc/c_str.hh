@@ -1,6 +1,4 @@
-#ifndef c_str_hh
-#define c_str_hh c_str_hh
-
+#pragma once
 #include "syscall.hh"
 #include "template-glue.hh"
 #include "dbg.hh"
@@ -131,7 +129,15 @@ namespace str {
     };
   };
 }
+namespace sys {
+  using str::c_str;
+  ssize_t write(fd_t fd, const char *beg, const char *end);
+  inline ssize_t write(fd_t fd, const c_str &str) {
+    return write(fd,str.begin(),str.end());
+  };
+};
 namespace itr {
+  using str::c_str;
   inline char *copy(char *db, char *de, c_str str) {
     if(db+str.len()>=de)
       return 0;
@@ -142,4 +148,3 @@ namespace itr {
   char *copy(char *db, char *de, iovec vec);
 };
 
-#endif

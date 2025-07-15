@@ -6,5 +6,5 @@ namespace vpipe {
   int set_term_size(fd_t fd, uint16_t rows, uint16_t cols);
   int term_set_raw(fd_t fd);
   int term_set_sane(fd_t fd);
-  int isatty(fd_t);
+  using sys::isatty;
 };

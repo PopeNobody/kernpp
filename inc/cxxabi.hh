@@ -44,14 +44,9 @@
 #pragma GCC system_header
 
 #pragma GCC visibility push(default)
-#include <syscall.hh>
+#include "syscall.hh"
 
 typedef int __guard __attribute__((mode (__DI__)));
-//#include <stddef.h>
-//#include <bits/c++config.h>
-//#include <bits/cxxabi_tweaks.h>
-//#include <bits/cxxabi_forced.h>
-//#include <bits/cxxabi_init_exception.h>
 
 #ifdef __cplusplus
 namespace __cxxabiv1

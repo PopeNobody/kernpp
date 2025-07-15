@@ -1,18 +1,5 @@
 #define NDEBUG
 
-#ifndef debug_hh
-#define debug_hh debug_hh
-
-//#include <iostream>
-//#include <exception>
-//#include <typeinfo>
-
-//using std::ostream;
-//using std::exception;
-//using std::type_info;
-//ostream &operator(ostream &lhs, const exception &rhs);
-//ostream &operator(ostream &lhs, const type_info &rhs);
-
 namespace dbg {
   struct runtime_error
   {
@@ -48,4 +35,3 @@ namespace dbg {
 //#define  xthrowre(y) xthrow(runtime_error,y)
 #define  xthrowre(y) xthrow(runtime_error,y)
 
-#endif //debug_hh

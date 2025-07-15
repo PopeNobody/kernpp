@@ -22,13 +22,13 @@
 // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#include <syscall.hh>
-#include <typeinfo.hh>
-//#include <cstddef>
+#include "syscall.hh"
+#include "typeinfo.hh"
+//#include "cstddef"
 
 // Class declarations shared between the typeinfo implementation files.
 
-#include <cxxabi.hh>
+#include "cxxabi.hh"
 
 namespace __cxxabiv1 {
 

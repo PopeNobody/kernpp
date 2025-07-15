@@ -38,18 +38,20 @@ typedef void* void_p;
 
 struct iocb;
 typedef long int __fd_mask;
-
-struct fdset_t;
+namespace sys {
+  struct fdset_t;
+  typedef fdset_t* fdset_p;
+};
 //   {
 //     __fd_mask fds_bits[1024 / (8 * (int) sizeof (__fd_mask))];
 //   };
 
-typedef fdset_t* fdset_p;
 struct sigaction_t {
 	void (*sa_handler) (int);
 	unsigned long sa_flags;
 	void (*sa_restorer) (void);
 	unsigned long sa_mask;
+  sigaction_t();
 };
 struct stat_t {
   uint64_t  st_dev;
@@ -288,3 +290,5 @@ typedef timespec* timespec_p;
 #define offsetof(TYPE, MEMBER) __builtin_offsetof (TYPE, MEMBER)
 
 #endif
+
+#include "c_str.hh"

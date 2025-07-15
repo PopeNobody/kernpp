@@ -28,11 +28,32 @@ void sys::err_log(sys::errno_t err)
   sys::write(2,fmt::fmt_t((long)err));
   sys::write(2,"\n\n");
 };
-void sys::set_errno(uint64_t err, errhand_t hand)
+void sys::err_fatal(errno_t err) {
+  sys::write(2,"FROM: ");
+  sys::write(2,fmt::fmt_t(getpid()));
+  sys::write(2,"  FATAL ERROR: ");
+  sys::write(2,fmt::fmt_t(err));
+  sys::write(2,"\n");
+  sys::write(2,strerror(err));
+  sys::write(2,"\n");
+  pexit(5,"err_fatal");
+  std::abort();
+  kill(getpid(),9);
+};
+void sys::set_errno(errno_t err, errhand_t hand)
 {
+  if(err<0 && err>-4096) {
+    err=(errno_t)-err;
+  } else if (err>uint64_t(-4096)) {
+    err=(errno_t)-err;
+  };
   errno=err;
+  hand(err);
 }
-void die::throw_errno(uint64_t err){
+namespace sys {
+  void throw_errno(errno_t err);
+};
+void sys::throw_errno(errno_t err){
   sys::set_errno(err);
   char buf[1023]="setting error to: ";
   char *pos=buf+itr::len(buf);
@@ -81,6 +102,8 @@ namespace sys {
       write(2,msg2);
       write(2,":");
     };
+    write(2,fmt::fmt_t(errno));
+    write(2,"  --  ",6);
     write(2,strerror(errno));
   };
   void pexit(const c_str &msg1, const c_str &msg2)

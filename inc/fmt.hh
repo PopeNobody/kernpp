@@ -1,11 +1,7 @@
 #pragma once
-#include "types.hh"
-#include "c_str.hh"
+#include "syscall.hh"
 namespace sys {
-  struct timeval;
-  inline ssize_t write(fd_t fd, const c_str &str){
-    return write(fd,str.begin(),str.end());
-  };
+  struct timeval_t;
 };
 namespace fmt {
   struct int_t {
@@ -51,36 +47,14 @@ namespace fmt {
     {
     }
   };
-  using sys::timeval;
+  
   struct fmt_t
   {
     char buf[68];
     char nul[1];
     char off;
     char len;
-    void format(int_t wrap, int base, int width, char fill) {
-      unsigned long val=wrap.abs;
-      unsigned long neg=wrap.neg;
-      if(width>=sizeof(buf)){
-        sys::write(2,"Error: width > ");
-        sys::write(2,fmt_t(sizeof(buf)));
-        sys::write(2,"\n");
-        width=sizeof(buf);
-      };
-      nul[0]=0;
-      off=(nul-buf);
-      do {
-        buf[--off]=digits[val%base];
-        val/=base;
-      } while(val);
-      while(off>(nul-buf)-width)
-        buf[--off]='0';
-      if(neg)
-        buf[--off]='-';
-      len=sizeof(buf)-off;
-      if(nul[0])
-        sys::exit(1);
-    };
+    void format(int_t wrap, int base, int width, char fill);
     void format(float val, int width, int prec=6);
     void format(void *ptr, int width=16);
     fmt_t(unsigned long val,int base=10, int width=1, char fill='0')
@@ -123,6 +97,7 @@ namespace fmt {
     {
       format(ptr,width);
     };
+    fmt_t(enum sys::errno_t err);
     template<class val_t>
       fmt_t(const val_t &val)
       {
@@ -130,25 +105,8 @@ namespace fmt {
         off=0;
         len=pos-buf;
       };
-    fmt_t(const timeval_t &val)
-    {
-      fmt_t fsec(val.tv_sec);
-      str::c_str sec=(iovec)fsec;
-      fmt_t fusec(val.tv_nsec);
-      str::c_str usec=(iovec)fusec;
-      char *pos=buf;
-      char *end=&nul[0];
-      pos=itr::copy(pos,end,"timeval_t{");
-      assert(!*pos);
-      pos=itr::copy(pos,end,sec.beg(),sec.end());
-      assert(!*pos);
-      pos=itr::copy(pos,end,",");
-      assert(!*pos);
-      pos=itr::copy(pos,end,usec.beg(),usec.end());
-      assert(!*pos);
-      pos=itr::copy(pos,end,"}");
-      assert(!*pos);
-    };
+    fmt_t(bool val);
+    fmt_t(const timeval_t &val);
     operator iovec() const {
       return { (void*)(buf+off), (size_t)(len) };
     };

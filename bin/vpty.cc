@@ -4,18 +4,42 @@ extern "C" { int main(int argc,char *const*argv,char *const*envp); };
 #include "fmt.hh"
 #include "bitset.hh"
 using vpipe::setup_term_and_pty;
-const int TIOCGPTPEER = 0x5441;
-const int  TIOCSPTLCK = 0x40045431;
 using fmt::fmt_t;
 
-struct fdset_t : public collect::bitset_t<32> {
-  fdset_t select(timeval_t);
-};
+
+fd_t mpty,spty;
+pid_t child;
 struct fd_act {
   typedef void(*act_t)(fd_t &);
   act_t act;
   fd_t fd;
-  bool operator()(const fdset_t &set);
+  bool operator()(const sys::fdset_t &set);
+};
+static void child_reap(int) {
+  pid_t pid;
+  while(true) {
+    int status=0;
+    pid=sys::waitpid(0,&status,0);
+    using sys::write;
+    write(2,"dead pid: ");
+    write(2,fmt::fmt_t(pid));
+    write(2,"\n");
+    if(pid==child) {
+      write(2,"child died\n");
+      write(spty,"\004",1);
+    };
+    if(pid==-1) {
+      write(2,"waitpid: ");
+      write(2,fmt::fmt_t(pid));
+      write(2,", errno: ");
+      write(2,fmt::fmt_t(sys::errno));
+    } else {
+      write(2,"waitpid: ");
+      write(2,fmt::fmt_t(pid));
+      write(2,", status: ");
+      write(2,fmt::fmt_t(status));
+    };
+  };
 };
 using enum sys::open_flags;
 using sys::ioctl;
@@ -91,20 +115,31 @@ void show_fds(int maxfd=64) {
     tpos=text;
   };
 };
+using sys::fdset_t;
+void test_fdset_t() {
+  fdset_t set;
+  set.set(0);
+  set.set(1);
+  set.set(3);
+  write(2,fmt_t(set));
+};
 int main(int argc,char *const*argv,char *const*envp) {
   const char mname[]="/dev/pts/ptmx";
   const char sname[]="             ";
-  fd_t mpty,spty;
-  int res;
-  open_flags flags=o_rdwr|o_noctty|o_cloexec|o_nonblock;
+  struct sigaction_t act;
+  memset(&act,0,sizeof(act));
+  act.sa_handler=child_reap;
+  act.sa_flags=0;
+  sys::rt_sigaction(17,&act,0);
+  open_flags flags=o_rdwr|o_noctty|o_cloexec;
   fd_t pipefds[2];
   sys::pipe(pipefds);
   mpty=open(mname,flags);
   uint64_t lock=0;
-  write(1,"call ioctl 1\n");
-  res=ioctl(mpty,TIOCSPTLCK,uint64_t(&lock));
-  write(1,"call ioctl 2\n");
-  spty=ioctl(mpty,TIOCGPTPEER,(size_t)flags);
+  write(2,"call ioctl 1\n");
+  sys::unlockpt(mpty,true,sys::err_fatal);
+  write(2,"call ioctl 2\n");
+  spty=sys::getpt_peer(mpty,o_rdwr|o_noctty,sys::err_fatal);
   show_fds(10); 
   fdset_t set;
   set.set(0);
@@ -112,82 +147,86 @@ int main(int argc,char *const*argv,char *const*envp) {
   timeval_t tv={1,0};
   fdset_t rset;
   timeval_t rtv;
-  if(!sys::fork()){
+  child=sys::fork();
+  if(!child){
     dup2(spty,0);
     dup2(spty,1);
     close(spty);
     close(mpty);
     char const * const argv[]= {
-      "/bin/cat",
+      "bin/true",
       0
     };
     sys::execve(argv[0],(char*const*)argv,envp);
     sys::pexit(2,"exec");
   };
-  close(spty);
-  struct fd_stuff_t {
+  struct fd_pair_t {
     fd_t rfd;
     fd_t wfd;
     char buf[1024*16];
     int pos;
   };
-  fd_stuff_t fd_stuff[2];
-  fd_stuff[0].rfd=0;
-  fd_stuff[0].wfd=mpty;
-  fd_stuff[0].pos=0;
-  fd_stuff[1].rfd=mpty;
-  fd_stuff[1].wfd=1;
-  fd_stuff[1].pos=0;
+  fd_pair_t fd_pair[2];
+  fd_pair[0].rfd=0;
+  fd_pair[0].wfd=mpty;
+  fd_pair[0].pos=0;
+  fd_pair[1].rfd=mpty;
+  fd_pair[1].wfd=1;
+  fd_pair[1].pos=0;
 
   while(set.any()){
     rset=set;
     rtv=tv;
     int highest=rset.find_highest()+1;
     int res = sys::select(highest,&rset,0,0,&rtv);
-    if(res) {
+    if(res<0) {
+      sys::pexit(2,"select");
+    } else {
       fd_t fds[2]={mpty,0};
       for(fd_t i : fds) {
-        fd_stuff_t &stuff=fd_stuff[i?1:0];
-        if(rset.test(i)){
-          res=read(stuff.rfd,stuff.buf+stuff.pos,1);
-          if(res<0) {
-            if(sys::errno==EAGAIN)
+        fd_pair_t &pair=fd_pair[i?1:0];
+        if(!rset.test(i))
+          continue;
+        res=read(pair.rfd,pair.buf+pair.pos,1);
+        switch(res) {
+          case -1:
+            if(sys::errno==sys::EAGAIN)
               continue;
             sys::pexit(1,"read");
             std::abort();
-          } else if (res) {
-            stuff.pos++;
-            res=write(stuff.wfd,stuff.buf,stuff.pos);
-            if(res<0) {
-              if(sys::errno==EAGAIN)
-                continue;
-              sys::pexit(1,"write");
-              std::abort();
-            } else if(res==0) {
-              // should not happen, but ...
+            break;
+          default:
+            assert(res>0);
+            break;
+          case 0:
+            break;
+        };
+        if(res<0) {
+        } else if (res) {
+          pair.pos+=res;
+          res=write(pair.wfd,pair.buf,pair.pos);
+          if(res<0) {
+            if(sys::errno==sys::EAGAIN)
               continue;
-            } else if(res<stuff.pos) {
-              memcpy(stuff.buf,stuff.buf+res,sizeof(stuff.buf)-res);
-              stuff.pos-=res; 
-            } else if(res==stuff.pos) {
-              memset(stuff.buf,0,sizeof(stuff.buf));
-              stuff.pos=0;
-            } else {
-              memset(stuff.buf,0,sizeof(stuff.buf));
-              stuff.pos=0;
-            };
+            sys::pexit(1,"write");
+            std::abort();
+          } else if(res==0) {
+            // should not happen, but ...
+            continue;
+          } else if(res<pair.pos) {
+            memcpy(pair.buf,pair.buf+res,sizeof(pair.buf)-res);
+            pair.pos-=res; 
           } else {
-            if(i==0) {
-              close(i);
-              set.clear(i);
-              char ten4[]={ 10, 4 };
-              write(mpty,ten4,2);
-            } else {
-              close(1);
-              close(mpty);
-              set.clear(0);
-              set.clear(mpty);
-            };
+            memset(pair.buf,0,sizeof(pair.buf));
+            pair.pos=0;
+          };
+        } else {
+          if(i==0) {
+            close(i);
+            set.clear(i);
+          } else {
+            close(mpty);
+            set.clear(mpty);
           };
         };
       };

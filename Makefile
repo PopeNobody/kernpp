@@ -8,14 +8,13 @@ CXX:=$(HOME)/bin/dist-clang++
 lib/lib:=lib/libkernpp.aa
 tgt/all:=$(lib/lib)
 show= $(warning $1: $($1))
-deps:= $(sort $(wildcard */*.d) $(wildcard */*.dd))
-cxxs:= $(sort $(wildcard */*.cc))
-objs:= $(sort $(wildcard */*.oo))
-include /dev/null $(wildcard $(deps))
 $(deps):;
 
 c++/src:=$(wildcard */*.cc)
 c++/obj:=$(c++/src:.cc=.cc.oo)
+c++/asm:=$(c++/src:.cc=.cc.SS)
+c++/cpp:=$(c++/src:.cc=.cc.ii)
+c++/dep:=$(c++/src:.cc=.cc.dd)
 c++/exe:=$(filter bin/% tst/%,$(c++/src:.cc=))
 c++/tst:=$(filter tst/%,$(c++/obj:.cc.oo=))
 c++/lib:=$(filter lib/%,$(c++/obj))
@@ -27,6 +26,11 @@ asm/src:=$(wildcard */*.S)
 asm/obj:=$(asm/src:.S=.S.oo)
 asm/lib:=$(filter lib/%,$(asm/obj))
 asm/exe:=$(filter bin/%,$(asm/src:.S=))
+
+TRS/dep:=$(filter-out $(c++/dep),$(wildcard */*.cc.dd))
+ifneq ($(TRS/dep),)
+$(foreach f,$(wildcard $(lib/lib) $(TRS/dep)),$(warning reap: $f)$(shell rm -f $f))
+endif
 
 all: $(c++/exe) $(asm/exe) $(lib/lib)
 
@@ -42,6 +46,7 @@ all/obj:= $(c++/obj) $(asm/obj)
 all/exe:=$(c++/exe) $(c++/tst) $(asm/exe)
 
 all: $(all/exe) inc/syscall.gen.hh
+
 
 inc/syscall.gen.hh: scr/genheaders.pl scr/syscall.pl
 	vi-perl scr/genheaders.pl > $@.new
@@ -70,9 +75,14 @@ $(c++/exe): %: %.cc.oo etc/ld_flags $(lib/lib)
 Makefile:;
 
 clean:
-	rm -f $(c++/exe) $(asm/exe) $(lib/lib)
-	rm -f $(c++/obj) $(asm/obj)
-	rm -f $(c++/asm) $(c++/cpp)
+	@rm -f $(asm/exe)
+	@rm -f $(asm/obj)
+	@rm -f $(c++/asm)
+	@rm -f $(c++/cpp)
+	@rm -f $(c++/dep)
+	@rm -f $(c++/exe)
+	@rm -f $(c++/obj)
+	@rm -f $(lib/lib)
 
 all: $(all/exe) $(tgt/all)
 	@echo made all
