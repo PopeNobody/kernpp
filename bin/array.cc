@@ -10,8 +10,17 @@ using collect::array_t;
 using namespace fmt;
 using sys::write;
 using str::c_str;
+template<class ... Args, class T>
+auto last_arg(Args ... args, T t) {
+  return t;
+};
 template<class ... Args>
-auto writeln(Args ... args) {
+auto _writeln(fd_t fd, Args ... args, sys::errhand_t hand){
+  return 0;
+};
+template<class ... Args>
+auto writeln(fd_t fd, Args ... args) {
+//tuple tuple(std::forward args);
   return 0;
 };
 extern "C" {

@@ -1,5 +1,5 @@
 extern "C" { int main(int argc,char *const*argv,char *const*envp); };
-#include "die.hh"
+#include "syscall.hh"
 #include "vpipe.hh"
 #include "fmt.hh"
 #include "bitset.hh"
@@ -88,7 +88,7 @@ void show_fds(int maxfd=64) {
       fmt_int(pos,end,i++);
       size_t max=sizeof(buf)-2;
       memset(buf,0,sizeof(buf));
-      ssize_t len=sys::readlink(fd_dir,buf,max);
+      ssize_t len=sys::readlink(fd_dir,buf,max,sys::err_ignore);
       if(len<0)
         continue;
       buf[len]=0;
@@ -130,7 +130,7 @@ int main(int argc,char *const*argv,char *const*envp) {
   memset(&act,0,sizeof(act));
   act.sa_handler=child_reap;
   act.sa_flags=0;
-  sys::rt_sigaction(17,&act,0);
+  sys::rt_sigaction(17,&act,0,8);
   open_flags flags=o_rdwr|o_noctty|o_cloexec;
   fd_t pipefds[2];
   sys::pipe(pipefds);

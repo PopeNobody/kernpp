@@ -8,31 +8,18 @@ using namespace sys;
 
 int main(int argc,char *const*argv,char *const*envp) {
   using namespace vpipe;
-  if(isatty(0)){
-    dup2(0,1);
-    dup2(0,2);
-  } else if (isatty(1)){
-    dup2(1,0);
-    dup2(1,2);
-  } else if (isatty(2)){
-    dup2(2,0);
-    dup2(2,1);
-  }else{
+  if(!isatty(0)){
     write(2,"cannot find term\n");
   };
+  system("stty -g > stty.log");
+  write(2,"set_sane\n");
+  term_set_sane(0);
+  system("stty -g >>stty.log");
+  write(2,"set_raw\n");
   term_set_raw(0);
-  write(1,"this\nis\na\ntest\n");
+  system("stty -g >>stty.log");
+  write(2,"set_raw\n");
   term_set_sane(0);
-  write(1,"this\nis\na\ntest\n");
-  term_set_sane(0);
-  write(1,"this\nis\na\ntest\n");
-  term_set_sane(0);
-  write(1,"this\nis\na\ntest\n");
-  term_set_sane(0);
-  write(1,"this\nis\na\ntest\n");
-  term_set_sane(0);
-  write(1,"this\nis\na\ntest\n");
-  term_set_sane(0);
-  write(1,"this\nis\na\ntest\n");
+  system("stty -g >>stty.log");
   return 0;
 };

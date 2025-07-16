@@ -31,8 +31,12 @@ TRS/dep:=$(filter-out $(c++/dep),$(wildcard */*.cc.dd))
 ifneq ($(TRS/dep),)
 $(foreach f,$(wildcard $(lib/lib) $(TRS/dep)),$(warning reap: $f)$(shell rm -f $f))
 endif
+include /dev/null $(wildcard */*.cc.dd)
 
-all: $(c++/exe) $(asm/exe) $(lib/lib)
+all: $(c++/exe) $(asm/exe) $(lib/lib) bin/printenv
+
+bin/printenv: bin/echo
+	ln -f $< $@
 
 obj: $(c++/obj) $(asm/obj)
 lib: $(lib/lib)

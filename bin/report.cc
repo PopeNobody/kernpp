@@ -24,20 +24,27 @@ int main(int argc,char *const*argv,char *const*envp) {
     pid_t pid=fork();
     pid_t res;
     if(pid) {
-      int ret;
+      int ret=-1;
       do {
         using fmt::fmt_t;
         fd_t efd(2);
-        res=waitpid(0,&ret,0);
-        write(efd,"pid ");
-        write(efd,fmt_t(res));
-        write(efd,"  returned ");
-        write(efd,fmt_t(ret));
-        exit(ret/256);
-      } while(res>0);
+        int tmp;
+        res=waitpid(0,&tmp,0,err_ignore);
+        if(res>1) {
+          ret=tmp/256;
+          write(efd,"pid ");
+          write(efd,fmt_t(res));
+          write(efd,"  returned ");
+          write(efd,fmt_t(ret));
+        } else {
+          break;
+        }
+      } while(true);
+      exit(ret);
     } else {
       execve(argv[0],argv,envp);
-      write(2,"execve:argv[0]");
+      write(2,"a\n",2);
+      pexit(2,"execve");
       exit(1);
     }
     return 0;
