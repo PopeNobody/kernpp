@@ -10,7 +10,7 @@ void collect::bitset_t<n>::check_bit(size_t bit)const
   static const char bits[]=" BITS=";
   fmt::fmt_t fbit = bit;
   static const char nl[]="\n";
-  char buf[sizeof(nl)+sizeof(bits)+sizeof(ferr)+fBITS.len+fbit.len];
+  char buf[sizeof(nl)+sizeof(bits)+sizeof(ferr)+fBITS.len()+fbit.len()];
   char *pos=buf;
   char *end=buf+sizeof(buf)-1;
   pos=itr::copy(pos,end,ferr);

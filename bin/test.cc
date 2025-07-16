@@ -32,9 +32,9 @@ extern "C" {
   int main(int, char**) {
     struct sigaction_t act;
     memset(&act,0,sizeof(act));
-//    act.sa_handler=child_reap;
+    act.sa_handler=child_reap;
     act.sa_flags=0;
-    auto res = sys::rt_sigaction(17,&act,0,16);
+    auto res = sys::rt_sigaction(17,&act,0,8);
     write(2,"res=");
     write(2,fmt::fmt_t(res));
     write(2,"\n");

@@ -7,8 +7,8 @@ namespace fmt {
     str::c_str sec=(iovec)fsec;
     fmt_t fusec(val.tv_usec);
     str::c_str usec=(iovec)fusec;
-    char *pos=buf;
-    char *end=&nul[0];
+    char *pos=body.buf;
+    char *end=&body.nul[0];
     pos=itr::copy(pos,end,"timeval_t{");
     assert(!*pos);
     pos=itr::copy(pos,end,sec.beg(),sec.end());
@@ -20,25 +20,28 @@ namespace fmt {
     pos=itr::copy(pos,end,"}");
     assert(!*pos);
   };
+  fmt_t::fmt_t(const str::c_str &str){
+    body.txt=(iovec)str;
+  };
   fmt_t::fmt_t(bool val) {
     char *str=(char*)(val?"-true":"false");
-    char *pos=nul;
+    char *pos=body.nul;
     *pos=0;
     memcpy(pos-5,str,5);
     pos-=5;
-    off=pos-buf;
-    len=5;
+    body.off=pos-body.buf;
+    body.len=5;
   };
   fmt_t::fmt_t(sys::errno_t err) {
     format((int64_t)err,10,20,'-');
   };
   void fmt_t::format(void *val, int width) {
     fmt_t fmt(uint64_t(val),16,16,'o');
-    char *pos=buf;
-    pos=itr::copy(pos,nul,"0x");
-    pos=itr::copy(pos,nul,fmt);
-    off=0;
-    len=pos-buf;
+    char *pos=body.buf;
+    pos=itr::copy(pos,body.nul,"0x");
+    pos=itr::copy(pos,body.nul,fmt);
+    body.off=0;
+    body.len=pos-body.buf;
   };
   void fmt_t::format(float val, int width, int precision) {
     format(uint64_t(val),10,width,'*');
@@ -47,24 +50,24 @@ namespace fmt {
   {
     unsigned long val=wrap.abs;
     unsigned long neg=wrap.neg;
-    if(width>=sizeof(buf)){
+    if(width>=sizeof(body.buf)){
       sys::write(2,"Error: width > ");
-      sys::write(2,fmt_t(sizeof(buf)));
+      sys::write(2,fmt_t(sizeof(body.buf)));
       sys::write(2,"\n");
-      width=sizeof(buf);
+      width=sizeof(body.buf);
     };
-    nul[0]=0;
-    off=(nul-buf);
+    body.nul[0]=0;
+    body.off=(body.nul-body.buf);
     do {
-      buf[--off]=digits[val%base];
+      body.buf[--body.off]=digits[val%base];
       val/=base;
     } while(val);
-    while(off>(nul-buf)-width)
-      buf[--off]='0';
+    while(body.off>(body.nul-body.buf)-width)
+      body.buf[--body.off]='0';
     if(neg)
-      buf[--off]='-';
-    len=sizeof(buf)-off;
-    if(nul[0])
+      body.buf[--body.off]='-';
+    body.len=sizeof(body.buf)-body.off;
+    if(body.nul[0])
       std::abort();
   };
 };

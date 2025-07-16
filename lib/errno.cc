@@ -15,6 +15,11 @@ struct set_bool {
     val=false;
   };
 };
+namespace itr {
+void fuck_off(int res, char const *msg) {
+  sys::die(res,msg);
+};
+};
 void sys::err_ignore(sys::errno_t err)
 {
 };
@@ -79,33 +84,36 @@ namespace sys {
       pexit(3,"stdin is a tty, but can't open /dev/tty");
   }
   errno_t errno;
-  void perror(const c_str &msg)
+  void perror(const char *msg)
   {
-    static c_str null;
+    static const char *null="";
     perror(null,msg);
   };
-  void die(int err, const c_str &msg1, const c_str &msg2)
+  void die(int err, const char *msg1, const char *msg2)
   {
     perror(msg1,msg2);
     exit(err);
   };
-  void die(int err, const c_str &msg)
+  void die(int err, const char *msg)
   {
     write(2,msg);
     exit(err);
   };
-  void pexit(int err, const c_str &msg1, const c_str &msg2)
+  void die(const char *msg){
+    die(1,msg);
+  };
+  void pexit(int err, const char *msg1, const char *msg2)
   {
     write(2,msg1);
     write(2,msg2);
     exit(err);
   };
-  void pexit(int err, const c_str &msg)
+  void pexit(int err, const char *msg)
   {
     perror(msg);
     exit(err);
   };
-  void perror(const c_str &msg1, const c_str &msg2)
+  void perror(const char *msg1, const char *msg2)
   {
     if(msg1) {
       write(2,msg1);
@@ -119,7 +127,7 @@ namespace sys {
     write(2,"  --  ",6);
     write(2,strerror(errno));
   };
-  void pexit(const c_str &msg1, const c_str &msg2)
+  void pexit(const char *msg1, const char *msg2)
   {
     perror(msg1,msg2);
     exit(1);
