@@ -42,3 +42,4 @@ tst/test1.t
 tst/test2.t
 tst/test_format
 tst/tuple
+bin/printenv
