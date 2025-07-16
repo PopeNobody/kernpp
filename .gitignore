@@ -12,6 +12,7 @@ bin/ls
 bin/malloc
 bin/report
 bin/runrep
+bin/sig
 bin/termctrl
 bin/termsize
 bin/test
@@ -21,6 +22,7 @@ bin/usleep
 bin/vpty
 bin/vv
 bin/write
+bin/xattr
 core*
 fuck
 git
