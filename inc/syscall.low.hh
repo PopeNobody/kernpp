@@ -1,4 +1,5 @@
 #pragma once
+
 namespace sys {
   inline uint64_t syscall0(uint64_t n) {
     uint64_t r;
@@ -39,6 +40,7 @@ namespace sys {
         );
     return r;
   }
+  void log_syscall4(uint64_t n, uint64_t a1, uint64_t a2, uint64_t a3, uint64_t a4 );
   inline uint64_t syscall4(
       uint64_t n, uint64_t a1, uint64_t a2, uint64_t a3, uint64_t a4
       )

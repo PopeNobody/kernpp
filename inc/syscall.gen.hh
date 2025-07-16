@@ -174,12 +174,12 @@ inline int brk(void_p brk, errhand_t hand) {
 
 
 // __NR__ rt_sigaction = 13
-inline int rt_sigaction(int sig, sigaction_p act, sigaction_p oact, errhand_t hand = err_log)
+inline int rt_sigaction(int sig, sigaction_p act, sigaction_p oact, size_t sigsetsize, errhand_t hand = err_log)
   __attribute__((__always_inline__));
 
 
-inline int rt_sigaction(int sig, sigaction_p act, sigaction_p oact, errhand_t hand) {
-  uint64_t res = syscall3(13 , (uint64_t)sig, (uint64_t)act, (uint64_t)oact);
+inline int rt_sigaction(int sig, sigaction_p act, sigaction_p oact, size_t sigsetsize, errhand_t hand) {
+  uint64_t res = syscall4(13 , (uint64_t)sig, (uint64_t)act, (uint64_t)oact, (uint64_t)sigsetsize);
 
 
   return chk_return<int>(res, hand);

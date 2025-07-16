@@ -2,20 +2,11 @@
 
 
 namespace sys {
-  template <typename... Args>
-    ssize_t write(fd_t fd, Args&&... args) {
-      auto tup = std::forward_as_tuple(std::forward<Args>(args)...);
-
-      constexpr std::size_t N = sizeof...(Args);
-      if constexpr (N > 0 && std::is_convertible_v<
-          std::tuple_element_t<N-1, decltype(tup)>, sys::errhand_t>)
-      {
-        auto hand = std::get<N-1>(tup);
-        auto data = std::tuple_slice<0, N-1>(tup);
-        return write(fd, data, hand);
-      } else {
-        return write(fd, tup, sys::err_log );
-      }
+  template <typename Arg1, typename... Args>
+    ssize_t write(fd_t fd, Arg1 arg1, Args&&... args) {
+      ssize_t val = 0;//write(fd,arg1,err_log);
+//      val+=write(fd, std::forward<Args...>(args...));
+      return val;
     }
 }
 void sys::log_syscall4(uint64_t n, uint64_t a1, uint64_t a2,

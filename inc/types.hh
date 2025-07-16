@@ -50,8 +50,7 @@ struct sigaction_t {
 	void (*sa_handler) (int);
 	unsigned long sa_flags;
 	void (*sa_restorer) (void);
-	unsigned long sa_mask;
-  sigaction_t();
+	unsigned sa_mask[2];
 };
 struct stat_t {
   uint64_t  st_dev;
@@ -246,12 +245,14 @@ typedef uint64_t ino64_t;
 struct timeval
 {
   time_t tv_sec;
-  int64_t tv_nsec;
+  int64_t tv_usec;
+  char *format(char *buf, char *end) const;
 };
 struct timespec
 {
   time_t tv_sec;
   int64_t tv_nsec;
+  char *format(char *buf, char *end) const;
 };
 typedef timespec timespec_t;
 enum ftype_t {

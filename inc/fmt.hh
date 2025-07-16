@@ -4,6 +4,10 @@ namespace sys {
   struct timeval_t;
 };
 namespace fmt {
+  template<size_t size>
+    struct buf_t {
+
+    };
   struct int_t {
     unsigned long abs;
     bool neg;

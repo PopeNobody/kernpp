@@ -167,6 +167,7 @@ namespace sys {
   void assert_fail(const char *, const char *, unsigned) NOR;
   bool isatty(fd_t fd);
   void drop_ctty(fd_t fd, errhand_t hand=err_log);
+  int system(const char *cmd);
 } // namespace sys
 
 #define L(x) x, sizeof(x) - 1
