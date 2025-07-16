@@ -113,6 +113,9 @@ namespace sys
 #include "syscall.gen.hh"
 
 namespace sys {
+  inline fd_t open(istr_t path, open_flags flags, mode_t mode, errhand_t hand=err_log) {
+    return open(path,flags,mode,hand);
+  };
   inline fd_t open(istr_t path, open_flags flags, errhand_t hand=err_log) {
     return open(path,flags,0,hand);
   };
