@@ -54,10 +54,24 @@ namespace fmt {
   
   struct fmt_t
   {
-    char buf[68];
-    char nul[1];
-    char off;
-    char len;
+    struct body_t {
+      char buf[68];
+      char nul[1];
+      char off;
+      char len;
+      iovec txt;
+      body_t(const iovec &txt={})
+        :txt(txt)
+      {
+        memset(buf,0,sizeof(buf));
+        nul[0]=0;
+        off=0;
+        len=0;
+      };
+
+      ~body_t() {
+      };
+    } body;
     void format(int_t wrap, int base, int width, char fill);
     void format(float val, int width, int prec=6);
     void format(void *ptr, int width=16);
@@ -105,14 +119,26 @@ namespace fmt {
     template<class val_t>
       fmt_t(const val_t &val)
       {
-        char *pos=val.format(buf,nul);
-        off=0;
-        len=pos-buf;
+        char *pos=val.format(body.buf,body.nul);
+        body.off=0;
+        body.len=pos-body.buf;
       };
+    fmt_t(const str::c_str &str);
     fmt_t(bool val);
     fmt_t(const timeval_t &val);
+    fmt_t(const iovec &txt)
+      : body(txt)
+    {
+    };
+    size_t len() {
+      return body.len;
+    };
     operator iovec() const {
-      return { (void*)(buf+off), (size_t)(len) };
+      if(body.txt.iov_base) {
+        return body.txt;
+      } else {
+        return { (void*)(body.buf+body.off), (size_t)(body.len) };
+      };
     };
     static constexpr const char digits[]="0123456789abcdef";
   };

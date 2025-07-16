@@ -28,12 +28,19 @@ namespace itr {
       *db++=*sb++;
     return db;
   };
+  void fuck_off(int res, const char *msg);
   template<class dst_t, class src_t>
   inline dst_t copy_n(dst_t db, src_t sb, size_t n){
-    if(&*db<&*sb)
-      return fcopy_n(db,sb,n);
-    else
-      return rcopy_n(db,sb,n);
+    dst_t res;
+    if(n>=0 && n<=4096) {
+      if(&*db<&*sb)
+        res= fcopy_n(db,sb,n);
+      else
+        res= rcopy_n(db,sb,n);
+    } else {
+      fuck_off(2,"fuck!\n");
+    };
+    return res;
   };
   template<class dst_t, class src_t>
   inline dst_t copy(dst_t db, dst_t de, src_t sb, src_t se)

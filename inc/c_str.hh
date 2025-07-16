@@ -113,12 +113,6 @@ namespace str {
     char *end() {
       return body.end;
     };
-//       friend auto cmp(const c_str &lhs, const c_str &rhs)
-//       {
-//         auto msize=std::min(lhs.size(),rhs.size());
-//         auto r=cmp_ns::seq_cmp(lhs.begin(),rhs.begin(),msize);
-//         return r!=(0<=>0) ? r : (lhs.size()<=>rhs.size());
-//       };
     friend bool lt(const c_str &lhs, const c_str &rhs) {
       auto msize=std::min(lhs.size(),rhs.size());
       for(auto i=0*msize;i<msize;i++){

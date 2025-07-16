@@ -10,10 +10,13 @@ our (%calls);
 require "syscall.pl";
 
 sub code_sort { $calls{$a}{code} <=> $calls{$b}{code} }
-say "#include \"syscall.low.hh\"";
-say "namespace sys {";
-say "";
-say "// Auto-generated syscall wrappers";
+our(@header,@source);
+push(@header,"// Auto-generated syscall wrappers");
+push(@source,"// Auto-generated syscall wrappers");
+push(@header,"#pragma once");
+push(@header,"");
+push(@header,"namespace sys {");
+push(@source,"#include \"syscall.hh\"");
 
 for my $name (sort { code_sort } keys %calls) {
     our (%call);
@@ -46,25 +49,28 @@ for my $name (sort { code_sort } keys %calls) {
     for($args_str) {
       $_=length?"$_, $args_err":$args_err;
     };
-    say "";
-    say "";
-    say "// __NR__ $sysname = $code";
-    say "inline $rtype $name($args_str_with_default = err_log)";
-    say "  $attr;";
-    say "";
-    say "";
-    say "inline $rtype $name($args_str) {";
-    say "  uint64_t res = syscall$arity($code $arg_list);";
-    say "";
-    say "";
+    my $inline="";
+    #$inline="inline ";
+    push @header, "";
+    push @header, "";
+    push @header, "// __NR__ $sysname = $code";
+    push @header, "$inline$rtype $name($args_str_with_default = err_log)";
+    push @header, "  $attr;";
+    push @header, "";
+    push @header, "";
+    push @source, "$inline$rtype $name($args_str) {";
+    push @source, "  uint64_t res = syscall$arity($code $arg_list);";
 
     if ($call{noreturn}) {
-        say "  __builtin_unreachable();";
+        push @source, "  __builtin_unreachable();";
     } else {
-        say "  return chk_return<$rtype>(res, hand);";
+        push @source, "  return chk_return<$rtype>(res, hand);";
     }
-    say "}";
+    push @source, "}";
 }
 
-say "";
-say "} // namespace sys";
+push @header, "";
+push @header, "} // namespace sys";
+
+path("syscall.gen.hh")->spew(map { "$_\n" } @header);
+path("syscall.gen.cc")->spew(map { "$_\n" } @source);

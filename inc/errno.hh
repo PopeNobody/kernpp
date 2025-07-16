@@ -13,19 +13,21 @@ namespace sys {
 
   extern errno_t errno;
   const c_str strerror(errno_t err=errno);
-  void perror(const c_str &msg1, const c_str &msg2);
-  void perror(const c_str &msg1);
+  void perror(const char *msg1, const char *msg2);
+  void perror(const char *msg1);
 
 
-  void die(int res, const c_str &m1) NOR;
-  void die(int res, const c_str &msg1, const c_str &msg2)NOR;
-  inline void die(const c_str &msg1, const c_str &msg2)NOR;
-  inline void die(const c_str &msg1);
-  void pexit(int res, const c_str &msg1) NOR;
-  void pexit(int res, const c_str &msg1, const c_str &msg2) NOR;
+  void die(int res, const char *m1) NOR;
+  void die(int res, const char *msg1, const char *msg2)NOR;
+  void die(const char *msg1, const char *msg2)NOR;
+  void die(const char *msg1);
+  void pexit(int res, const char *msg1) NOR;
+  void pexit(int res, const char *msg1, const char *msg2) NOR;
   
-  void pexit(int res, const c_str &msg1, const c_str &msg2);
-  void pexit(int res, const c_str &msg1);
+  void pexit(int res, const char *msg1, const char *msg2);
+  void pexit(int res, const char *msg1);
+  void die(int res, const char * msg1);
+  void die(int res, const char * msg1, const char * msg2);
   void die(int res, const c_str &msg1);
   void die(int res, const c_str &msg1, const c_str &msg2);
   inline void die(const c_str &msg1) {
