@@ -1,5 +1,6 @@
 /* gen_all_syscall_constants.c */
 
+#define _POSIX_C_SOURCE 200000L
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>

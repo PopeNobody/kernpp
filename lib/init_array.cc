@@ -1,8 +1,5 @@
 #include <types.hh>
 #include <syscall.hh>
-typedef unsigned long size_t;
-typedef long ssize_t;
-typedef unsigned char uint8_t;
 using sys::write;
 extern void (*__preinit_array_start []) (void) __attribute__((weak));
 extern void (*__preinit_array_end []) (void) __attribute__((weak));
@@ -14,17 +11,6 @@ extern void (*__fini_array_end []) (void) __attribute__((weak));
 #ifndef L
 #define L(x) x,sizeof(x)-1
 #endif
-//   inline ssize_t write( fd_t fd,  const char *buf,  size_t len)
-//   {
-//   	long res;
-//   	asm (
-//   			"syscall\n"
-//   			: "=a"(res)
-//   			: "a"(1), "D"(fd), "S"(buf),"d"(len)
-//   			: "rcx", "r11", "memory"
-//   			);
-//   	return res;
-//   };
 extern "C" {
 	void _init();
 	void _fini();
@@ -36,8 +22,6 @@ extern "C" {
 		count = __preinit_array_end - __preinit_array_start;
 		for (i = 0; i < count; i++)
 			__preinit_array_start[i]();
-
-		//_init();
 
 		count = __init_array_end - __init_array_start;
 		for (i = 0; i < count; i++)
@@ -53,7 +37,6 @@ extern "C" {
       __fini_array_start[i]();
     };
 
-		//_fini();
 	}
 
 #define MAX_ATEXIT 32

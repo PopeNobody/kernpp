@@ -9,6 +9,8 @@ CXXFLAGS:= $(CFLAGS) -std=c++23
 CC:=clang
 CXX:= clang++
 
+find_all_values.o: find_all_values_list.h
+
 c:= $(wildcard *.c)
 cc:= $(wildcard *.cc)
 

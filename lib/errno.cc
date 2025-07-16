@@ -66,6 +66,18 @@ void sys::throw_errno(errno_t err){
   exit(-1);
 };
 namespace sys {
+  inline bool err_retry_on_transient(errno_t err) {
+    static collect::bitset_t<128> transient = {
+      EINTR,
+      EAGAIN,
+      EWOULDBLOCK,
+    };
+    return transient.is_set(err);
+  }
+  void err_die_if_stdin_tty(sys::errno_t err) {
+    if(isatty(0))
+      pexit(3,"stdin is a tty, but can't open /dev/tty");
+  }
   errno_t errno;
   void perror(const c_str &msg)
   {
@@ -79,12 +91,13 @@ namespace sys {
   };
   void die(int err, const c_str &msg)
   {
-    perror(msg);
+    write(2,msg);
     exit(err);
   };
   void pexit(int err, const c_str &msg1, const c_str &msg2)
   {
-    perror(msg1,msg2);
+    write(2,msg1);
+    write(2,msg2);
     exit(err);
   };
   void pexit(int err, const c_str &msg)
