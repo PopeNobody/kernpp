@@ -1,10 +1,7 @@
-MAKEFLAGS+= -rR -j1
 #export override PATH:=$(PWD)/sbin:$(PATH)
-DISTCC_HOSTS:=localhost/1 10.1.3.102/24
-SHELL:=/bin/bash -e
+include etc/vars.mk
 all: lib bin tst
 #CXX:=/opt/bin/clang++
-CXX:=$(HOME)/bin/dist-clang++
 lib/lib:=lib/libkernpp.aa
 tgt/all:=$(lib/lib)
 show= $(warning $1: $($1))
@@ -12,6 +9,7 @@ $(deps):;
 
 c++/src:=$(wildcard */*.cc)
 c++/obj:=$(c++/src:.cc=.cc.oo)
+
 c++/asm:=$(c++/src:.cc=.cc.SS)
 c++/cpp:=$(c++/src:.cc=.cc.ii)
 c++/dep:=$(c++/src:.cc=.cc.dd)
