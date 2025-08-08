@@ -1,6 +1,12 @@
 #include "fmt.hh"
+#include "bitset.hh"
 
 namespace fmt {
+  using collect::bitset_t;
+  template<size_t sz>
+  fmt_t::fmt_t(const bitset_t<sz> &val)
+  {
+  }
   fmt_t::fmt_t(const timeval_t &val)
   {
     fmt_t fsec(val.tv_sec);
@@ -19,9 +25,7 @@ namespace fmt {
     assert(!*pos);
     pos=itr::copy(pos,end,"}");
     assert(!*pos);
-  };
-  fmt_t::fmt_t(const str::c_str &str){
-    body.txt=(iovec)str;
+    body.len=pos-body.buf;
   };
   fmt_t::fmt_t(bool val) {
     char *str=(char*)(val?"-true":"false");
@@ -70,7 +74,29 @@ namespace fmt {
     if(body.nul[0])
       std::abort();
   };
+  fmt_t::fmt_t(const timespec_t &val)
+  {
+    fmt_t fsec(val.tv_sec);
+    str::c_str sec=(iovec)fsec;
+    fmt_t fusec(val.tv_nsec);
+    str::c_str usec=(iovec)fusec;
+    char *pos=body.buf;
+    char *end=&body.nul[0];
+    pos=itr::copy(pos,end,"timespec_t{");
+    assert(!*pos);
+    pos=itr::copy(pos,end,sec.beg(),sec.end());
+    assert(!*pos);
+    pos=itr::copy(pos,end,",");
+    assert(!*pos);
+    pos=itr::copy(pos,end,usec.beg(),usec.end());
+    assert(!*pos);
+    pos=itr::copy(pos,end,"}");
+    assert(!*pos);
+    body.len=pos-body.buf;
+  };
 };
+
+#if 0
 char *timeval::format(char *buf, char *end) const {
   assert((buf<end) && (buf>end-100));
   fmt::fmt_t fu(tv_usec);
@@ -95,3 +121,4 @@ char *timespec::format(char *buf, char *end) const {
   pos=itr::copy(pos,end,"}");
   return pos;
 };
+#endif

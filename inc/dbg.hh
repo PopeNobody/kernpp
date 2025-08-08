@@ -1,3 +1,4 @@
+#pragma once
 #define NDEBUG
 
 namespace dbg {

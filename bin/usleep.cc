@@ -21,7 +21,8 @@ int main(int argc,char *const*argv,char *const*envp) {
   } else {
     sys::die("no time specified");
   };
-  write(2,fmt::fmt_t(tm));
+  fmt_t tm_fmt(tm);
+  write(2,tm_fmt);
   nanosleep(&tm,0);
   return 0;
 };

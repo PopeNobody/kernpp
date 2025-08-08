@@ -1,5 +1,4 @@
-#include <syscall.hh>
-
+#include "syscall.hh"
 extern "C" {
   using sys::write;
   using std::abort;
@@ -33,4 +32,10 @@ void memset(void *vb, char v, size_t n){
   char *b=(char*)vb;
   for(int i=0;i<n;i++)
     b[n]=v;
+};
+size_t strlen(const char* const str){
+  size_t pos=0;
+  while(str[pos])
+    ++pos;
+  return pos;
 };

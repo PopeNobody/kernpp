@@ -1,9 +1,13 @@
 #include "syscall.hh"
 using namespace sys;
 static char buf[4096];
-void cat(int fd) {
+// ssize_t sys::read(fd_t fd, char *buf, size_t len, errhand_t hand)
+// {
+//   return 0;
+// };
+void cat(fd_t fd) {
   while(1){
-    ssize_t nr=read(fd,buf,sizeof(buf));
+    ssize_t nr=read(fd,buf,sizeof(buf),err_log);
     if(!nr)
       return;
     if(nr<0) {
@@ -22,7 +26,7 @@ void cat(int fd) {
 };
 void cat(const char *file) {
   int fd=open(file,o_rdonly);
-  cat(fd);
+  cat(fd_t(fd));
 };
 extern "C" {
   int main(int argc,char *const*argv,char *const*envp) {
@@ -31,7 +35,7 @@ extern "C" {
         cat(argv[i]);
       };
     } else {
-      cat(0);
+      cat(fd_t(0));
     }
     return 0;
   };

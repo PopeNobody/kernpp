@@ -4,12 +4,6 @@ extern "C" { int main(int argc,char *const*argv,char *const*envp); };
 using namespace sys;
 char **envv;
 
-size_t str_len(const char *str) {
-  const char *pos=str;
-  while(*pos)
-    ++pos;
-  return pos-str;
-};
 char name[256];
 char *find_name(const char * const arg){
   int j=0;

@@ -35,7 +35,7 @@ namespace collect {
         {
         }
         slot_t &slot(size_t idx){
-          assert(idx<size);
+          xassert(idx<size);
           return data[idx];
         };
       };

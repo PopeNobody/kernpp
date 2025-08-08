@@ -15,11 +15,11 @@ struct fmt_t : public iovec
 {
   template<class val_t>
     fmt_t(const val_t&val)
-    :iovec{0,0}
+    :iovec(0)
   {
   };
   fmt_t()
-    :iovec{0,0}
+    :iovec(0)
   {
   };
   ssize_t write(fd_t fd) const

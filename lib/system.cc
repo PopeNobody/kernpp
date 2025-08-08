@@ -9,7 +9,7 @@ int sys::system(const char *cmd) {
   int status;
   pid_t pid=sys::fork();
   if(pid) {
-    pid_t kid=sys::waitpid(pid,&status,0);
+    pid_t kid=sys::wait4(pid,&status,0,0,err_log);
     using sys::write;
     write(1,"\r\n");
     write(1,fmt::fmt_t(pid));

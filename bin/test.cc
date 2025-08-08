@@ -1,11 +1,16 @@
 #include "syscall.hh"
 
+namespace sys {
+  pid_t wait4(pid_t pid, int *status, int opts, errhand_t hand=err_log) {
+    return 0;
+  };
+};
 pid_t child;
 static void child_reap(int) {
   pid_t pid;
   while(true) {
     int status=0;
-    pid=sys::waitpid(0,&status,0);
+    pid=sys::wait4(0,&status,0,0,sys::err_log);
     using sys::write;
     write(2,"dead pid: ");
     write(2,fmt::fmt_t(pid));

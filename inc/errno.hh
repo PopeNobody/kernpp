@@ -2,11 +2,11 @@
 
 #include "types.hh"
 #include "errno_enum.hh"
+#include "attrs.hh"
 
 namespace str {
   struct c_str;
 };
-#include "attrs.hh"
 namespace sys {
   using str::c_str;
 
@@ -37,5 +37,4 @@ namespace sys {
     die(99,msg1,msg2);
   };
 };
-#include "attrs.hh"
 #include "c_str.hh"

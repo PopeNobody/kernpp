@@ -1,8 +1,5 @@
 #include "syscall.hh"
 
-int main(int argc, char**argv, char**args) {
-  return 0;
-}
 using sys::write;
 using fmt::fmt_t;
 namespace rc {

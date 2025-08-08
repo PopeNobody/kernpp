@@ -19,7 +19,7 @@ static void child_reap(int) {
   pid_t pid;
   while(true) {
     int status=0;
-    pid=sys::waitpid(0,&status,0);
+    pid=sys::wait4(0,&status,0,0,sys::err_log);
     using sys::write;
     write(2,"dead pid: ");
     write(2,fmt::fmt_t(pid));
@@ -50,12 +50,6 @@ using sys::dup2;
 using sys::getpid;
 using sys::open_flags;
 
-size_t strlen(const char* const str){
-  size_t pos=0;
-  while(str[pos])
-    ++pos;
-  return pos;
-};
 char *fmt_int(char *beg, char *end, size_t num)
 {
   char buf[63];
@@ -116,12 +110,15 @@ void show_fds(int maxfd=64) {
   };
 };
 using sys::fdset_t;
+using str::c_str;
 void test_fdset_t() {
   fdset_t set;
   set.set(0);
   set.set(1);
   set.set(3);
-  write(2,fmt_t(set));
+  char buf[set.bits()+1];
+  set.format(buf,buf+sizeof(buf)-1);
+//     write(2,str);
 };
 int main(int argc,char *const*argv,char *const*envp) {
   const char mname[]="/dev/pts/ptmx";

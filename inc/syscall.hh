@@ -2,7 +2,6 @@
 
 #include "errno.hh"
 #include "types.hh"
-#include "attrs.hh"
 
 
 namespace sys
@@ -91,55 +90,47 @@ namespace sys
     map_populate = 0x08000,
     map_stack    = 0x20000,
   };
-//     inline int sleep(time_t secs)
-//     {
-//       uint64_t res= 0xfeebdaed;
-//       timespec_t rqtp, rmtp;
-//   
-//       rqtp.tv_sec=secs;
-//       rqtp.tv_nsec=0;
-//       rmtp.tv_sec=0;
-//       rmtp.tv_nsec=0;
-//       asm("\tsyscall;\n"
-//           : "=a"(res)
-//           : "0"(35), "D"(&rqtp), "S"(&rmtp)
-//           : "rcx", "r11", "memory");
-//       return chk_return<int>(res);
-//     }
-//   namespace sys
-//   {
-
 }
+/// INCLUDE
+/// INCLUDE
+/// INCLUDE
+/// INCLUDE
+/// INCLUDE
 #include "syscall.gen.hh"
-
+/// INCLUDE
+/// INCLUDE
+/// INCLUDE
+/// INCLUDE
+/// INCLUDE
+namespace fmt {
+  struct fmt_t;
+};
 namespace sys {
-  inline fd_t open(istr_t path, open_flags flags, mode_t mode, errhand_t hand=err_log) {
-    return open(path,flags,mode,hand);
-  };
   inline fd_t open(istr_t path, open_flags flags, errhand_t hand=err_log) {
-    return open(path,flags,0,hand);
+    return open(path,flags,mode_t(0),hand);
   };
+//     inline pid_t waitpid(pid_t pid, int *status, int flags, errhand_t hand=err_log) AIL;
+//     inline pid_t waitpid(pid_t pid, int *status, int flags, errhand_t hand) {
+//       return wait4(pid,status,flags,0,hand);
+//     };
 
-  inline pid_t waitpid(pid_t pid, int *status, int flags, errhand_t hand=err_log) AIL;
-  inline pid_t waitpid(pid_t pid, int *status, int flags, errhand_t hand) {
-    return wait4(pid,status,flags,0,hand);
+  inline ssize_t write(fd_t fd, const iovec &vec, errhand_t hand) {
+    return write(fd,(const char*)vec.iov_base,vec.iov_len,hand);
   };
-
-  inline ssize_t write(fd_t fd, const char* buf, const char* end)
+  inline ssize_t write(fd_t fd, const char *buf, const char *end, errhand_t hand=err_log)
   {
-    return write(fd, buf, end - buf);
-  }
-  inline ssize_t write(fd_t fd, iovec val)
-  {
-    return write(fd, (const char*)val.iov_base, val.iov_len);
-  }
-
-  inline ssize_t write(fd_t fd, const char* buf)
+    iovec vec;
+    vec.iov_base=(void*)buf;
+    vec.iov_len=ssize_t(end-buf);
+    return write(fd,vec,hand);
+  };
+  ssize_t write(fd_t fd, const fmt::fmt_t &fmt, errhand_t hand = err_log);
+  inline ssize_t write(fd_t fd, const char* buf, errhand_t hand=err_log)
   {
     const char* end= buf;
     while(*end)
       ++end;
-    return write(fd, buf, end - buf);
+    return write(fd, iovec(buf, end), hand);
   }
   inline ssize_t full_write(fd_t fd, const char* const beg, size_t len)
     AIL;
@@ -157,7 +148,7 @@ namespace sys {
     const char* pos= beg;
     while(pos != end)
     {
-      ssize_t res= write(fd, pos, end - pos, err_fatal);
+      ssize_t res= write(fd, pos, end-pos, hand);
       pos+= res;
     }
     return pos;
@@ -167,6 +158,7 @@ namespace sys {
   {
     return full_write(fd, beg, beg + len, hand=err_fatal) - beg;
   }
+  ssize_t write(fd_t fd, const c_str &buf, errhand_t hand=err_log);
   void assert_fail(const char *, const char *, unsigned) NOR;
   bool isatty(fd_t fd);
   void drop_ctty(fd_t fd, errhand_t hand=err_log);
@@ -202,17 +194,12 @@ namespace sys {
   int login_tty(fd_t fd);
   fd_t openpty(fd_t &mpty, fd_t &spty, const termios &term, const winsize &size);
   pid_t forkpty(fd_t &mpty, fd_t &spty, const termios &term, const winsize &size);
-  fd_t openpt(int flags, sys::errhand_t=sys::err_log);
-  int unlockpt(fd_t fd,bool ilock,sys::errhand_t hand=sys::err_log);
-  int grantpt(fd_t fd,sys::errhand_t hand=sys::err_log);
-  fd_t getpt_peer(fd_t fd,sys::open_flags flags,sys::errhand_t hand=sys::err_log);
+  fd_t openpt(int flags, errhand_t=err_log);
+  int unlockpt(fd_t fd,bool ilock,errhand_t hand=err_log);
+  int grantpt(fd_t fd,errhand_t hand=err_log);
+  fd_t getpt_peer(fd_t fd,open_flags flags,errhand_t hand=err_log);
 };
 
-#include "attrs.hh"
-#define _GLIBCXX_NOEXCEPT noexcept
-#ifndef _GLIBCXX_NOTHROW
-#define _GLIBCXX_NOTHROW
-#endif
 extern "C" {
   void *memcpy(void *d, void *s, size_t n);
   void memset(void *b, char v, size_t n);
@@ -224,4 +211,3 @@ extern "C" {
   }\
 } while(0)
 #include "bitset.hh"
-

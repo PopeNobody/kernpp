@@ -1,5 +1,12 @@
 #export override PATH:=$(PWD)/sbin:$(PATH)
+all:
 include etc/vars.mk
+etc/multi.mk:;
+etc/cxxflags:;
+etc/ld_flags:;
+etc/cppflags:;
+etc/asmflags:;
+
 all: lib bin tst
 #CXX:=/opt/bin/clang++
 lib/lib:=lib/libkernpp.aa
@@ -25,6 +32,10 @@ asm/obj:=$(asm/src:.S=.S.oo)
 asm/lib:=$(filter lib/%,$(asm/obj))
 asm/exe:=$(filter bin/%,$(asm/src:.S=))
 
+scr/genheaders.pl:;
+
+#$(c++/cpp) $(asm/obj): inc/syscall.gen.hh lib/syscall.gen.cc
+
 TRS/dep:=$(filter-out $(c++/dep),$(wildcard */*.cc.dd))
 ifneq ($(TRS/dep),)
 $(foreach f,$(wildcard $(lib/lib) $(TRS/dep)),$(warning reap: $f)$(shell rm -f $f))
@@ -47,14 +58,23 @@ all/obj:= $(c++/obj) $(asm/obj)
 
 all/exe:=$(c++/exe) $(c++/tst) $(asm/exe)
 
-all: $(all/exe) inc/syscall.gen.hh
+all: $(all/exe)
 
+FORCE:
 
-inc/syscall.gen.hh: scr/genheaders.pl scr/syscall.pl
-	vi-perl scr/genheaders.pl > $@.new
-	mv $@.new $@
+.PHONY: FORCE
 
-#    include etc/one-step.mk
+scr/syscall.gen.hh scr/syscall.gen.cc: scr/genheaders.pl
+	vi-perl scr/genheaders.pl
+
+lib/syscall.gen.cc: scr/syscall.gen.cc
+	cp $< $@
+	ls -l $@
+
+inc/syscall.gen.hh: scr/syscall.gen.hh
+	cp $< $@
+	ls -l $@
+
 include etc/multi.mk
 
 $(asm/obj): %.S.oo: %.S etc/asmflags
@@ -71,12 +91,14 @@ all: $(c++/obj)
 $(c++/exe): %: %.cc.oo etc/ld_flags $(lib/lib)
 	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) @etc/ld_flags -Wl,--end-group
 
+c++/gen:= inc/syscall.gen.hh lib/syscall.gen.cc
 
 /dev/null:;
 %.mk:;
 Makefile:;
 
 clean:
+	rm -f $(c++/gen)  $(warning $(c++/gen))
 	@rm -f $(asm/exe)
 	@rm -f $(asm/obj)
 	@rm -f $(c++/asm)

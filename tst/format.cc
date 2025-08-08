@@ -61,7 +61,7 @@ struct fmt_holder {
     fmt_holder(small_string<64>&& buf) : data(buf.begin()), size(buf.size()), owned_buf(std::move(buf)) {}
 
     iovec to_iovec() const {
-        return { .iov_base = const_cast<void*>(data), .iov_len = size };
+        return iovec((char*)data,size);
     }
 };
 

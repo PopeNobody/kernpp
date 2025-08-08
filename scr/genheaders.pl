@@ -16,7 +16,18 @@ push(@source,"// Auto-generated syscall wrappers");
 push(@header,"#pragma once");
 push(@header,"");
 push(@header,"namespace sys {");
+#push(@header,"  namespace impl {");
 push(@source,"#include \"syscall.hh\"");
+push(@source,"#include \"syscall.low.hh\"");
+push(@source,"");
+push(@source,"namespace sys {");
+#    push(@source,"using sys::errhand_t;");
+#    for(0 .. 6) {
+#      push(@source,"using sys::syscall$_;");
+#    };
+#    push(@source,"using sys::fdset_t;");
+#    push(@source,"using sys::fdset_p;");
+
 
 for my $name (sort { code_sort } keys %calls) {
     our (%call);
@@ -33,9 +44,9 @@ for my $name (sort { code_sort } keys %calls) {
     my $code = $call{code};
     my $sysname = $call{name};
 
-    my $attr = "__attribute__((__always_inline__))";
+    my $attr = "";
     if ($call{noreturn}) {
-        $attr = "__attribute__((__always_inline__, __noreturn__))";
+        $attr = "__attribute__((__noreturn__))";
     }
 
     my $arity = scalar(@args);
@@ -68,9 +79,11 @@ for my $name (sort { code_sort } keys %calls) {
     }
     push @source, "}";
 }
+push(@source,"} // namespace sys {");
 
 push @header, "";
+#push @header, "  } // namespace impl";
 push @header, "} // namespace sys";
 
-path("syscall.gen.hh")->spew(map { "$_\n" } @header);
-path("syscall.gen.cc")->spew(map { "$_\n" } @source);
+path("scr/syscall.gen.hh")->spew(map { "$_\n" } @header);
+path("scr/syscall.gen.cc")->spew(map { "$_\n" } @source);

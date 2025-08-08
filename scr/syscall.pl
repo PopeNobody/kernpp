@@ -1,7 +1,7 @@
 %calls = (
   'read' => {
     'code' => 0,
-    'name' => 'read',
+    'name' => 'sys_read',
     'impl' => 1,
     'args' => [
       [
@@ -21,7 +21,7 @@
   },
   'write' => {
     'code' => 1,
-    'name' => 'write',
+    'name' => 'sys_write',
     'impl' => 1,
     'args' => [
       [

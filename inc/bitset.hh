@@ -1,6 +1,8 @@
 #pragma once
 
 #include "fmt.hh"
+#include "c_str.hh"
+#include "dbg.hh"
 namespace collect {
   template <size_t N>
     struct bitset_t {
@@ -11,12 +13,13 @@ namespace collect {
 
       uint64_t vals[WORDS] = {};
 
-      void check_bit(size_t bit)const;
+      void check_bit(size_t bit) const {
+        xassert(bit<BITS);
+      };
       constexpr void set(size_t bit) {
         check_bit(bit);
         vals[bit / WORD_BITS] |= (word_t(1) << (bit % WORD_BITS));
       }
-
       constexpr void clear(size_t bit) {
         check_bit(bit);
         vals[bit / WORD_BITS] &= ~(word_t(1) << (bit % WORD_BITS));
@@ -31,7 +34,9 @@ namespace collect {
         check_bit(bit);
         return vals[bit / WORD_BITS] & (word_t(1) << (bit % WORD_BITS));
       }
-
+      constexpr size_t bits() const {
+        return BITS;
+      };
       constexpr void reset() {
         for (size_t i = 0; i < WORDS; ++i) {
           vals[i] = 0;
@@ -68,20 +73,25 @@ namespace collect {
         }
         return -1;
       }
-      char* format(char* b, char* e, char zero_char = '0', char one_char = '1') const {
-        if ((e - b) > ptrdiff_t(N)) {
-
-          for (size_t i = 0; i < N; ++i) {
-            *b++ = test(N - 1 - i) ? one_char : zero_char;  // MSB first
-          }
-
-          *b = '\0';
-          return b;
-        } else {
-          *b=0;
-          return 0;
+      char *format(char *beg, char *end) {
+        xassert(beg<end);
+        int b=4;
+        *beg++='[';
+        for(int i=0;i<N;i++){
+          assert(beg<end);
+          *beg++='0'+is_set(i);
+          if(!--b){
+            b=4;
+            *beg++=' ';
+          };
         };
-      }
+        while(--b){
+          assert(beg<end);
+          *beg++=' ';
+        };
+        *beg++=']';
+        return beg;
+      };
     };
 }
 namespace sys {

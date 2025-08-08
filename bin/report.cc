@@ -29,7 +29,7 @@ int main(int argc,char *const*argv,char *const*envp) {
         using fmt::fmt_t;
         fd_t efd(2);
         int tmp;
-        res=waitpid(0,&tmp,0,err_ignore);
+        res=wait4(0,&tmp,0,0,err_ignore);
         if(res>1) {
           ret=tmp/256;
           write(efd,"pid ");

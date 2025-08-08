@@ -3,11 +3,12 @@
 namespace sys {
   struct timeval_t;
 };
+namespace collect {
+  template<size_t sz>
+    struct bitset_t;
+};
 namespace fmt {
-  template<size_t size>
-    struct buf_t {
-
-    };
+  using collect::bitset_t;
   struct int_t {
     unsigned long abs;
     bool neg;
@@ -51,7 +52,7 @@ namespace fmt {
     {
     }
   };
-  
+
   struct fmt_t
   {
     struct body_t {
@@ -59,16 +60,9 @@ namespace fmt {
       char nul[1];
       char off;
       char len;
-      iovec txt;
-      body_t(const iovec &txt={})
-        :txt(txt)
+      body_t()
       {
-        memset(buf,0,sizeof(buf));
-        nul[0]=0;
-        off=0;
-        len=0;
       };
-
       ~body_t() {
       };
     } body;
@@ -115,30 +109,17 @@ namespace fmt {
     {
       format(ptr,width);
     };
-    fmt_t(enum sys::errno_t err);
-    template<class val_t>
-      fmt_t(const val_t &val)
-      {
-        char *pos=val.format(body.buf,body.nul);
-        body.off=0;
-        body.len=pos-body.buf;
-      };
-    fmt_t(const str::c_str &str);
+    fmt_t(sys::errno_t errno);
     fmt_t(bool val);
     fmt_t(const timeval_t &val);
-    fmt_t(const iovec &txt)
-      : body(txt)
-    {
-    };
+    fmt_t(const timespec_t &val);
+    template<size_t sz>
+      fmt_t(const bitset_t<sz> &val);
     size_t len() {
       return body.len;
     };
     operator iovec() const {
-      if(body.txt.iov_base) {
-        return body.txt;
-      } else {
-        return { (void*)(body.buf+body.off), (size_t)(body.len) };
-      };
+      return { (void*)(body.buf+body.off), (size_t)(body.len) };
     };
     static constexpr const char digits[]="0123456789abcdef";
   };
@@ -167,11 +148,5 @@ namespace fmt {
     };
     return res;
   }
-  struct form_t : public iovec {
-    form_t(void *base, size_t len)
-      : iovec{base,len}
-    {
-    }
-  };
 }
 

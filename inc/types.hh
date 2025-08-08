@@ -202,17 +202,17 @@ typedef int32_t pid_t;
 typedef int64_t intptr_t;
 typedef uint64_t uintptr_t;
 typedef int64_t off64_t;
-//   struct fd_t : protected wrap_t<uint32_t>
-//   {
-//     fd_t()
-//       :wrap_t(-1)
-//     {
-//     };
-//     using wrap_t::wrap_t;
-//     using wrap_t::operator val_t&;
-//     using wrap_t::operator val_t;
-//   };
-typedef uint32_t fd_t;
+struct fd_t : protected wrap_t<uint32_t>
+{
+  fd_t()
+    :wrap_t(-1)
+  {
+  };
+  using wrap_t::wrap_t;
+  using wrap_t::operator val_t&;
+  using wrap_t::operator val_t;
+};
+//   typedef uint32_t fd_t;
 typedef fd_t* fd_p;
 struct pollfd_t {
   fd_t   fd;
@@ -246,13 +246,11 @@ struct timeval
 {
   time_t tv_sec;
   int64_t tv_usec;
-  char *format(char *buf, char *end) const;
 };
 struct timespec
 {
   time_t tv_sec;
   int64_t tv_nsec;
-  char *format(char *buf, char *end) const;
 };
 typedef timespec timespec_t;
 enum ftype_t {
@@ -277,9 +275,39 @@ struct linux_dirent {
 		return (linux_dirent*)(((char*)this)+this->d_reclen);
 	};
 };
+namespace fmt {
+  struct fmt_t;
+};
 struct iovec {
 	void  *iov_base;
 	size_t iov_len;
+  iovec()
+    : iov_base(0), iov_len(0)
+  {
+  };
+  iovec(void *iov_base, size_t iov_len=-1)
+    : iov_base((void*)iov_base), iov_len(iov_len)
+  {
+    if(iov_len>=0)
+      return;
+    const char *beg=(const char *)iov_base;
+    const char *end=beg;
+    while(*end)
+      ++end;
+    iov_len=end-beg;
+  };
+  iovec(const char *iov_base, const char *iov_end)
+    : iov_base((void*)iov_base), iov_len(iov_end-iov_base)
+  {
+  };
+  iovec(const char *iov_base, size_t iov_len)
+    : iov_base((void*)iov_base), iov_len(iov_len)
+  {
+  };
+  iovec(char *iov_base, size_t iov_len)
+    : iov_base((void*)iov_base), iov_len(iov_len)
+  {
+  };
 };
 
 typedef timespec* timespec_p;
