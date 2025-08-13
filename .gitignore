@@ -23,3 +23,8 @@ bin/lspath
 *.orig
 *.SS
 *.log
+bin/printenv
+bin/touch
+tst/test1.t
+tst/test2.t
+tst/test3.t
