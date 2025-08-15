@@ -1,6 +1,9 @@
 #ifndef types_hh
 #define types_hh types_hh
 
+typedef __int128_t int128_t;
+typedef __uint128_t uint128_t;
+
 template<class T>
 struct wrap_t {
   using val_t=T;
