@@ -21,8 +21,6 @@ namespace sys {
 const void *BAD=(void*)((char*)-1);
 void *malloc(size_t size) {
   void *addr=0;
-  write(1,fmt::fmt_t(BAD));
-  write(1,"\n");
   int prot=prot_read|prot_write;
   int flag=map_private|map_anon;
   int fd=-1;

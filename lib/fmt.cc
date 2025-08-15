@@ -37,9 +37,9 @@ namespace fmt {
     body.len=5;
   };
   fmt_t::fmt_t(sys::errno_t err) {
-    eformat((int64_t)err,10,20,'-');
+    format((int64_t)err,10,20,'-');
   };
-  void fmt_t::pformat(void *val, int width) {
+  void fmt_t::format(void *val, int width) {
     fmt_t fmt(uint64_t(val),16,16,'o');
     char *pos=body.buf;
     pos=itr::copy(pos,body.nul,"0x");
@@ -47,10 +47,10 @@ namespace fmt {
     body.off=0;
     body.len=pos-body.buf;
   };
-  void fmt_t::fformat(float val, int width, int precision) {
+  void fmt_t::format(float val, int width, int precision) {
     format(uint64_t(val),10,width,'*');
   }
-  void fmt_t::iformat(int_t wrap, int base, int width, char fill)
+  void fmt_t::format(int_t wrap, int base, int width, char fill)
   {
     unsigned long val=wrap.abs;
     unsigned long neg=wrap.neg;
@@ -96,29 +96,3 @@ namespace fmt {
   };
 };
 
-#if 0
-char *timeval::format(char *buf, char *end) const {
-  assert((buf<end) && (buf>end-100));
-  fmt::fmt_t fu(tv_usec);
-  fmt::fmt_t fs(tv_sec);
-  char *pos(buf);
-  pos=itr::copy(pos,end,"timeval{");
-  pos=itr::copy(pos,end,fs);
-  pos=itr::copy(pos,end,",");
-  pos=itr::copy(pos,end,fu);
-  pos=itr::copy(pos,end,"}");
-  return pos;
-};
-char *timespec::format(char *buf, char *end) const {
-  assert((buf<end) && (buf>end-100));
-  fmt::fmt_t fu(tv_nsec);
-  fmt::fmt_t fs(tv_sec);
-  char *pos(buf);
-  pos=itr::copy(pos,end,"timespec{");
-  pos=itr::copy(pos,end,fs);
-  pos=itr::copy(pos,end,",");
-  pos=itr::copy(pos,end,fu);
-  pos=itr::copy(pos,end,"}");
-  return pos;
-};
-#endif
