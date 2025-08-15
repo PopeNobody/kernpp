@@ -66,48 +66,48 @@ namespace fmt {
       ~body_t() {
       };
     } body;
-    void format(int_t wrap, int base, int width, char fill);
-    void format(float val, int width, int prec=6);
-    void format(void *ptr, int width=16);
+    void iformat(int_t wrap, int base, int width, char fill);
+    void fformat(float val, int width, int prec=6);
+    void pformat(void *ptr, int width=16);
     fmt_t(unsigned long val,int base=10, int width=1, char fill='0')
     {
-      format(val,base,width,fill);
+      iformat(val,base,width,fill);
     };
     fmt_t(long val,int base=10, int width=1, char fill='0')
     {
-      format(val,base,width,fill);
+      iformat(val,base,width,fill);
     };
     fmt_t(unsigned int val,int base=10, int width=1, char fill='0')
     {
-      format(val,base,width,fill);
+      iformat(val,base,width,fill);
     };
     fmt_t(int val,int base=10, int width=1, char fill='0')
     {
-      format(val,base,width,fill);
+      iformat(val,base,width,fill);
     };
     fmt_t(unsigned short val,int base=10, int width=1, char fill='0')
     {
-      format(val,base,width,fill);
+      iformat(val,base,width,fill);
     };
     fmt_t(short val,int base=10, int width=1, char fill='0')
     {
-      format(val,base,width,fill);
+      iformat(val,base,width,fill);
     };
     fmt_t(unsigned char val,char base=10, char width=1, char fill='0')
     {
-      format(val,base,width,fill);
+      iformat(val,base,width,fill);
     };
     fmt_t(char val,char base=10, char width=1, char fill='0')
     {
-      format(val,base,width,fill);
+      iformat(val,base,width,fill);
     };
     fmt_t(float f,int width=0, int prec=6, char fill=' ')
     {
-      format(f,width,prec);
+      fformat(f,width,prec);
     };
     fmt_t(void *ptr, int width=16)
     {
-      format(ptr,width);
+      pformat(ptr,width);
     };
     fmt_t(sys::errno_t errno);
     fmt_t(bool val);
