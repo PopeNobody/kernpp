@@ -21,6 +21,7 @@ bin/test
 bin/touch
 bin/true
 bin/usleep
+bin/vector
 bin/vpty
 bin/vv
 bin/write
