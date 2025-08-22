@@ -1,4 +1,5 @@
 #include "fmt.hh"
+#include "itr-ops.hh"
 #include "bitset.hh"
 
 namespace fmt {
