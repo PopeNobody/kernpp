@@ -25,35 +25,35 @@ void terminate_ctty() {
 }
 fdset_t fds;
 void _write2(const char *file, unsigned line, fd_t fd, const char *lab, fmt::fmt_t val){
-  c_str strs[]={
-    file,
-    ":",
-    (iovec)fmt::fmt_t(line),
-    ":",
-    lab,
-    "  ---  ",
-    (iovec)fmt::fmt_t(val),
-    "  ---  ",
-    "\n\n"
-  };
-  int len=0;
-  for(auto str: strs) {
-    len+=str.len();
-  };
-  char buf[len+256];
-  for(auto str: strs) {
-  };
-  char *end=buf+sizeof(buf)-1;
-  *--end=0;
-  char *pos=itr::copy(buf,end,file); 
-  pos=itr::copy(pos,end,":");
-  pos=itr::copy(pos,end,fmt::fmt_t(line));
-  pos=itr::copy(pos,end,":");
-  pos=itr::copy(pos,end,lab);
-  pos=itr::copy(pos,end," => ");
-  pos=itr::copy(pos,end,val);
-  pos=itr::copy(pos,end,"\n");
-  full_write(fd,buf,pos-buf,err_fatal);
+//     c_str strs[]={
+//       file,
+//       ":",
+//       (iovec)fmt::fmt_t(line),
+//       ":",
+//       lab,
+//       "  ---  ",
+//       (iovec)fmt::fmt_t(val),
+//       "  ---  ",
+//       "\n\n"
+//     };
+//     int len=0;
+//     for(auto str: strs) {
+//       len+=str.len();
+//     };
+//     char buf[len+256];
+//     for(auto str: strs) {
+//     };
+//     char *end=buf+sizeof(buf)-1;
+//     *--end=0;
+//     char *pos=itr::copy(buf,end,file); 
+//     pos=itr::copy(pos,end,":");
+//     pos=itr::copy(pos,end,fmt::fmt_t(line));
+//     pos=itr::copy(pos,end,":");
+//     pos=itr::copy(pos,end,(const char *)lab);
+//     pos=itr::copy(pos,end," => ");
+//     pos=itr::copy(pos,end,val);
+//     pos=itr::copy(pos,end,"\n");
+//     full_write(fd,buf,pos-buf,err_fatal);
 };
 #define write2(fd,lab,val) do { \
   _write2(__FILE__,__LINE__,fd,lab,val); \

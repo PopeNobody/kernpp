@@ -6,7 +6,6 @@
 
 namespace sys
 {
-#define linux_dirent64 linux_dirent
   enum open_mode
   {
     o_default= 0664
@@ -114,7 +113,7 @@ namespace sys {
 //       return wait4(pid,status,flags,0,hand);
 //     };
 
-  inline ssize_t write(fd_t fd, const iovec &vec, errhand_t hand) {
+  inline ssize_t write(fd_t fd, const iovec &vec, errhand_t hand=err_log) {
     return write(fd,(const char*)vec.iov_base,vec.iov_len,hand);
   };
   inline ssize_t write(fd_t fd, const char *buf, const char *end, errhand_t hand=err_log)
@@ -130,7 +129,7 @@ namespace sys {
     const char* end= buf;
     while(*end)
       ++end;
-    return write(fd, iovec(buf, end), hand);
+    return write(fd, iovec(buf, end-buf), hand);
   }
   inline ssize_t full_write(fd_t fd, const char* const beg, size_t len)
     AIL;

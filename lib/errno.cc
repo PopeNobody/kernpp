@@ -4032,8 +4032,7 @@ namespace sys {
 
 
   inline ssize_t write(fd_t fd, const c_str &str, errhand_t hand) {
-    iovec vec = (iovec)str;
-    return write(fd,str,hand);
+    return write(fd,str.beg(),str.size(),hand);
   };
   inline ssize_t write(fd_t fd, const iovec &vec, errhand_t hand) {
     return write(fd,(const char*)vec.iov_base,vec.iov_len,hand);

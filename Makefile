@@ -1,4 +1,5 @@
 #export override PATH:=$(PWD)/sbin:$(PATH)
+test:
 all:
 include etc/vars.mk
 etc/multi.mk:;
@@ -8,6 +9,9 @@ etc/cppflags:;
 etc/asmflags:;
 
 all: lib bin tst
+
+test: all
+
 #CXX:=/opt/bin/clang++
 lib/lib:=lib/libkernpp.aa
 tgt/all:=$(lib/lib)

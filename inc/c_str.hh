@@ -125,20 +125,13 @@ namespace str {
 }
 namespace itr {
   using str::c_str;
-  inline char *copy(char *db, char *de, c_str str) {
+  inline char *copy(char *db, char *de, const c_str &str) {
     if(db+str.len()>=de)
       return 0;
     for(int i=0;i<str.len();i++)
       *db++=str[i];
     return db;
   };
-  template<class ch_t, size_t num>
-    inline char *copy(char *db, char *de, ch_t (&str)[num]){
-      ssize_t n=num;
-      while(!str[n])
-        --n;
-      return copy(db,de,c_str(str,str+n));
-    };
-  char *copy(char *db, char *de, iovec vec);
+  char *copy(char *db, char *de, const fmt::fmt_t &str);
 };
 

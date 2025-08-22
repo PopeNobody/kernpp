@@ -3,10 +3,6 @@
 
 namespace fmt {
   using collect::bitset_t;
-  template<size_t sz>
-  fmt_t::fmt_t(const bitset_t<sz> &val)
-  {
-  }
   fmt_t::fmt_t(const timeval_t &val)
   {
     fmt_t fsec(val.tv_sec);
@@ -43,7 +39,7 @@ namespace fmt {
     fmt_t fmt(uint64_t(val),16,16,'o');
     char *pos=body.buf;
     pos=itr::copy(pos,body.nul,"0x");
-    pos=itr::copy(pos,body.nul,fmt);
+    pos=itr::copy(pos,body.nul,fmt.beg(),fmt.end());
     body.off=0;
     body.len=pos-body.buf;
   };

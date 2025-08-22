@@ -116,7 +116,7 @@ typedef msqid_ds* msqid_ds_p;
 typedef int qid_t;
 struct linux_dirent;
 typedef linux_dirent* linux_dirent_p;
-struct linux_dirent64;
+typedef linux_dirent linux_dirent64;
 typedef linux_dirent64* linux_dirent64_p;
 struct sigevent;
 typedef sigevent* sigevent_p;
@@ -267,28 +267,36 @@ enum ftype_t {
 	DT_SOCK = 12,
 	DT_WHT = 14
 };
-struct linux_dirent {
+class linux_dirent {
 	ino64_t        d_ino;    /* 64-bit inode number */
 	off64_t        d_off;    /* 64-bit offset to next structure */
 	unsigned short d_reclen; /* Size of this dirent */
-	unsigned char  d_type;   /* File type */
 	char           d_name[]; /* Filename (null-terminated) */
-
-	linux_dirent *next() {
-		return (linux_dirent*)(((char*)this)+this->d_reclen);
-	};
+  public:
+  ino64_t ino() const {
+    return d_ino;
+  };
+  unsigned short reclen() const {
+    return d_reclen;
+  };
+  const char *name() const {
+    return d_name;
+  };
+  int type() const {
+    return (((char*)this)+reclen())[-1];
+  };
 };
 namespace fmt {
   struct fmt_t;
 };
 struct iovec {
-	void  *iov_base;
+	const void  *iov_base;
 	size_t iov_len;
   iovec()
     : iov_base(0), iov_len(0)
   {
   };
-  iovec(void *iov_base, size_t iov_len=-1)
+  iovec(const void *iov_base, size_t iov_len=-1)
     : iov_base((void*)iov_base), iov_len(iov_len)
   {
     if(iov_len>=0)
@@ -299,17 +307,9 @@ struct iovec {
       ++end;
     iov_len=end-beg;
   };
-  iovec(const char *iov_base, const char *iov_end)
-    : iov_base((void*)iov_base), iov_len(iov_end-iov_base)
-  {
-  };
-  iovec(const char *iov_base, size_t iov_len)
-    : iov_base((void*)iov_base), iov_len(iov_len)
-  {
-  };
-  iovec(char *iov_base, size_t iov_len)
-    : iov_base((void*)iov_base), iov_len(iov_len)
-  {
+  template<class val_t>
+  static iovec mk_iov(val_t *beg, val_t *end) {
+    return iovec((void*)beg, (end-beg)*sizeof(val_t));
   };
 };
 

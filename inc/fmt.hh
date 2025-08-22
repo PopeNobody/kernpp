@@ -56,10 +56,10 @@ namespace fmt {
   struct fmt_t
   {
     struct body_t {
-      char buf[68];
-      char nul[1];
-      char off;
-      char len;
+      char buf[68]={};
+      char nul[1]={};
+      char off=0;
+      char len=0;
       body_t()
       {
       };
@@ -115,11 +115,17 @@ namespace fmt {
     fmt_t(const timespec_t &val);
     template<size_t sz>
       fmt_t(const bitset_t<sz> &val);
-    size_t len() {
+    size_t len() const {
       return body.len;
     };
+    const char *beg() const {
+      return body.buf+body.off;
+    };
+    const char *end() const {
+      return beg()+len();
+    };
     operator iovec() const {
-      return { (void*)(body.buf+body.off), (size_t)(body.len) };
+      return { (void*)beg(), len() };
     };
     static constexpr const char digits[]="0123456789abcdef";
   };
@@ -149,4 +155,6 @@ namespace fmt {
     return res;
   }
 }
+namespace itr {
+};
 

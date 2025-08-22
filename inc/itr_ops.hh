@@ -28,18 +28,17 @@ namespace itr {
       *db++=*sb++;
     return db;
   };
-  void fuck_off(int res, const char *msg);
   template<class dst_t, class src_t>
   inline dst_t copy_n(dst_t db, src_t sb, size_t n){
     dst_t res;
-    if(n>=0 && n<=4096) {
+//       if(n>=0 && n<=4096) {
       if(&*db<&*sb)
         res= fcopy_n(db,sb,n);
       else
         res= rcopy_n(db,sb,n);
-    } else {
-      fuck_off(2,"fuck!\n");
-    };
+//       } else {
+//         fuck_off(2,"fuck!\n");
+//       };
     return res;
   };
   template<class dst_t, class src_t>
@@ -47,14 +46,19 @@ namespace itr {
   {
     return copy_n(db,sb,min(se-sb,de-db));
   };
+  template<class dst_t>
+  inline dst_t copy(dst_t db, dst_t de, const char *sb)
+  {
+    const char *se=sb;
+    while(*se)
+      ++se;
+    return copy_n(db,sb,min(se-sb,de-db));
+  };
   inline char *copy(char *db, char *de, void *sb, size_t sl)
   {
     return copy(db,de,(char*)sb,((char*)sb)+sl);
   };
   inline char *copy(char *db, char *de, str::c_str str);
-  inline char *copy(char *db, char *de, iovec vec) {
-    return copy(db,de,vec.iov_base,vec.iov_len);
-  };
   template<class itr_t, class val_t>
     inline auto find_val(itr_t db, itr_t de, val_t val){
       while(db!=de)
