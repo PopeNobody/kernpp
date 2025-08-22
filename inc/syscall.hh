@@ -113,24 +113,10 @@ namespace sys {
 //       return wait4(pid,status,flags,0,hand);
 //     };
 
-  inline ssize_t write(fd_t fd, const iovec &vec, errhand_t hand=err_log) {
-    return write(fd,(const char*)vec.iov_base,vec.iov_len,hand);
-  };
-  inline ssize_t write(fd_t fd, const char *buf, const char *end, errhand_t hand=err_log)
-  {
-    iovec vec;
-    vec.iov_base=(void*)buf;
-    vec.iov_len=ssize_t(end-buf);
-    return write(fd,vec,hand);
-  };
+  ssize_t write(fd_t fd, const iovec &vec, errhand_t hand=err_log);
+  ssize_t write(fd_t fd, const char *buf, const char *end, errhand_t hand=err_log);
   ssize_t write(fd_t fd, const fmt::fmt_t &fmt, errhand_t hand = err_log);
-  inline ssize_t write(fd_t fd, const char* buf, errhand_t hand=err_log)
-  {
-    const char* end= buf;
-    while(*end)
-      ++end;
-    return write(fd, iovec(buf, end-buf), hand);
-  }
+  ssize_t write(fd_t fd, const char* buf, errhand_t hand=err_log);
   inline ssize_t full_write(fd_t fd, const char* const beg, size_t len)
     AIL;
   inline const char* full_write(int               fd,

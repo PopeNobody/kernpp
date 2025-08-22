@@ -1,8 +1,9 @@
 #pragma once
-#include "syscall.hh"
-#include "template-glue.hh"
-#include "dbg.hh"
-#include "itr_ops.hh"
+#include "types.hh"
+//   #include "syscall.hh"
+//   #include "template-glue.hh"
+//   #include "dbg.hh"
+//   #include "itr_ops.hh"
 namespace str {
   class c_str {
     struct body_t {
@@ -28,14 +29,7 @@ namespace str {
     static const char colon[2];
     static const char newline[2];
     public:
-    c_str(char *b, char *e = 0)
-      :body(b,e)
-    {
-      if(!body.beg)
-        body.end=0;
-      if(!body.end)
-        body.end=body.beg+itr::len(body.beg);
-    };
+    c_str(char *b, char *e = 0);
     c_str(const char *b=0, const char *e=0)
       : body((char*)b,(char*)(e))
     {
@@ -113,25 +107,8 @@ namespace str {
     char *end() {
       return body.end;
     };
-    friend bool lt(const c_str &lhs, const c_str &rhs) {
-      auto msize=std::min(lhs.size(),rhs.size());
-      for(auto i=0*msize;i<msize;i++){
-        if(lhs[i]!=rhs[i])
-          return lhs[i]<rhs[i]?true:false;
-      };
-      return lhs.size()<rhs.size();
-    };
+    friend bool lt(const c_str &lhs, const c_str &rhs);
   };
+  bool lt(const c_str&lhs, const c_str &rhs);
 }
-namespace itr {
-  using str::c_str;
-  inline char *copy(char *db, char *de, const c_str &str) {
-    if(db+str.len()>=de)
-      return 0;
-    for(int i=0;i<str.len();i++)
-      *db++=str[i];
-    return db;
-  };
-  char *copy(char *db, char *de, const fmt::fmt_t &str);
-};
 

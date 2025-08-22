@@ -128,6 +128,9 @@ namespace fmt {
       return { (void*)beg(), len() };
     };
     static constexpr const char digits[]="0123456789abcdef";
+    char operator[](size_t idx) const {
+      return beg()[idx];
+    }
   };
   inline bool isspace(int i){
     switch(i){

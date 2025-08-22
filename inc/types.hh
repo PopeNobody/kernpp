@@ -3,26 +3,8 @@
 
 typedef __int128_t int128_t;
 typedef __uint128_t uint128_t;
+#include "wrap.hh"
 
-template<class T>
-struct wrap_t {
-  using val_t=T;
-  val_t val;
-  wrap_t(const val_t &val)
-    :val(val)
-  {
-  }
-  wrap_t(const wrap_t &rhs)
-    : val(rhs.val)
-  {
-  }
-  operator val_t&() {
-    return val;
-  };
-  operator val_t() const {
-    return val;
-  };
-};
 typedef char* ostr_t;
 typedef const char* istr_t;
 typedef istr_t istr_v[];
@@ -205,23 +187,15 @@ typedef int32_t pid_t;
 typedef int64_t intptr_t;
 typedef uint64_t uintptr_t;
 typedef int64_t off64_t;
-struct fd_t : protected wrap_t<uint32_t>
-{
-  fd_t()
-    :wrap_t(-1)
-  {
-  };
-  using wrap_t::wrap_t;
-  using wrap_t::operator val_t&;
-  using wrap_t::operator val_t;
-};
 //   typedef uint32_t fd_t;
-typedef fd_t* fd_p;
-struct pollfd_t {
-  fd_t   fd;
-  short events;
-  short revents;
-};
+namespace sys {
+  typedef fd_t* fd_p;
+  struct pollfd_t {
+    fd_t   fd;
+    short events;
+    short revents;
+  };
+}
 typedef int64_t clock_t;
 typedef int64_t off_t;
 typedef off_t* off_p;

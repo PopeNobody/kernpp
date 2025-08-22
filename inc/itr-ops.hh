@@ -1,11 +1,9 @@
 #pragma once
-#include "template-glue.hh"
 #include "c_str.hh"
-namespace str {
-  struct c_str;
-};
+#include "min.hh"
 namespace itr {
-  using std::min;
+  char *copy(char *db, char *de, const str::c_str &str);
+  char *copy(char *db, char *de, const fmt::fmt_t &str);
 	template<class dst_t, class val_t>
   inline dst_t fill(dst_t beg, dst_t end, val_t val){
     while(beg!=end)
@@ -42,9 +40,16 @@ namespace itr {
     return res;
   };
   template<class dst_t, class src_t>
+  inline dst_t copy(dst_t db, dst_t de, src_t sb)
+  {
+    return db;
+//    return copy_n(db,sb,min(se-sb,de-db));
+  };
+  template<class dst_t, class src_t>
   inline dst_t copy(dst_t db, dst_t de, src_t sb, src_t se)
   {
-    return copy_n(db,sb,min(se-sb,de-db));
+    return db;
+//    return copy_n(db,sb,min(se-sb,de-db));
   };
   template<class dst_t>
   inline dst_t copy(dst_t db, dst_t de, const char *sb)
@@ -52,13 +57,20 @@ namespace itr {
     const char *se=sb;
     while(*se)
       ++se;
+    using std::min;
     return copy_n(db,sb,min(se-sb,de-db));
   };
-  inline char *copy(char *db, char *de, void *sb, size_t sl)
+  template<class dst_t, class src_t>
+  inline char *copy(dst_t *db, dst_t *de, const src_t *sb, ssize_t sl)
   {
     return copy(db,de,(char*)sb,((char*)sb)+sl);
   };
-  inline char *copy(char *db, char *de, str::c_str str);
+  template<class val_t>
+  inline char *copy(val_t *db, val_t *de, const void *sb, ssize_t sl)
+  {
+    return copy(db,de,(char*)sb,((char*)sb)+sl);
+  };
+  char *copy(char *db, char *de, const str::c_str &str);
   template<class itr_t, class val_t>
     inline auto find_val(itr_t db, itr_t de, val_t val){
       while(db!=de)

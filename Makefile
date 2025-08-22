@@ -51,7 +51,9 @@ all: $(c++/exe) $(asm/exe) $(lib/lib) bin/printenv
 bin/printenv: bin/echo
 	ln -f $< $@
 
-obj: $(c++/obj) $(asm/obj)
+$(c++/cpp): inc/syscall.gen.hh lib/syscall.gen.cc
+
+obj: $(c++/obj) $(asm/obj) 
 lib: $(lib/lib)
 
 $(lib/lib): $(asm/lib) $(c++/lib)
