@@ -6,6 +6,7 @@
 
 namespace sys
 {
+  using namespace std;
   enum open_mode
   {
     o_default= 0664
@@ -47,15 +48,15 @@ namespace sys
   void err_fatal(errno_t err);
 
   typedef void (*errhand_t)(errno_t);
-  void set_errno(errno_t val, errhand_t hand=err_log);
-  inline void set_errno(int32_t val, errhand_t hand=err_log){
-    set_errno((errno_t)val,hand);
+  void set_errno(errno_t val, errhand_t hand);
+  inline void set_errno(errno_t val){
+    set_errno((errno_t)val,err_log);
   };
   template<class res_t>
     res_t chk_return(uint64_t val, errhand_t hand=err_log)
     {
       if(val>uint64_t(-4096))
-        set_errno(int64_t(val),hand);
+        set_errno(errno_t(val),hand);
       return res_t(val);
     };
   constexpr auto UTIME_NOW = (((1<<30)-1));

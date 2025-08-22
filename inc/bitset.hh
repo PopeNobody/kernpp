@@ -4,6 +4,8 @@
 #include "c_str.hh"
 #include "dbg.hh"
 namespace collect {
+  using std::uint16_t;
+  using std::uint64_t;
   template <size_t N>
     struct bitset_t {
       typedef uint16_t word_t;
@@ -11,7 +13,7 @@ namespace collect {
       static constexpr size_t WORD_BITS = sizeof(word_t)*8;
       static constexpr size_t WORDS = (N + WORD_BITS - 1) / WORD_BITS;
 
-      uint64_t vals[WORDS] = {};
+      word_t vals[WORDS] = {};
 
       void check_bit(size_t bit) const {
         xassert(bit<BITS);

@@ -42,14 +42,15 @@ namespace itr {
   template<class dst_t, class src_t>
   inline dst_t copy(dst_t db, dst_t de, src_t sb)
   {
-    return db;
-//    return copy_n(db,sb,min(se-sb,de-db));
+    src_t se(sb);
+    while(*se)
+      se++;
+    return copy_n(db,sb,min(se-sb,de-db));
   };
   template<class dst_t, class src_t>
   inline dst_t copy(dst_t db, dst_t de, src_t sb, src_t se)
   {
-    return db;
-//    return copy_n(db,sb,min(se-sb,de-db));
+    return copy_n(db,sb,std::min(se-sb,de-db));
   };
   template<class dst_t>
   inline dst_t copy(dst_t db, dst_t de, const char *sb)

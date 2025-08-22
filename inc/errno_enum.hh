@@ -36,10 +36,10 @@ X(  EDOM,     33,  "Math_argument_out_of_domain_of_func"  ) \
 X(  ERANGE,   34,  "Math_result_not_representable"        )
 #define X(s,n,m) s = n, \
 
-namespace sys {
+namespace std {
   enum errno_t : int32_t {
     ERR_LIST(X)
-    EWOULDBLOCK=EAGAIN
+      EWOULDBLOCK=EAGAIN
   };
 };
 

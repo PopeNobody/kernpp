@@ -9,10 +9,10 @@ namespace str {
 };
 namespace sys {
   using str::c_str;
+  using std::errno_t;
 
-
-  extern errno_t errno;
-  const c_str strerror(errno_t err=errno);
+  extern std::errno_t errno;
+  const c_str strerror(std::errno_t err=errno);
   void perror(const char *msg1, const char *msg2);
   void perror(const char *msg1);
 

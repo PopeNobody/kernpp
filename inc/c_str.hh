@@ -47,7 +47,7 @@ namespace str {
       :body(b,b+n-(b[n-1]?0:1))
       {
       }
-    c_str(const iovec &vec)
+    c_str(const iovec_t &vec)
       : body((char*)vec.iov_base, vec.iov_len)
     {
     };
@@ -55,8 +55,8 @@ namespace str {
       : body(lhs.body.beg,lhs.body.end)
     {
     };
-    operator iovec() const {
-      return iovec{ (void*)beg(), size() };
+    operator iovec_t() const {
+      return iovec_t{ (void*)beg(), size() };
     };
     size_t len() const
     {

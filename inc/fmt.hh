@@ -8,6 +8,7 @@ namespace collect {
     struct bitset_t;
 };
 namespace fmt {
+  using std::uint64_t;
   using collect::bitset_t;
   struct int_t {
     unsigned long abs;
@@ -111,8 +112,8 @@ namespace fmt {
     };
     fmt_t(sys::errno_t errno);
     fmt_t(bool val);
-    fmt_t(const timeval_t &val);
-    fmt_t(const timespec_t &val);
+    fmt_t(const std::timeval_t &val);
+    fmt_t(const std::timespec_t &val);
     template<size_t sz>
       fmt_t(const bitset_t<sz> &val);
     size_t len() const {
@@ -124,13 +125,37 @@ namespace fmt {
     const char *end() const {
       return beg()+len();
     };
-    operator iovec() const {
+    char *beg() {
+      return body.buf+body.off;
+    };
+    char *end() {
+      return beg()+len();
+    };
+    operator iovec_t() const {
       return { (void*)beg(), len() };
     };
     static constexpr const char digits[]="0123456789abcdef";
     char operator[](size_t idx) const {
       return beg()[idx];
     }
+    char &operator[](size_t idx) {
+      return ((char*)beg())[idx];
+    }
+    void push_back(char ch) {
+      if(end()==body.nul){
+        if(beg()==body.buf) {
+          sys::pexit(2,"push_back: full");
+        }
+        char *pos=body.buf;
+        for(char *b(beg()), *e(end()); b!=e; b++) {
+          *pos++=*b++;
+        };
+        while(pos!=end())
+          *pos++=0;
+        body.off=0;
+      };
+      body.buf[body.len++]=ch;
+    };
   };
   inline bool isspace(int i){
     switch(i){
@@ -158,6 +183,4 @@ namespace fmt {
     return res;
   }
 }
-namespace itr {
-};
 
