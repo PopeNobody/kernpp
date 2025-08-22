@@ -4,12 +4,14 @@
 
 namespace fmt {
   using collect::bitset_t;
+  using std::timeval_t;
+  using std::timespec_t;
   fmt_t::fmt_t(const timeval_t &val)
   {
     fmt_t fsec(val.tv_sec);
-    str::c_str sec=(iovec)fsec;
+    str::c_str sec=(iovec_t)fsec;
     fmt_t fusec(val.tv_usec);
-    str::c_str usec=(iovec)fusec;
+    str::c_str usec=(iovec_t)fusec;
     char *pos=body.buf;
     char *end=&body.nul[0];
     pos=itr::copy(pos,end,"timeval_t{");
@@ -34,7 +36,7 @@ namespace fmt {
     body.len=5;
   };
   fmt_t::fmt_t(sys::errno_t err) {
-    format((int64_t)err,10,20,'-');
+    format((std::int64_t)err,10,20,'-');
   };
   void fmt_t::format(void *val, int width) {
     fmt_t fmt(uint64_t(val),16,16,'o');
@@ -74,9 +76,9 @@ namespace fmt {
   fmt_t::fmt_t(const timespec_t &val)
   {
     fmt_t fsec(val.tv_sec);
-    str::c_str sec=(iovec)fsec;
+    str::c_str sec=(iovec_t)fsec;
     fmt_t fusec(val.tv_nsec);
-    str::c_str usec=(iovec)fusec;
+    str::c_str usec=(iovec_t)fusec;
     char *pos=body.buf;
     char *end=&body.nul[0];
     pos=itr::copy(pos,end,"timespec_t{");

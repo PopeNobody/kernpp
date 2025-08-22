@@ -53,6 +53,7 @@ struct termios {
   speed_t c_ospeed;
 };
 namespace vpipe {
+  using std::uint64_t;
   struct holder_t {
     termios ios;
     bool ok;
