@@ -40,6 +40,7 @@ struct pair {
 };
 // note:  this has to have the comma, which is weird, but
 // sometimes it is a semicolon
+#define H(x,y) 
 #define P(name) { \
   #name, \
   {name} \
@@ -47,6 +48,8 @@ struct pair {
 struct pair vals[] = {
 #include "find_all_values_list.h"
 };
+#undef P
+#undef H
 
 size_t maxlen=0;
 int display(const char *name, int64_t val){
@@ -57,14 +60,14 @@ int display(const char *name, int64_t val){
   if(len>maxlen)
     maxlen=len;
   if(val<(1llU<<8)) 
-    fmt="%s%-13s %18s"   "%3ld\n";
+    fmt="%s%-13s %18s"   "%3ld %10x\n";
   else if(val<(1llU<<16)) 
-    fmt="%s%-13s %16s"   "%5ld\n";
+    fmt="%s%-13s %16s"   "%5ld %10x\n";
   else if(val<(1llU<<32)) 
-    fmt="%s%-13s %11s"  "%10ld\n";
+    fmt="%s%-13s %11s"  "%10ld %10x\n";
   else 
-    fmt="%s%-13s %1s"   "%20ld\n";
-  printf(fmt," ",name," ",val);
+    fmt="%s%-13s %1s"   "%20ld %10x\n";
+  printf(fmt," ",name," ",val,val);
   return write(1,buf,res); 
 };
 
@@ -74,8 +77,10 @@ int main() {
 // sometimes it is a comma
 
 #define P(name) display(#name,(name));
-#define H(name) dprintf(1,"%s\n",#name);
+#define H(name,x) dprintf(1,"%s\n",#name);
 #include "find_all_values_list.h"
+#undef P
+#undef H
   dprintf(2,"%10lu\n",maxlen);
   return 0;
 }

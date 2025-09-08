@@ -1,3 +1,4 @@
+all:
 MAKEFLAGS:= -rR -j20
 
 #CPPFLAGS:=-dMDNIU
@@ -8,7 +9,6 @@ CXX:= g++
 
 c := $(wildcard *.c)
 cc := $(wildcard *.cc)
-$(foreach c,$(c),$(warning $c))
 
 o:= $(c:.c=.o)
 oo:=$(cc:.cc=.oo)
@@ -17,11 +17,15 @@ i:= $(c:.c=.i)
 ii:= $(cc:.cc=.ii)
 
 
-x:= $(o:.o=)
-xx:= $(oo:.oo=)
+x:= $(c:.c=)
+xx:= $(cc:.cc=)
+
+#$(foreach v, i ii o oo x xx, $(warning $v:=$($v)))
+$(foreach v, i ii o oo x xx, $(eval $v: $($v)))
 
 xx: $(xx)
 x: $(x)
+
 .PRECIOUS: %
 
 show= $(warning $(eval $1=$$($1)))
@@ -30,35 +34,30 @@ show= $(warning $(eval $1=$$($1)))
 clean:
 	rm -f $(i)
 	rm -f $(o)
-	rm -f $(e)
+	rm -f $(x)
+	rm -f $(ii)
+	rm -f $(oo)
+	rm -f $(xx)
 
-$(warning rule $(i))
+$(ii): %.ii: %.cc
+	$(CXX) $(CXXFLAGS) $< -o $@ -E
+
 $(i): %.i: %.c
 	$(CC) $(CFLAGS) $< -o $@ -E
 
 $(o): %.o: %.i
 	$(CC) $(CFLAGS) $< -o $@ -c
 
+$(oo): %.oo: %.cc
+	$(CXX) $(CXXFLAGS) $< -o $@ -c
 
 $(x): %: %.o
 	$(CC) -o $@ $< $(LDFLAGS)
 
-
-%.a: %.oo
-	ar r $@ $<
-
-%.oo: %.cc
-	$(CXX) $(CXXFLAGS) $< -o $@ -c
-
-%: %.a
-	$(CXX) -o $@ $< $(LDFLAGS) 
+$(xx): %: %.oo
+	$(CXX) -o $@ $< $(LDFLAGS)
 
 
+all: x xx o oo i ii 
 
-#    %.S: %.c
-#    	$(CC) -S -o $@ $<
-#    
-#    %.i: %.c
-#    	$(CC) -E -o $@ $< $(CFLAGS)
-
-all: $(x) $(xx)
+.PRECIOUS: $(i) $(o) $(x) $(ii) $(oo) $(xx)

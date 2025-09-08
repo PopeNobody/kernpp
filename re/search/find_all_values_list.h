@@ -1,9 +1,3 @@
-#ifndef P
-#define P(x)
-#endif
-#ifndef H
-#define H(a,b)
-#endif
 H(termios,x)
 P(ICANON) P(ECHO) P(ISIG) P(ICRNL) P(INPCK) P(ISTRIP) P(OPOST)
 P(VINTR) P(VQUIT) P(VERASE) P(VKILL) P(VEOF) P(VTIME) P(VMIN)
@@ -49,4 +43,3 @@ P(IFF_UP) P(IFF_BROADCAST) P(IFF_RUNNING) P(IFF_MULTICAST)
 H(linux tun,x)
 P(IFF_TUN) P(IFF_TAP) P(IFF_NO_PI)
 
-#undef P
