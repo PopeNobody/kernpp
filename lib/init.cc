@@ -2,8 +2,12 @@
 
 typedef int (*main_t)(int, char **, char **);
 extern "C" {
+	void libc_init();
+	void libc_fini();
   int run_main(void **args);
   int main(int, char**, char**);
+  void __cxa_guard_abort() {
+  };
 };
 int run_main(void **args) {
   main_t main_func=main;
@@ -12,22 +16,9 @@ int run_main(void **args) {
 
   char **argv=(char**)args++;
   char **envp=argv+argc+1;
-#if 0
-  using sys::write;
-  write(1,fmt::fmt_t(argc));
-  write(1,"\n");
-  write(1,fmt::fmt_t((void*)argv));
-  write(1,"\n");
-  write(1,*argv);
-  write(1,"\n");
-  write(1,"\n");
-  write(1,fmt::fmt_t((void*)envp));
-  write(1,"\n");
-  write(1,*envp);
-  write(1,"\n");
-  write(1,"\n");
-#endif
+  libc_init();
   int res=main_func(argc,argv,envp);
+  libc_fini();
   sys::exit(0);
 };
 

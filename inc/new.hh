@@ -6,6 +6,9 @@ void* operator new(size_t sz);
 void* operator new(size_t size, std::align_val_t align);
 void* operator new[](size_t size);
 void* operator new[](size_t size, std::align_val_t align);
+void* operator new(size_t size, void *place){
+  return place;
+};
 
 void operator delete(void* ptr) noexcept;
 void operator delete[](void *ptr);

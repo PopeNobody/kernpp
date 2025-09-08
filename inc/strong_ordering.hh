@@ -1,3 +1,4 @@
+#pragma once
 namespace std {
   namespace __cmp_cat
   {
@@ -14,7 +15,7 @@ namespace std {
   }
   class strong_ordering
   {
-    __cmp_cat::type _M_value;
+    signed char _M_value;
 
     constexpr explicit
     strong_ordering(__cmp_cat::_Ord __v) noexcept
@@ -22,6 +23,10 @@ namespace std {
     { }
 
   public:
+    strong_ordering()
+      :_M_value(0)
+    {
+    };
     // valid values
     static const strong_ordering less;
     static const strong_ordering equal;

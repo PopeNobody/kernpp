@@ -94,7 +94,8 @@ namespace itr {
     size_t max=end?end-beg:size_t(-1);
     size_t i;
     for(i=0;beg[i];i++)
-      ; // say nothing, act natural
+      if(i==max)
+        break;
     return i;
   };
   inline int str_cmp(const char *lhs, const char *rhs)

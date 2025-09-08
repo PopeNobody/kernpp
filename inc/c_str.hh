@@ -1,9 +1,5 @@
 #pragma once
 #include "types.hh"
-//   #include "syscall.hh"
-//   #include "template-glue.hh"
-//   #include "dbg.hh"
-//   #include "itr_ops.hh"
 namespace str {
   class c_str {
     struct body_t {
@@ -108,7 +104,11 @@ namespace str {
       return body.end;
     };
     friend bool lt(const c_str &lhs, const c_str &rhs);
+    friend bool gt(const c_str&lhs, const c_str &rhs);
+    friend bool eq(const c_str&lhs, const c_str &rhs);
   };
   bool lt(const c_str&lhs, const c_str &rhs);
+  bool gt(const c_str&lhs, const c_str &rhs);
+  bool eq(const c_str&lhs, const c_str &rhs);
 }
 

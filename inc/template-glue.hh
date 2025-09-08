@@ -1,40 +1,13 @@
 #include "types.hh"
 
 #pragma once
+
+#include "temp/rem-ref.hh"
+#include "temp/forward.hh"
 #include "min.hh"
 
 namespace std {
-  template<typename _type>
-    struct remove_reference {
-      typedef _type type;
-    };
-  template<typename _type>
-    struct remove_reference<_type&> {
-      typedef _type type;
-    };
-  template<typename _type>
-    struct remove_reference<_type&&> {
-      typedef _type type;
-    };
 
-  template< class T >
-    using remove_reference_t = typename remove_reference<T>::type;
-
-  template< class T >
-    constexpr T&& forward( std::remove_reference_t<T>& t ) noexcept
-    {
-      return (T&&)t;
-    };
-  template< class T >
-    constexpr T&& forward( std::remove_reference_t<T>&& t ) noexcept
-    {
-      return t;
-    };
-
-  template <typename T>
-    constexpr typename remove_reference<T>::type&& move(T&& t) noexcept {
-      return static_cast<typename remove_reference<T>::type&&>(t);
-    }
 
 
   template <typename>
@@ -42,7 +15,7 @@ namespace std {
   //     template <typename R, typename... Args>
   //       struct function_traits<R(Args...)> {
   //         using return_type = R;
-  //         using arg_tuple = std::tuple<Args...>;
+  //         using arg_tuple = tuple<Args...>;
   //       };
   // Variadic min with constraints
 
@@ -76,14 +49,14 @@ namespace std {
 
       template <typename H, typename... T>
         tuple(H&& h, T&&... t)
-        : tuple<Tail...>(std::forward<T>(t)...), head(std::forward<H>(h)) 
+        : tuple<Tail...>(forward<T>(t)...), head(forward<H>(h)) 
         {
         }
     };
 
   template <typename... Ts>
     constexpr auto make_tuple(Ts&&... args) {
-      return tuple<std::decay_t<Ts>...>(std::forward<Ts>(args)...);
+      return tuple<decay_t<Ts>...>(forward<Ts>(args)...);
     }
   template <typename T>
     struct tuple_size;
@@ -155,15 +128,15 @@ namespace std {
   // ----------------------------------------
   template <typename Tuple, typename Func, size_t... Is>
     void tuple_for_each_impl(Tuple&& tup, Func&& func, index_sequence<Is...>) {
-      (func(std::get<Is>(tup)), ...);
+      (func(get<Is>(tup)), ...);
     }
 
   template <typename Tuple, typename Func>
     void tuple_for_each(Tuple&& tup, Func&& func) {
-      constexpr size_t N = std::tuple_size<std::remove_reference_t<Tuple>>::value;
+      constexpr size_t N = tuple_size<remove_reference_t<Tuple>>::value;
       tuple_for_each_impl(
-          std::forward<Tuple>(tup),
-          std::forward<Func>(func),
+          forward<Tuple>(tup),
+          forward<Func>(func),
           make_index_sequence<N>{}
           );
     }

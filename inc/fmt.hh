@@ -114,19 +114,44 @@ namespace fmt {
     fmt_t(bool val);
     fmt_t(const std::timeval_t &val);
     fmt_t(const std::timespec_t &val);
+    fmt_t(char *val)
+    {
+      *(char **)body.buf=val;
+      body.nul[0]=1;
+    };
+    fmt_t(const char *val)
+    {
+      *(const char **)body.buf=val;
+      body.nul[0]=1;
+    };
     template<size_t sz>
       fmt_t(const bitset_t<sz> &val);
     size_t len() const {
+      if(body.nul[0]) {
+        const char *tmp=beg();
+        size_t i=0;
+        while(tmp[i])
+          ++i;
+        return i;
+      }
       return body.len;
     };
     const char *beg() const {
-      return body.buf+body.off;
+      if(body.nul[0]) {
+        return *(const char**)body.buf;
+      } else {
+        return body.buf+body.off;
+      };
     };
     const char *end() const {
       return beg()+len();
     };
     char *beg() {
-      return body.buf+body.off;
+      if(body.nul[0]) {
+        return *(char**)body.buf;
+      } else {
+        return body.buf+body.off;
+      };
     };
     char *end() {
       return beg()+len();

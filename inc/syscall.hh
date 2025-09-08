@@ -187,7 +187,7 @@ namespace sys {
 };
 
 extern "C" {
-  void *memcpy(void *d, void *s, size_t n);
+  void *memcpy(void *d, const void *s, size_t n);
   void memset(void *b, char v, size_t n);
   size_t strlen(const char *);
 }

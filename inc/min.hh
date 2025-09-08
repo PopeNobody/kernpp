@@ -1,5 +1,6 @@
 #pragma once
 #include "template-glue.hh"
+
 namespace std {
   template <typename T>
     constexpr auto min(T&& a) {
@@ -12,6 +13,6 @@ namespace std {
   template <typename T, typename... Ts>
     requires (requires (T&& a, Ts&&... args) { (... , (args < a)); })
     constexpr auto min(T&& a, Ts&&... args) -> decltype(auto) {
-      return min(std::forward<T>(a), min(std::forward<Ts>(args)...));
+      return min(forward<T>(a), min(forward<Ts>(args)...));
     }
 };

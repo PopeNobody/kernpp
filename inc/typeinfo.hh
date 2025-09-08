@@ -67,6 +67,9 @@ namespace std
    *  this class (or something derived from this class) is thrown.  */
   class exception
   {
+    virtual const char* what() const ;
+    virtual ~exception(){
+    };
   };
   class bad_cast : public exception
   {

@@ -91,8 +91,8 @@ extern "C" {
 		{
 		};
 	};
-	char func_buf[MAX_ATEXIT*sizeof(exit_func)];
-	exit_func *funcs=(exit_func*)(0+func_buf);
+	static char func_buf[MAX_ATEXIT*sizeof(exit_func)];
+	static exit_func *funcs=(exit_func*)(0+func_buf);
 	static size_t nfunc=0;
 
 	int __cxa_atexit(
@@ -118,12 +118,17 @@ extern "C" {
 		int i=nfunc;
 		while(i)
 			funcs[--i].call();	
-
-		__libc_fini_array();
     sys::exit(return_code);
 	}
 
 	void libc_init() {
+    sys::write(2,__PRETTY_FUNCTION__);
+    sys::write(2,"\n",1);
 		__libc_init_array();
 	}
+  void libc_fini() {
+		__libc_fini_array();
+    sys::write(2,__PRETTY_FUNCTION__);
+    sys::write(2,"\n",1);
+  }
 }
