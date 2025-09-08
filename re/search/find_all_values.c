@@ -1,5 +1,6 @@
 /* gen_all_syscall_constants.c */
 
+#define _GNU_SOURCE
 #define _POSIX_C_SOURCE 200000L
 #include <stdio.h>
 #include <fcntl.h>
@@ -73,8 +74,8 @@ int main() {
 // sometimes it is a comma
 
 #define P(name) display(#name,(name));
-
+#define H(name) dprintf(1,"%s\n",#name);
 #include "find_all_values_list.h"
- dprintf(2,"%10lu\n",maxlen);
+  dprintf(2,"%10lu\n",maxlen);
   return 0;
 }
