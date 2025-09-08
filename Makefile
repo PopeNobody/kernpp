@@ -113,7 +113,8 @@ clean:
 	@rm -f $(c++/exe)
 	@rm -f $(c++/obj)
 	@rm -f $(lib/lib)
-
+T:=
 all: $(all/exe) $(tgt/all)
+	$(if $T, env LDFLAGS=-static CFLAGS=-ggdb3\ -O0 CXXFLAGS=-ggdb3\ -O0\ -std=c++23 MAKEFLAGS= make -f /dev/null $T)
 	@echo made all
 	@printf '%s\n' $(asm/exe) $(c++/exe) | sort .gitignore -u -o .gitignore -

@@ -1,11 +1,6 @@
 #include "syscall.hh"
 // Clean, constrained variadic min ensuring comparability, with reference return if possible.
 // Now includes a test with different comparable types.
-#if 0
-#include <utility>
-#include <type_traits>
-#include <concepts>
-#include <string>
 
 // Base case for two arguments with constraint
 template <typename T, typename U>
@@ -33,9 +28,3 @@ int main(int argc,char *const*argv,char *const*envp) {
 
     return r1 + static_cast<int>(r2) + r3.size();
 }
-#endif
-extern "C" {
-int main(int argc,char *const*argv,char *const*envp) {
-  return 0;
-}
-};

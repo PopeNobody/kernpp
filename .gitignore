@@ -7,6 +7,7 @@ arc
 bin/array
 bin/bitset
 bin/cat
+bin/del-test
 bin/echo
 bin/false
 bin/fixed
@@ -15,12 +16,9 @@ bin/malloc
 bin/report
 bin/runrep
 bin/sig
-bin/simple_ca
-bin/simple_ca_tiny
 bin/termctrl
 bin/termsize
 bin/test
-bin/thread-test
 bin/throw
 bin/touch
 bin/true
@@ -34,10 +32,8 @@ bin/xxx
 core*
 fuck
 git
-gnutls/
 hide
 log/
-openssl/
 out
 output
 printenv
@@ -45,14 +41,13 @@ tags
 trace
 tst/comparable_min
 tst/comparable_min.t
+tst/del-test
 tst/format
 tst/fuck.t
 tst/max_width
 tst/memcpy.t
 tst/min-test.t
-tst/simple_ca_tiny
 tst/test1.t
 tst/test2.t
 tst/test_format
-tst/thread-test
 tst/tuple
