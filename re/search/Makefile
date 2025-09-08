@@ -1,24 +1,21 @@
 MAKEFLAGS:= -rR -j20
 
-all: tcgetattr isprint
-
-all:
 #CPPFLAGS:=-dMDNIU
 CFLAGS:= -ggdb3 -g3 -ggdb -O0 
 CXXFLAGS:= $(CFLAGS) -std=c++23
-CC:=clang
-CXX:= clang++
+CC:=gcc
+CXX:= g++
 
-find_all_values.o: find_all_values_list.h
-
-c:= $(wildcard *.c)
-cc:= $(wildcard *.cc)
+c := $(wildcard *.c)
+cc := $(wildcard *.cc)
+$(foreach c,$(c),$(warning $c))
 
 o:= $(c:.c=.o)
 oo:=$(cc:.cc=.oo)
 
-rvalue-ref: rvalue-ref.oo
-	$(CXX) -o $@ $< 
+i:= $(c:.c=.i)
+ii:= $(cc:.cc=.ii)
+
 
 x:= $(o:.o=)
 xx:= $(oo:.oo=)
@@ -29,12 +26,21 @@ x: $(x)
 
 show= $(warning $(eval $1=$$($1)))
 
-# $(warning $(xx) $(oo) $(cc) )
 
-$(o): %.o: %.c
+clean:
+	rm -f $(i)
+	rm -f $(o)
+	rm -f $(e)
+
+$(warning rule $(i))
+$(i): %.i: %.c
+	$(CC) $(CFLAGS) $< -o $@ -E
+
+$(o): %.o: %.i
 	$(CC) $(CFLAGS) $< -o $@ -c
 
-%: %.o
+
+$(x): %: %.o
 	$(CC) -o $@ $< $(LDFLAGS)
 
 
@@ -49,10 +55,10 @@ $(o): %.o: %.c
 
 
 
-%.S: %.c
-	$(CC) -S -o $@ $<
-
-%.i: %.c
-	$(CC) -E -o $@ $< $(CFLAGS)
+#    %.S: %.c
+#    	$(CC) -S -o $@ $<
+#    
+#    %.i: %.c
+#    	$(CC) -E -o $@ $< $(CFLAGS)
 
 all: $(x) $(xx)
