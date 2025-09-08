@@ -2,10 +2,11 @@
 -O0
 -g3
 -ffreestanding
--fno-exceptions
 -fno-stack-protector
 -ggdb3
 -nodefaultlibs
 -nostartfiles
 -nostdlib
 -static
+-Wno-exceptions
+-fno-rtti

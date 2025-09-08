@@ -1,11 +1,12 @@
 -Iinc
 -O0
+-Wno-exceptions
 -ffreestanding
--fno-exceptions
+-fno-rtti
 -fno-stack-protector
 -g3
 -ggdb
 -ggdb3
 -nostdinc
 -nostdinc++
--std=c++20
+-std=c++23

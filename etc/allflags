@@ -1,7 +1,6 @@
 -Iinc
 -O0
 -ffreestanding
--fno-exceptions
 -fno-stack-protector
 -g
 -ggdb3
