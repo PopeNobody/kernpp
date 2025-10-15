@@ -10,6 +10,7 @@ namespace fmt {
 };
 #include "wrap.hh"
 namespace std {
+  typedef fd_t* fd_p;
   typedef char* ostr_t;
   typedef const char* istr_t;
   typedef istr_t istr_v[];
@@ -18,12 +19,16 @@ namespace std {
   typedef unsigned char uint8_t;
   typedef int   int32_t;
   typedef int32_t* int32_p;
+  typedef short int16;
+  typedef char int8;
   typedef long  int64_t;
   typedef unsigned uint32_t;
   typedef uint32_t* uint32_p;
+  typedef unsigned uint16_t;
+  typedef uint16_t* uint16_p;
+  typedef uint8_t* uint8_p;
   typedef unsigned long uint64_t;
   typedef uint64_t* uint64_p;
-  typedef unsigned short int uint16_t;
   typedef void* void_p;
 
   struct iocb;
@@ -68,15 +73,14 @@ namespace std {
   struct iovec;
   typedef iovec iovec_t;
   typedef iovec* iovec_p;
-  struct timeval;
-  typedef timeval timeval_t;
-  typedef timeval_t* timeval_p;
+
+  struct itimerval;
+  typedef itimerval* itimerval_p;
+
   struct sockaddr;
   typedef sockaddr* sockaddr_p;
   struct shmid_ds;
   typedef shmid_ds* shmid_ds_p;
-  struct itimerval;
-  typedef itimerval* itimerval_p;
   struct msghdr;
   typedef msghdr* msghdr_p;
   struct rusage;
@@ -191,8 +195,6 @@ namespace std {
   typedef int64_t intptr_t;
   typedef uint64_t uintptr_t;
   typedef int64_t off64_t;
-  //   typedef uint32_t fd_t;
-  typedef fd_t* fd_p;
   struct pollfd_t {
     fd_t   fd;
     short events;
@@ -206,15 +208,15 @@ namespace std {
   typedef int64_t suseconds_t;
   typedef int64_t syscall_slong_t;
   typedef int32_t clockid_t;
-  typedef int64_t time_t;
-  typedef time_t* time_p;
   typedef int64_t ptrdiff_t;
   typedef uint32_t mode_t;
   typedef uint64_t* size_p;
   typedef uint64_t size_t;
   typedef int64_t ssize_t;
   typedef uint64_t ino64_t;
+}
 #include "time.hh"
+namespace std {
   enum ftype_t {
     DT_UNKNOWN = 0,
     DT_FIFO = 1,
@@ -268,8 +270,6 @@ namespace std {
         return iovec((void*)beg, (end-beg)*sizeof(val_t));
       };
   };
-
-  typedef timespec* timespec_p;
 }
 
 #ifndef NULL
@@ -283,8 +283,7 @@ using std::ptrdiff_t;
 using std::ssize_t;
 using std::size_t;
 using std::iovec_t;
-using std::timeval_t;
-using std::timespec_t;
 using std::uint64_t;
+using std::uintptr_t;
 
 #include "c_str.hh"

@@ -8,7 +8,7 @@ use lib "$FindBin::Bin";
 
 our (%calls);
 require "syscall.pl";
-
+path("gen")->mkdir;
 sub code_sort { $calls{$a}{code} <=> $calls{$b}{code} }
 our(@header,@source);
 push(@header,"// Auto-generated syscall wrappers");
@@ -85,5 +85,5 @@ push @header, "";
 #push @header, "  } // namespace impl";
 push @header, "} // namespace sys";
 
-path("scr/syscall.gen.hh")->spew(map { "$_\n" } @header);
-path("scr/syscall.gen.cc")->spew(map { "$_\n" } @source);
+path("gen/syscall.gen.hh")->spew(map { "$_\n" } @header);
+path("gen/syscall.gen.cc")->spew(map { "$_\n" } @source);

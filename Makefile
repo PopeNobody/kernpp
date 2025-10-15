@@ -2,19 +2,13 @@
 test:
 all:
 include etc/vars.mk
-etc/multi.mk:;
-etc/cxxflags:;
-etc/ld_flags:;
-etc/cppflags:;
-etc/asmflags:;
-
+etc/multi.mk etc/cxxflags etc/ld_flags etc/cppflags etc/asmflags:;
 all: lib bin tst
 
 test: all
 
-#CXX:=/opt/bin/clang++
 lib/lib:=lib/libkernpp.aa
-tgt/all:=$(lib/lib)
+lib/lsc:=libsc/libsc.aa
 show= $(warning $1: $($1))
 $(deps):;
 
@@ -29,34 +23,48 @@ c++/tst:=$(filter tst/%,$(c++/obj:.cc.oo=))
 c++/lib:=$(filter lib/%,$(c++/obj))
 #$(foreach x,src obj exe lib,$(call show,c++/$x))
 
-all: $(c++/exe) $(asm/exe) $(lib/lib)
+all: $(c++/exe) $(asm/exe)
+
 
 asm/src:=$(wildcard */*.S)
 asm/obj:=$(asm/src:.S=.S.oo)
 asm/lib:=$(filter lib/%,$(asm/obj))
 asm/exe:=$(filter bin/%,$(asm/src:.S=))
-
+asm/lsc:=$(filter libsc/%,$(asm/src:.S=.S.oo))
+$(c++/exe) $(asm/exe): $(lib/lib)
 scr/genheaders.pl:;
 
 #$(c++/cpp) $(asm/obj): inc/syscall.gen.hh lib/syscall.gen.cc
 
-TRS/dep:=$(filter-out $(c++/dep),$(wildcard */*.cc.dd))
-ifneq ($(TRS/dep),)
-$(foreach f,$(wildcard $(lib/lib) $(TRS/dep)),$(warning reap: $f)$(shell rm -f $f))
-endif
-include /dev/null $(wildcard */*.cc.dd)
+all_deps:=$(wildcard */*.dd)
+c++_deps:=$(foreach s,$(wildcard */*.cc),$(wildcard $s.dd)))
+oth_deps:=$(filter-out $(c++_deps),$(all_deps))
+#    show=$(warning $1:=$($1))
+#    $(foreach v,all_deps c++_deps oth_deps,$(call show,$v))
+#    $(if $(oth_deps),$(eval pre-clean+=$(oth_deps)))
+#    
+#    $(if $(oth_deps),$(eval pre-clean: ; rm -f $(oth_deps)))
+#    pre-clean:
+#    $(all_deps): pre-clean
+include /dev/null $(wildard $(c++_deps))
 
-all: $(c++/exe) $(asm/exe) $(lib/lib) bin/printenv
+all: $(c++/exe) $(asm/exe) $(lib/lib) 
 
-bin/printenv: bin/echo
-	ln -f $< $@
+#all: bin/printenv
+
+#bin/printenv: bin/echo
+#	ln -f $< $@
 
 $(c++/cpp): inc/syscall.gen.hh lib/syscall.gen.cc
 
 obj: $(c++/obj) $(asm/obj) 
-lib: $(lib/lib)
+lib: $(lib/lib) $(lib/lsc)
 
-$(lib/lib): $(asm/lib) $(c++/lib)
+$(lib/lsc): $(sort $(asm/lsc))
+	ar r $@ $(asm/lsc) $(c++/lsc)
+	ranlib $@
+
+$(lib/lib): $(sort $(asm/lib) $(c++/lib))
 	ar r $@ $(asm/lib) $(c++/lib)
 	ranlib $@
 
@@ -70,16 +78,12 @@ FORCE:
 
 .PHONY: FORCE
 
-scr/syscall.gen.hh scr/syscall.gen.cc: scr/genheaders.pl
+inc/syscall.gen.hh lib/syscall.gen.cc: scr/genheaders.pl
 	vi-perl scr/genheaders.pl
+	mv gen/syscall.gen.hh inc/syscall.gen.hh
+	mv gen/syscall.gen.cc lib/syscall.gen.cc
+	rm -f lib/syscall.gen.cc.*
 
-lib/syscall.gen.cc: scr/syscall.gen.cc
-	cp $< $@
-	ls -l $@
-
-inc/syscall.gen.hh: scr/syscall.gen.hh
-	cp $< $@
-	ls -l $@
 
 include etc/multi.mk
 
@@ -103,18 +107,13 @@ c++/gen:= inc/syscall.gen.hh lib/syscall.gen.cc
 %.mk:;
 Makefile:;
 
-clean:
-	rm -f $(c++/gen)  $(warning $(c++/gen))
-	@rm -f $(asm/exe)
-	@rm -f $(asm/obj)
-	@rm -f $(c++/asm)
-	@rm -f $(c++/cpp)
-	@rm -f $(c++/dep)
-	@rm -f $(c++/exe)
-	@rm -f $(c++/obj)
-	@rm -f $(lib/lib)
+#$(warning $(filter c++/%,$(.VARIABLES)) )
+#$(warning $(filter asm/%,$(.VARIABLES)) )
+#vars := $(foreach l,c++ asc,$(foreach o,cpp asm obj exe,$l/$o))
+
 T:=
-all: $(all/exe) $(tgt/all)
+
+all:
 	$(if $T, env LDFLAGS=-static CFLAGS=-ggdb3\ -O0 CXXFLAGS=-ggdb3\ -O0\ -std=c++23 MAKEFLAGS= make -f /dev/null $T)
 	@echo made all
 	@printf '%s\n' $(asm/exe) $(c++/exe) | sort .gitignore -u -o .gitignore -
