@@ -70,5 +70,5 @@ $(c++/exe): %: %.cc.oo etc/ld_flags $(lib/lib)
 T:=
 
 all:
-	@echo made all
-	@printf '%s\n' $(asm/exe) $(c++/exe) | sort .gitignore -u -o .gitignore -
+	echo made all
+	printf '%s\n' $(all/exe) | sort .gitignore -u -o .gitignore -

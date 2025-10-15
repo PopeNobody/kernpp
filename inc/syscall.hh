@@ -34,6 +34,21 @@ namespace sys
     o_noatime  = 01000000,
     o_cloexec  = 02000000,
   };
+  enum seek_whence
+  {
+    seek_set,
+    seek_end,
+    seek_cur
+  };
+
+  inline seek_whence operator|(seek_whence lhs, seek_whence rhs)
+  {
+    return seek_whence(int(lhs) | int(rhs));
+  }
+  inline seek_whence operator&(seek_whence lhs, seek_whence rhs)
+  {
+    return seek_whence(int(lhs) & int(rhs));
+  }
   inline open_flags operator|(open_flags lhs, open_flags rhs)
   {
     return open_flags(int(lhs) | int(rhs));
@@ -188,6 +203,11 @@ extern "C" {
   void *memcpy(void *d, const void *s, size_t n);
   void memset(void *b, char v, size_t n);
   size_t strlen(const char *);
+  void strcpy(char *d, char *s) {
+    for(int i=0;i<strlen(s);i++) {
+      d[i]=s[i];
+    };
+  };
 }
 #define assert(x) do{\
   if(!(x)){\
