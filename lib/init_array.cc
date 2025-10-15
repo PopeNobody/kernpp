@@ -1,5 +1,8 @@
 #include <types.hh>
 #include <syscall.hh>
+using std::size_t;
+using std::ssize_t;
+using std::uint8_t;
 using sys::write;
 extern void (*__preinit_array_start []) (void) __attribute__((weak));
 extern void (*__preinit_array_end []) (void) __attribute__((weak));
@@ -11,12 +14,14 @@ extern void (*__fini_array_end []) (void) __attribute__((weak));
 #ifndef L
 #define L(x) x,sizeof(x)-1
 #endif
+using std::fd_t;
+
 extern "C" {
 	void _init();
 	void _fini();
 	void exit(int return_code) __attribute__((noreturn));
 
-	static void __libc_init_array() {
+	void libc_init() {
 		size_t count, i;
 
 		count = __preinit_array_end - __preinit_array_start;
@@ -28,7 +33,7 @@ extern "C" {
 			__init_array_start[i]();
 	}
 
-	static void __libc_fini_array() {
+	void libc_fini() {
 		ssize_t count, i;
 
 		count = __fini_array_end - __fini_array_start;
@@ -91,8 +96,8 @@ extern "C" {
 		{
 		};
 	};
-	static char func_buf[MAX_ATEXIT*sizeof(exit_func)];
-	static exit_func *funcs=(exit_func*)(0+func_buf);
+	char func_buf[MAX_ATEXIT*sizeof(exit_func)];
+	exit_func *funcs=(exit_func*)(0+func_buf);
 	static size_t nfunc=0;
 
 	int __cxa_atexit(
@@ -113,22 +118,12 @@ extern "C" {
 		funcs[nfunc++] = func;
 		return 0;
 	}
-
 	void exit(int return_code) {
 		int i=nfunc;
 		while(i)
 			funcs[--i].call();	
+    libc_fini();
     sys::exit(return_code);
 	}
 
-	void libc_init() {
-    sys::write(2,__PRETTY_FUNCTION__);
-    sys::write(2,"\n",1);
-		__libc_init_array();
-	}
-  void libc_fini() {
-		__libc_fini_array();
-    sys::write(2,__PRETTY_FUNCTION__);
-    sys::write(2,"\n",1);
-  }
 }

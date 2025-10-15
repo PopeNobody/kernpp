@@ -67,6 +67,7 @@ namespace std
    *  this class (or something derived from this class) is thrown.  */
   class exception
   {
+    public:
     virtual const char* what() const ;
     virtual ~exception(){
     };

@@ -8,10 +8,6 @@ namespace std {
         :val(val)
       {
       }
-      wrap_t(const wrap_t &rhs)
-        : val(rhs.val)
-      {
-      }
       operator val_t&() {
         return val;
       };
@@ -20,7 +16,8 @@ namespace std {
       };
     };
   typedef unsigned uint32_t;
-  struct fd_t : protected wrap_t<uint32_t>
+  typedef int int32_t;
+  struct fd_t : public wrap_t<int32_t>
   {
     fd_t()
       :wrap_t(-1)

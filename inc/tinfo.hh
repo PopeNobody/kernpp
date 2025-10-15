@@ -36,7 +36,6 @@ namespace {
 
 using namespace std;
 using namespace abi;
-using std::ptrdiff_t;
 
 // Initial part of a vtable, this structure is used with offsetof, so we don't
 // have to keep alignments consistent manually.

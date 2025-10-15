@@ -1,10 +1,11 @@
-#include <syscall.hh>
-#include <fmt.hh>
+#include "time.hh"
+#include "syscall.hh"
+#include "fmt.hh"
 
 using namespace sys;
 
 int touch(const char *path){
-  timespec times[2];
+  timespec_t times[2];
   times[0].tv_nsec=times[1].tv_nsec=UTIME_NOW;
   int res=utimensat(AT_FDCWD,path,times,0);
   perror("utimensat");

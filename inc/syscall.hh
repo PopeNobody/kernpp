@@ -49,9 +49,7 @@ namespace sys
 
   typedef void (*errhand_t)(errno_t);
   void set_errno(errno_t val, errhand_t hand);
-  inline void set_errno(errno_t val){
-    set_errno((errno_t)val,err_log);
-  };
+  void set_errno(errno_t val);
   template<class res_t>
     res_t chk_return(uint64_t val, errhand_t hand=err_log)
     {
@@ -120,12 +118,12 @@ namespace sys {
   ssize_t write(fd_t fd, const char* buf, errhand_t hand=err_log);
   inline ssize_t full_write(fd_t fd, const char* const beg, size_t len)
     AIL;
-  inline const char* full_write(int               fd,
+  inline const char* full_write(fd_t               fd,
                                 const char* const beg,
                                 const char*       end)
     AIL;
 
-  inline const char* full_write(int               fd,
+  inline const char* full_write(fd_t               fd,
                                 const char* const beg,
                                 const char*       end,
                                 errhand_t hand=err_fatal
@@ -197,3 +195,5 @@ extern "C" {
   }\
 } while(0)
 #include "bitset.hh"
+
+#define countof(x) (sizeof(x)/sizeof((x)[0]))

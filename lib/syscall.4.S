@@ -1,4 +1,4 @@
-	.globl	_ZN3sys8syscall4Emmmmm          # -- Begin function _ZN3sys8syscall4Emmmmm
+	.globl	_ZN3sys8syscall4Emmmmm
 _ZN3sys8syscall4Emmmmm:
 	pushq	%rbp
 	movq	%rsp, %rbp
@@ -18,5 +18,4 @@ _ZN3sys8syscall4Emmmmm:
 	movq	-48(%rbp), %rax
 	popq	%rbp
 	retq
-                                        # -- End function
 .section	".note.GNU-stack","",@progbits

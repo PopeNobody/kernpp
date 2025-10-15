@@ -31,6 +31,12 @@ namespace stream {
       return lhs;
     };
   template<>
+    inline ostream &operator<<<fmt::int_t>(ostream &lhs, const fmt::int_t &rhs)
+    {
+      sys::write(lhs.fd, fmt::fmt_t(rhs));
+      return lhs;
+    };
+  template<>
     inline ostream &operator<<<endl_t>(ostream &lhs, const endl_t &rhs) {
       sys::write(lhs.fd, "\n");
       return lhs;

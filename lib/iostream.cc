@@ -3,7 +3,7 @@
 stream::ostream::ostream(fd_t fd)
   :fd(fd)
 {
-  *this << fd << endl;
+//     *this << fd << endl;
 }
 
 stream::ostream::~ostream() {

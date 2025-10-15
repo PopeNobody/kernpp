@@ -1,4 +1,5 @@
 #pragma once
+
 namespace std {
   namespace __cmp_cat
   {
@@ -13,6 +14,7 @@ namespace std {
       constexpr __unspec(__unspec*) noexcept { }
     };
   }
+
   class strong_ordering
   {
     signed char _M_value;
@@ -105,4 +107,5 @@ namespace std {
 
   inline constexpr strong_ordering
   strong_ordering::greater(__cmp_cat::_Ord::greater);
+
 };

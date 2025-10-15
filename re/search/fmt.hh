@@ -10,6 +10,8 @@ namespace collect {
 namespace fmt {
   using std::uint64_t;
   using collect::bitset_t;
+
+  
   struct int_t {
     unsigned long abs;
     bool neg;
@@ -53,9 +55,16 @@ namespace fmt {
     {
     };
   };
+  struct float_t {
+    long double val;
+    float_t(long double val)
+      : val(val)
+    {
+    };
+  };
   struct bool_t {
     bool val;
-    bool_t(bool val)
+    explicit bool_t(bool val)
       :val(val)
     {
     };
@@ -65,6 +74,14 @@ namespace fmt {
     operator const bool&() const {
       return val;
     };
+  };
+  struct ptr_t {
+    void *val;
+    template<class val_t>
+      ptr_t(val_t *val)
+      :val(val)
+      {
+      };
   };
   struct fmt_t
   {
@@ -79,47 +96,32 @@ namespace fmt {
       ~body_t() {
       };
     } body;
-    void format(int_t wrap, int base, int width, char fill);
-    void format(float val, int width, int prec=6);
-    void format(void *ptr, int width=16);
-    fmt_t(int_t val,int base=10, int width=1, char fill='0')
-    {
-      format(val,base,width,fill);
-    };
-    fmt_t(float f,int width=0, int prec=6, char fill=' ')
-    {
-      format(f,width,prec);
-    };
-    fmt_t(void *ptr, int width=16)
-    {
-      format(ptr,width);
-    };
-    fmt_t(const sys::errno_t &errno);
-    explicit fmt_t(const bool_t &val);
-    template<class T>
-    fmt_t(const std::wrap_t<T> &val)
-    {
-      T t=val;
-      int base=10;
-      int width=0;
-      int fill=0;
-      format(val,base,width,fill);
-    };;
-
-    fmt_t(const std::timeval_t &val);
-    fmt_t(const std::timespec_t &val);
-    fmt_t(char *val)
-    {
-      *(char **)body.buf=val;
-      body.nul[0]=1;
-    };
-    fmt_t(const char *val)
-    {
-      *(const char **)body.buf=val;
-      body.nul[0]=1;
-    };
-    template<size_t sz>
-      fmt_t(const bitset_t<sz> &val);
+    void int_fmt(int_t wrap, int base, int width, char fill);
+    void float_fmt(float_t val, int width, int prec=6);
+    void ptr_fmt(ptr_t ptr, int width=16);
+    void bool_fmt(bool_t val);
+    
+//       fmt_t(const int_t &val,int base=10, int width=1, char fill='0')
+//       {
+//         int_fmt(val,base,width,fill);
+//       };
+//       fmt_t(const float_t &f,int width=0, int prec=6, char fill=' ')
+//       {
+//         float_fmt(f,width,prec);
+//       };
+//       fmt_t(const ptr_t &ptr, int width=16)
+//       {
+//         ptr_fmt(ptr,width);
+//       };
+//       fmt_t(const sys::errno_t &errno);
+//       explicit fmt_t(const bool_t &val)
+//       {
+//         bool_fmt(val);
+//       };
+//       fmt_t(const std::timeval_t &val);
+//       fmt_t(const std::timespec_t &val);
+//       template<size_t sz>
+//         fmt_t(const bitset_t<sz> &val);
     size_t len() const {
       if(body.nul[0]) {
         const char *tmp=beg();
@@ -175,6 +177,26 @@ namespace fmt {
       };
       body.buf[body.len++]=ch;
     };
+//       template<class T>
+//       fmt_t(const std::wrap_t<T> &val)
+//       {
+//         T t=val;
+//         int base=10;
+//         int width=0;
+//         int fill=0;
+//         format(val,base,width,fill);
+//       };;
+
+//       fmt_t(char *val)
+//       {
+//         *(char **)body.buf=val;
+//         body.nul[0]=1;
+//       };
+//       fmt_t(const char *val)
+//       {
+//         *(const char **)body.buf=val;
+//         body.nul[0]=1;
+//       };
   };
   inline bool isspace(int i){
     switch(i){

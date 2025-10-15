@@ -1,3 +1,4 @@
+#include "time.hh"
 #include "fmt.hh"
 #include "itr-ops.hh"
 #include "bitset.hh"
@@ -8,9 +9,9 @@ namespace fmt {
   using std::timespec_t;
   fmt_t::fmt_t(const timeval_t &val)
   {
-    fmt_t fsec(val.tv_sec);
+    fmt_t fsec(int_t(val.tv_sec));
     str::c_str sec=(iovec_t)fsec;
-    fmt_t fusec(val.tv_usec);
+    fmt_t fusec(int_t(val.tv_usec));
     str::c_str usec=(iovec_t)fusec;
     char *pos=body.buf;
     char *end=&body.nul[0];
@@ -26,7 +27,7 @@ namespace fmt {
     assert(!*pos);
     body.len=pos-body.buf;
   };
-  fmt_t::fmt_t(bool val) {
+  fmt_t::fmt_t(const bool_t &val) {
     char *str=(char*)(val?"-true":"false");
     char *pos=body.nul;
     *pos=0;
@@ -35,7 +36,7 @@ namespace fmt {
     body.off=pos-body.buf;
     body.len=5;
   };
-  fmt_t::fmt_t(sys::errno_t err) {
+  fmt_t::fmt_t(const sys::errno_t &err) {
     format((std::int64_t)err,10,20,'-');
   };
   void fmt_t::format(void *val, int width) {
@@ -55,7 +56,7 @@ namespace fmt {
     unsigned long neg=wrap.neg;
     if(width>=sizeof(body.buf)){
       sys::write(2,"Error: width > ");
-      sys::write(2,fmt_t(sizeof(body.buf)));
+      sys::write(2,fmt_t(int_t(sizeof(body.buf))));
       sys::write(2,"\n");
       width=sizeof(body.buf);
     };
@@ -75,9 +76,9 @@ namespace fmt {
   };
   fmt_t::fmt_t(const timespec_t &val)
   {
-    fmt_t fsec(val.tv_sec);
+    fmt_t fsec(int_t(val.tv_sec));
     str::c_str sec=(iovec_t)fsec;
-    fmt_t fusec(val.tv_nsec);
+    fmt_t fusec(int_t(val.tv_nsec));
     str::c_str usec=(iovec_t)fusec;
     char *pos=body.buf;
     char *end=&body.nul[0];

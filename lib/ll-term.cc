@@ -124,7 +124,9 @@ namespace vpipe {
 #define CS8                           48
 extern "C" {
   int int_out(int val) {
-    fmt_t fmt(val);
+    using fmt::int_t;
+    int_t ival=val;
+    fmt_t fmt(ival);
     return write(1,fmt);
   }
 };

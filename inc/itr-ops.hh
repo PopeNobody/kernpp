@@ -29,14 +29,10 @@ namespace itr {
   template<class dst_t, class src_t>
   inline dst_t copy_n(dst_t db, src_t sb, size_t n){
     dst_t res;
-//       if(n>=0 && n<=4096) {
-      if(&*db<&*sb)
-        res= fcopy_n(db,sb,n);
-      else
-        res= rcopy_n(db,sb,n);
-//       } else {
-//         fuck_off(2,"fuck!\n");
-//       };
+    if(&*db<&*sb)
+      res= fcopy_n(db,sb,n);
+    else
+      res= rcopy_n(db,sb,n);
     return res;
   };
   template<class dst_t, class src_t>
@@ -108,6 +104,16 @@ namespace itr {
       return -1;
     if(*rhs)
       return 1;
+    return 0;
+  };
+  inline int str_cmp(const char *lhs, const char *rhs, size_t n) {
+    for(size_t i=0;i<n;i++) {
+      int del=lhs[i]-rhs[i];
+      if(del)
+        return del;
+      if(lhs[i]==0)
+        return 0;
+    };
     return 0;
   };
 };
