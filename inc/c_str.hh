@@ -1,7 +1,11 @@
 #pragma once
 #include "types.hh"
+#include "strong_ordering.hh"
+
 namespace str {
-  class c_str {
+  using strong_ordering = std::strong_ordering;
+
+  struct c_str {
     struct body_t {
       char *beg;
       char *end;
@@ -21,11 +25,14 @@ namespace str {
       {
       };
     } body;
-    static const char null_str[1];
-    static const char colon[2];
-    static const char newline[2];
+    static const c_str null_str;
+    static const c_str colon;
+    static const c_str newline;
     public:
-    c_str(char *b, char *e = 0);
+    c_str(char *b, char *e = 0)
+      : body(b,e)
+    {
+    };
     c_str(const char *b=0, const char *e=0)
       : body((char*)b,(char*)(e))
     {
@@ -63,6 +70,9 @@ namespace str {
     };
     char operator[](size_t pos) const
     {
+      return body.beg[pos];
+    };
+    char &operator[](size_t pos) {
       return body.beg[pos];
     };
     operator bool() const
@@ -103,6 +113,8 @@ namespace str {
     char *end() {
       return body.end;
     };
+    friend strong_ordering cmp(size_t sz1, size_t sz2 );
+    friend strong_ordering cmp(char ch1, char ch2);
     friend bool lt(const c_str &lhs, const c_str &rhs);
     friend bool gt(const c_str&lhs, const c_str &rhs);
     friend bool eq(const c_str&lhs, const c_str &rhs);
@@ -110,5 +122,8 @@ namespace str {
   bool lt(const c_str&lhs, const c_str &rhs);
   bool gt(const c_str&lhs, const c_str &rhs);
   bool eq(const c_str&lhs, const c_str &rhs);
+  strong_ordering cmp(size_t sz1, size_t sz2 );
+  strong_ordering cmp(char ch1, char ch2);
+  strong_ordering cmp(const c_str &lhs, const c_str &rhs);
 }
 
