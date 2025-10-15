@@ -6,7 +6,7 @@ union magic_t {
 };
 template<char ch1, char ch2>
 constexpr magic_t magic() {
-   
+  return magic_t{ ch1,ch2 }   ;
 };
 const char* choose_decompressor(short magic) {
   switch(magic) {
@@ -23,7 +23,7 @@ const char* choose_decompressor(short magic) {
   };
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv, char **envp) {
     if (argc != 2) {
       write(2, "Usage: ");
       write(2, "%s");
@@ -39,26 +39,26 @@ int main(int argc, char** argv) {
     }
     
     magic_t magic;
-    ssize_t n = read(fd, (ostr)&magic, 2);
+    ssize_t n = read(fd, (char*)&magic.b, 2);
     if (n != 2) {
         perror("read");
         return 1;
     }
 
-    const char* decomp = choose_decompressor(magic);
+    const char* decomp = choose_decompressor(magic.s);
     if (!decomp) {
-        fprintf(stderr, "Unknown compression format\n");
+        write(2, "Unknown compression format\n");
         return 1;
     }
 
-    int pipefd[2];
+    fd_t pipefd[2];
     if (pipe(pipefd) < 0) {
         perror("pipe");
         return 1;
     }
 
     // write the magic bytes into the pipe
-    if (write(pipefd[1], magic.data(), 2) != 2) {
+    if (write(pipefd[1], magic.b, 2) != 2) {
         perror("write");
         return 1;
     }
@@ -76,10 +76,11 @@ int main(int argc, char** argv) {
     close(pipefd[1]); // finished writing to pipe
 
     // Replace stdin with the pipe’s read end
-    dup2(pipefd[0], STDIN_FILENO);
+    dup2(pipefd[0], 0);
     close(pipefd[0]);
 
-    execlp(decomp, decomp, nullptr);
+    const char * const cmd[]={ "/bin/bash", "-c", decomp, 0 };
+    sys::execve(cmd[0], (char*const*)cmd, envp);
     perror("execlp"); // should not return
     return 127;
 }
