@@ -2,6 +2,7 @@
 *.S.oo
 *.aa
 *.cc.[Sdio][Sdio]
+.gdb_history
 bin/cat
 bin/decom
 bin/echo
@@ -23,4 +24,3 @@ tst/termsize
 tst/test-is-t
 tst/throw
 tst/vector.t
-.gdb_history
