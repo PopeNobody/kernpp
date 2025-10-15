@@ -1,76 +1,11 @@
 extern "C" { int main(int argc,char *const*argv,char *const*envp); };
 #include "syscall.hh"
+#include "errno.hh"
 #include "new.hh"
+#include "vector.hh"
+#include "itr-ops.hh"
 using namespace sys;
 
-struct string_t {
-  char *_str=0;
-  size_t _cap=0;
-  size_t _len=0;
-  string_t(const char *str="")
-  {
-    _len=strlen(str);
-    _cap=_len;
-    _str=new char[_cap+1];
-    memcpy(_str,str,_len);
-    _str[_len+1]=0;
-  };
-  ~string_t()
-  {
-    delete[] _str;
-    memset(this,0,sizeof(*this));
-  };
-  char operator[](size_t pos) const {
-    assert(pos<_len);
-    return _str[pos];
-  };
-  size_t length() const {
-    return _len;
-  };
-  const char *c_str() const {
-    return _str;
-  };
-};
-template<class T>
-struct vector {
-  size_t cap=0;
-  size_t len=0;
-  T *arr=0;
-  vector(size_t cap=32)
-    :cap(cap), len(0), arr((T*)new char[sizeof(T)*cap])
-  {
-  };
-  void ensure(size_t new_cap, bool front=false)
-  {
-    if(new_cap >cap) {
-      T *tmp=(T*)new char[sizeof(T)*cap];
-      for(int i=0, j=front;i<len;i++)
-        tmp[i+front]=arr[i];
-      delete arr;
-      arr=tmp;
-      tmp=0;
-    }
-  };
-  const T &operator[](size_t pos){
-    assert(pos<len);
-    return arr[pos];
-  };
-  size_t size() const {
-    return len;
-  };
-  void push_back(const T &rhs){
-    ensure(size()+1);
-    new((void*)&arr[size()])T(rhs);
-    ++len;
-  };
-  void push_front(const T&rhs){
-    ensure(size()+1, 1);
-    for(int i=0;i<size();i++) {
-      arr[size()-i-1]=arr[size()-i];
-    }
-    new(arr)T(rhs);
-  };
-};
 template<size_t n>
 struct dirent_buf_t {
   char buf[n]={};
@@ -126,7 +61,7 @@ struct dirent_buf_t {
 class dirent_t {
   ino64_t        d_ino=0;    /* 64-bit inode number */
   int            d_type=-1;
-  string_t       d_name; /* Filename (null-terminated) */
+  c_str       d_name; /* Filename (null-terminated) */
   public:
   dirent_t()
   {
@@ -142,7 +77,7 @@ class dirent_t {
   ino64_t ino() const {
     return d_ino;
   }
-  const string_t &name() const {
+  const c_str &name() const {
     return d_name;
   }
   int type() const {
@@ -154,9 +89,11 @@ struct pair {
   c1 v1;
   c2 v2;
 };
+using cont::vector_t;
+
 class dirent_v {
   char *names;
-  vector<dirent_t> arr;
+  vector_t<dirent_t> arr;
   public:
   dirent_v(size_t cap=32)
     :arr(cap)
@@ -165,12 +102,12 @@ class dirent_v {
   void append(const dirent_t &ent) {
     arr.push_back(ent);
   };
-  size_t size() {
-    return arr.size();
+  size_t len() {
+    return arr.len();
   };
   const dirent_t &operator[](size_t pos)
   {
-    return arr[pos];
+    return arr.get()[pos];
   };
 };
 dirent_v read_dir(fd_t fd)
@@ -202,38 +139,41 @@ char *cpy(char *dst, const char *src, size_t max)
 }
 const char *format(dirent_t ent, size_t max){
   static char buf[1024];
-  char *pos=cpy(buf,ent.name().c_str(),1024);
-  while(pos<buf+max)
-    *pos++=' ';
-  *pos++=' ';
-  *pos++='|';
-  *pos++=' ';
-  fmt::fmt_t fino(ent.ino());
-  pos=cpy(pos,fino.beg(),buf+sizeof(buf)-1-pos);
-  *pos++=' ';
-  *pos++='|';
-  *pos++=' ';
-  const char *type;
-  switch(ent.type()){
-    case 0: type="zero"; break;
-    case 1: type="fifo"; break;
-    case 2: type="cdev"; break;
-    case 4: type="dir "; break;
-    case 8: type="file"; break;
-    default: type="???";
-  };
-  pos=cpy(pos,type,buf+sizeof(buf)-1-pos);
-  *pos++='(';
-  *pos++=' ';
-  fmt::fmt_t numtype((size_t)ent.type());
-  pos=cpy(pos,numtype.beg(),numtype.len());
-  write(1,numtype.beg());
-  write(1,fmt::fmt_t(numtype.len()));
-  *pos++=' ';
-  *pos++=')';
-  *pos++=' ';
-  *pos++='|';
-  *pos++='\n';
+  char *beg(buf);
+  char *end(beg+sizeof(buf));
+  itr::copy(beg,end,ent.name());
+//     char *pos=cpy(buf,ent.name(),1024);
+//     while(pos<buf+max)
+//       *pos++=' ';
+//     *pos++=' ';
+//     *pos++='|';
+//     *pos++=' ';
+//     fmt::fmt_t fino(ent.ino());
+//     pos=cpy(pos,fino.beg(),buf+sizeof(buf)-1-pos);
+//     *pos++=' ';
+//     *pos++='|';
+//     *pos++=' ';
+//     const char *type;
+//     switch(ent.type()){
+//       case 0: type="zero"; break;
+//       case 1: type="fifo"; break;
+//       case 2: type="cdev"; break;
+//       case 4: type="dir "; break;
+//       case 8: type="file"; break;
+//       default: type="???";
+//     };
+//     pos=cpy(pos,type,buf+sizeof(buf)-1-pos);
+//     *pos++='(';
+//     *pos++=' ';
+//     fmt::fmt_t numtype((size_t)ent.type());
+//     pos=cpy(pos,numtype.beg(),numtype.len());
+//     write(1,numtype.beg());
+//     write(1,fmt::fmt_t(numtype.len()));
+//     *pos++=' ';
+//     *pos++=')';
+//     *pos++=' ';
+//     *pos++='|';
+//     *pos++='\n';
 
   return buf;
 };
@@ -266,12 +206,12 @@ int main(int argc,char *const*argv,char *const*envp) {
       pexit(3,"open:.");
     dirent_v ents=read_dir(fd);
     size_t max=0;
-    for(size_t i=0;i<ents.size();i++) {
+    for(size_t i=0;i<ents.len();i++) {
       const dirent_t &ent=ents[i];
-      if(size_t len=ent.name().length(); len>max)
+      if(size_t len=ent.name().len(); len>max)
         max=len;
     }
-    for(size_t i=0;i<ents.size();i++) {
+    for(size_t i=0;i<ents.len();i++) {
       const dirent_t &ent=ents[i];
       write(1,format(ent,max)); 
     }
