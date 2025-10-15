@@ -17,6 +17,12 @@ extern "C" {
     for(int i=0;i<n;i++)
       b[n]=v;
   };
+  void strcpy(char *dst, const char *src)
+  {
+    for(int i=0;i<strlen(s);i++) {
+      d[i]=s[i];
+    };
+  };
   size_t strlen(const char* const str){
     size_t pos=0;
     while(str[pos])
