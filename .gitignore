@@ -3,6 +3,7 @@
 *.aa
 *.cc.[Sdio][Sdio]
 .gdb_history
+.gitignore.old
 bin/cat
 bin/decom
 bin/echo
