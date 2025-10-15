@@ -70,5 +70,7 @@ $(c++/exe): %: %.cc.oo etc/ld_flags $(lib/lib)
 T:=
 
 all:
-	echo made all
-	printf '%s\n' $(all/exe) | sort .gitignore -u -o .gitignore -
+	@echo made all
+	@cp .gitignore .gitignore.old
+	@printf '%s\n' $(all/exe) | sort .gitignore -u -o .gitignore -
+	@report cmp -s .gitignore .gitignore.old || echo ".gitignore changed"
