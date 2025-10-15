@@ -7,11 +7,13 @@ arc
 bin/array
 bin/bitset
 bin/cat
+bin/decom
 bin/del-test
 bin/echo
 bin/false
 bin/fixed
 bin/ls
+bin/lspath
 bin/malloc
 bin/report
 bin/runrep
@@ -47,7 +49,13 @@ tst/fuck.t
 tst/max_width
 tst/memcpy.t
 tst/min-test.t
+tst/stupid-ptr.h
+tst/termctrl
+tst/termsize
+tst/test-is-t
 tst/test1.t
 tst/test2.t
 tst/test_format
+tst/throw
 tst/tuple
+tst/vector.t
