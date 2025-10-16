@@ -12,7 +12,29 @@ union magic_t {
   {
   };
 };
+struct hex_t {
+  static constexpr char dig[]="0123456789abcdef";
+  char buf[256*4];
+  hex_t() 
+  {
+    char *pos=buf;
+    for(int i=0;i<16;i++){
+      for(int j=0;j<16;j++) {
+        *pos++=dig[i];
+        *pos++=dig[j];
+        *pos++=0;
+        *pos++=0;
+      };
+    };
+  };
+  char *get(short val)
+  {
+    return buf+val*4;
+  };
+} hex;
 const char* choose_decompressor(short magic) {
+  write(1,hex.get(magic/256));
+  write(1,hex.get(magic%256));
   switch(magic) {
     case 0x1f8b:       
       return "gzip";
@@ -23,68 +45,48 @@ const char* choose_decompressor(short magic) {
     case 0x0422:       
       return "lz4";
     default:
-      return nullptr;  
+      return "cat";  
   };
 }
 
+ssize_t read2(char buf[2]){
+  buf[0]=buf[1]=0;
+  if(!read(0,&buf[0],1,err_fatal))
+    return 0;
+  if(!read(0,&buf[1],1,err_fatal))
+    return 1;
+  return 2;
+};
 int main(int argc, char** argv, char **envp) {
-    if (argc != 2) {
-      write(2, "Usage: ");
-      write(2, "%s");
-      write(2," <compressed-file>\n", argv[0]);
-      return 1;
-    }
-
+  if(argc>1) {
     const char* filename = argv[1];
-    int fd = open(filename, o_rdonly);
-    if (fd < 0) {
-        perror("open");
-        return 1;
-    }
-    
-    magic_t magic;
-    ssize_t n = read(fd, (char*)&magic.b, 2);
-    if (n != 2) {
-        perror("read");
-        return 1;
-    }
+    fd_t fd;
+    if(fd=open(filename, o_rdonly,err_fatal)){
+      dup2(fd,0);
+      close(fd);
+    };
+  };
+  magic_t magic;
+  ssize_t n=read2(magic.b);
+  switch(n) {
+    case 0: return 0;
+    case 1: write(1,&magic.b[0],1); return 0;
+  };
+  const char* decomp = choose_decompressor(magic.s);
+  fd_t pipefd[2];
+  pipe(pipefd,err_fatal);
+  if(write(pipefd[1],&magic.b[0],2,err_fatal)!=2)
+    pexit("write");
+  while (true) {
+    ssize_t spliced = splice(0, nullptr, pipefd[1], nullptr, 65536, 0,err_fatal);
+    if (spliced == 0) break; // EOF
+  }
+  close(pipefd[1]); // finished writing to pipe
+  dup2(pipefd[0], 0);
+  close(pipefd[0]);
 
-    const char* decomp = choose_decompressor(magic.s);
-    if (!decomp) {
-        write(2, "Unknown compression format\n");
-        return 1;
-    }
-
-    fd_t pipefd[2];
-    if (pipe(pipefd) < 0) {
-        perror("pipe");
-        return 1;
-    }
-
-    // write the magic bytes into the pipe
-    if (write(pipefd[1], magic.b, 2) != 2) {
-        perror("write");
-        return 1;
-    }
-
-    // splice remaining file contents into the pipe
-    while (true) {
-        ssize_t spliced = splice(fd, nullptr, pipefd[1], nullptr, 65536, 0);
-        if (spliced == 0) break; // EOF
-        if (spliced < 0) {
-            perror("splice");
-            return 1;
-        }
-    }
-
-    close(pipefd[1]); // finished writing to pipe
-
-    // Replace stdin with the pipe’s read end
-    dup2(pipefd[0], 0);
-    close(pipefd[0]);
-
-    const char * const cmd[]={ "/bin/bash", "-c", decomp, 0 };
-    sys::execve(cmd[0], (char*const*)cmd, envp);
-    perror("execlp"); // should not return
-    return 127;
+  const char * const cmd[]={ "/bin/bash", "-c", decomp, 0 };
+  sys::execve(cmd[0], (char*const*)cmd, envp);
+  perror("execlp"); // should not return
+  return 127;
 }
