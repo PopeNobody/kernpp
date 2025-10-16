@@ -1,9 +1,10 @@
 #pragma once
 namespace std
 {
+  typedef unsigned uint32_t;
   struct source_location
   {
-  private:
+  public:
     struct __impl
     {
       const char* _M_file_name;
@@ -13,7 +14,6 @@ namespace std
     };
     using __builtin_ret_type = decltype(__builtin_source_location());
 
-  public:
 
     // [support.srcloc.cons], creation
     static consteval source_location
@@ -27,11 +27,11 @@ namespace std
     constexpr source_location() noexcept { }
 
     // [support.srcloc.obs], observers
-    constexpr uint_least32_t
+    constexpr uint32_t
     line() const noexcept
     { return _M_impl ? _M_impl->_M_line : 0u; }
 
-    constexpr uint_least32_t
+    constexpr uint32_t
     column() const noexcept
     { return _M_impl ? _M_impl->_M_column : 0u; }
 
@@ -47,13 +47,11 @@ namespace std
     const __impl* _M_impl = nullptr;
   };
 
-_GLIBCXX_END_NAMESPACE_VERSION
 } // namespace std
 namespace sys {
   struct loc_t : public std::source_location {
     loc_t(const void *vp=__builtin_source_location())
     {
-      impl=(__impl*)vp;
     };
   };
 };

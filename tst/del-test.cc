@@ -5,11 +5,11 @@ using namespace stream;
 struct loc_t : public std::source_location {
   loc_t(const void *vp=__builtin_source_location())
   {
-    impl=(__impl*)vp;
+//       impl=(__impl*)vp;
   };
 };
 ostream &operator <<(ostream &lhs, const loc_t &rhs) {
-  lhs << rhs.file() << ":" << rhs.line() << ":" << rhs.func() << endl;
+  lhs << rhs.file_name() << ":" << rhs.line() << ":" << rhs.function_name() << endl;
 
   return lhs;
 };

@@ -1,5 +1,11 @@
 #include <syscall.hh>
 extern "C" {
+  void *memset(void *vp, int v, size_t n){
+    char *p=(char*)vp;
+    for(size_t i=0;i<n;i++)
+      p[i]=v;
+    return p;
+  };
   void *memcpy(void *vd, const void *vs, size_t n){
     const char *s=(const char *)vs;
     char *d=(char*)vd;
@@ -11,11 +17,6 @@ extern "C" {
         d[n-i-1]=s[n-i-1];
     }
     return d;
-  };
-  void memset(void *vb, char v, size_t n){
-    char *b=(char*)vb;
-    for(int i=0;i<n;i++)
-      b[n]=v;
   };
   char *strcpy(char *d, const char *s)
   {

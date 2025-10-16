@@ -1,3 +1,13 @@
+extern "C" {
+  typedef unsigned long size_t;
+void __cxa_throw(void *thrown_exception, void *tinfo, void (*dest)(void *));
+void __cxa_free_exception(void *thrown_exception);
+void __gxx_personality_v0();
+void* __cxa_allocate_exception(size_t thrown_size);
+void *__cxa_begin_catch(void *exception_object);
+void __cxa_end_catch();
+void _Unwind_Resume();
+};
 #if 0
 #include "unwind.hh"
 
