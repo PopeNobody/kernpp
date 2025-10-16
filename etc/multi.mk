@@ -19,5 +19,8 @@ $(lib/lib): $(sort $(asm/lib) $(c++/lib))
 $(asm/obj): %.S.oo: %.S etc/asmflags
 	$(CXX) -o $@ $< @etc/aflags -c
 
-$(asm/exe): %: %.S.oo etc/ld_flags $(lib/lib)
-	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) @etc/ld_flags -Wl,--end-group
+$(c++/exe): %: %.cc.oo etc/ld_flags $(lib/lib) $(abi/lib)
+	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) $(abi/lib) @etc/ld_flags -Wl,--end-group
+
+$(asm/exe): %: %.S.oo etc/ld_flags $(lib/lib) $(abi/lib)
+	$(CXX) -o $@ -Wl,--start-group $<  $(abi/lib) $(lib/lib) @etc/ld_flags -Wl,--end-group

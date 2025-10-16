@@ -17,6 +17,7 @@ bin/true
 bin/usleep
 bin/xattr
 tst/comparable_min.t
+tst/decom.t
 tst/del-test
 tst/memfd_cat
 tst/stupid-ptr.h

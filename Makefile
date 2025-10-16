@@ -7,7 +7,7 @@ all: lib bin tst
 test: all
 
 lib/lib:=lib/libkernpp.aa
-abi/lib:=lib/libabi.aa
+abi/lib:=abi/libabi.aa
 
 show= $(warning $1: $($1))
 $(deps):;
@@ -30,6 +30,7 @@ asm/src:=$(wildcard */*.S)
 asm/obj:=$(asm/src:.S=.S.oo)
 asm/lib:=$(filter lib/%,$(asm/obj))
 asm/exe:=$(filter bin/%,$(asm/src:.S=))
+asm/abi:=$(filter abi/%,$(asm/obj))
 $(c++/exe) $(asm/exe): $(lib/lib)
 scr/genheaders.pl:;
 
@@ -42,7 +43,7 @@ include /dev/null $(wildard $(c++_deps))
 
 all: $(c++/exe) $(asm/exe) $(lib/lib) 
 
-$(c++/cpp): inc/syscall.gen.hh lib/syscall.gen.cc
+$(c++/cpp): inc/syscall.gen.hh abi/syscall.gen.cc
 
 obj: $(c++/obj) $(asm/obj) 
 lib: $(lib/lib) $(lib/lsc) $(abi/lib)
@@ -57,18 +58,15 @@ FORCE:
 
 .PHONY: FORCE
 
-inc/syscall.gen.hh lib/syscall.gen.cc: scr/genheaders.pl
+inc/syscall.gen.hh abi/syscall.gen.cc: scr/genheaders.pl
 	vi-perl scr/genheaders.pl
 	mv gen/syscall.gen.hh inc/syscall.gen.hh
-	mv gen/syscall.gen.cc lib/syscall.gen.cc
+	mv gen/syscall.gen.cc abi/syscall.gen.cc
 
 include etc/multi.mk
 
 all: $(c++/obj)
 
-
-$(c++/exe): %: %.cc.oo etc/ld_flags $(lib/lib)
-	$(CXX) -o $@ -Wl,--start-group $< $(lib/lib) @etc/ld_flags -Wl,--end-group
 
 T:=
 
