@@ -1,3 +1,4 @@
+#if 0
 #include "unwind.hh"
 
 // Define the structure for the C++ exception object
@@ -81,3 +82,4 @@ _Unwind_Reason_Code __gxx_personality_v0(int version,
                                         _Unwind_Context *context);
 
 } // extern "C"
+#endif
