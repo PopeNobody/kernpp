@@ -8,6 +8,10 @@ $(c++/obj:.oo=.SS): %.cc.SS: %.cc.ii etc/cxxflags
 $(c++/obj:.oo=.ii): %.cc.ii: %.cc    etc/cppflags
 	$(CXX)  @etc/cppflags -o $@ -E $< -MMD -MF $<.dd -MT $@
 
+$(abi/lib): $(sort $(asm/abi) $(c++/abi))
+	$(AR) r $@ $(asm/abi) $(c++/abi)
+	$(RANLIB) $@
+
 $(lib/lib): $(sort $(asm/lib) $(c++/lib))
 	$(AR) r $@ $(asm/lib) $(c++/lib)
 	$(RANLIB) $@

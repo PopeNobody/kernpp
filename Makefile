@@ -7,6 +7,8 @@ all: lib bin tst
 test: all
 
 lib/lib:=lib/libkernpp.aa
+abi/lib:=lib/libabi.aa
+
 show= $(warning $1: $($1))
 $(deps):;
 
@@ -19,6 +21,7 @@ c++/dep:=$(c++/src:.cc=.cc.dd)
 c++/exe:=$(filter bin/% tst/%,$(c++/src:.cc=))
 c++/tst:=$(filter tst/%,$(c++/obj:.cc.oo=))
 c++/lib:=$(filter lib/%,$(c++/obj))
+c++/abi:=$(filter abi/%,$(c++/obj))
 
 all: $(c++/exe) $(asm/exe)
 
@@ -42,7 +45,7 @@ all: $(c++/exe) $(asm/exe) $(lib/lib)
 $(c++/cpp): inc/syscall.gen.hh lib/syscall.gen.cc
 
 obj: $(c++/obj) $(asm/obj) 
-lib: $(lib/lib) $(lib/lsc)
+lib: $(lib/lib) $(lib/lsc) $(abi/lib)
 
 all/obj:= $(c++/obj) $(asm/obj)
 
