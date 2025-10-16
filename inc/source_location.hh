@@ -1,31 +1,59 @@
 #pragma once
-using loc_type = decltype(__builtin_source_location());
-namespace std {
-  struct source_location {
-    struct __impl {
+namespace std
+{
+  struct source_location
+  {
+  private:
+    struct __impl
+    {
       const char* _M_file_name;
       const char* _M_function_name;
       unsigned _M_line;
       unsigned _M_column;
     };
-    const __impl *impl;
-    source_location(const void *impl=__builtin_source_location())
-      : impl((__impl*)impl)
+    using __builtin_ret_type = decltype(__builtin_source_location());
+
+  public:
+
+    // [support.srcloc.cons], creation
+    static consteval source_location
+    current(__builtin_ret_type __p = __builtin_source_location()) noexcept
     {
-    };
-    static source_location current(const void *impl=__builtin_source_location())
+      source_location __ret;
+      __ret._M_impl = static_cast <const __impl*>(__p);
+      return __ret;
+    }
+
+    constexpr source_location() noexcept { }
+
+    // [support.srcloc.obs], observers
+    constexpr uint_least32_t
+    line() const noexcept
+    { return _M_impl ? _M_impl->_M_line : 0u; }
+
+    constexpr uint_least32_t
+    column() const noexcept
+    { return _M_impl ? _M_impl->_M_column : 0u; }
+
+    constexpr const char*
+    file_name() const noexcept
+    { return _M_impl ? _M_impl->_M_file_name : ""; }
+
+    constexpr const char*
+    function_name() const noexcept
+    { return _M_impl ? _M_impl->_M_function_name : ""; }
+
+  private:
+    const __impl* _M_impl = nullptr;
+  };
+
+_GLIBCXX_END_NAMESPACE_VERSION
+} // namespace std
+namespace sys {
+  struct loc_t : public std::source_location {
+    loc_t(const void *vp=__builtin_source_location())
     {
-      return impl;
-    };
-    const char *file() const {
-      return impl->_M_file_name;
-    }
-    const char *func() const {
-      return impl->_M_function_name;
-    }
-    unsigned line() const {
-      return impl->_M_line;
+      impl=(__impl*)vp;
     };
   };
-  typedef source_location src_t;
 };

@@ -3,10 +3,14 @@ using namespace sys;
 union magic_t {
   char  b[2];
   short s;
-};
-template<char ch1, char ch2>
-constexpr magic_t magic() {
-  return magic_t{ ch1,ch2 }   ;
+  magic_t(short s=0)
+    :s(s)
+  {
+  };
+  magic_t(char b0, char b1)
+    : b{b0,b1}
+  {
+  };
 };
 const char* choose_decompressor(short magic) {
   switch(magic) {
