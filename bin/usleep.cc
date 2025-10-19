@@ -21,9 +21,14 @@ int main(int argc,char *const*argv,char *const*envp) {
   } else {
     sys::die("no time specified");
   };
+  if(*++argv) {
+    tm.tv_nsec=atoi(*argv);
+    tm.tv_sec+=tm.tv_nsec/1000000000;
+    tm.tv_nsec=tm.tv_nsec%1000000000;
+  }
   fmt_t tm_fmt(tm);
-  tm_fmt.push_back('\n');
   write(2,tm_fmt);
+  write(2,"\n");
   nanosleep(&tm,0);
   return 0;
 };

@@ -69,70 +69,55 @@ namespace cont {
       val_p get(size_t idx=0) {
         return arr+idx;
       };
-      static array_t *mk_arr(size_t cap, size_t len=0, T *beg=0, T *end=0)
-      {
-        const size_t size=sizeof(array_t)+cap*sizeof(T);
-        char *chars=new char[size];
-        memset(chars,-1,size);
-        array_t *res = (array_t*)chars;
-        ((size_t&)res->cap)=cap;
-        res->len=0;
-        while(beg!=end)
-          res->arr[res->len++]=*beg++;
-        while(res->len < len)
-          res->arr[res->len++]=T();
-        return res;
-      };
     };
-  template<class T>
-    struct arrhold_t : public value_t<T>
-  {
-    typedef T val_t;
-    typedef const T val_T;
-    typedef T *val_p;
-    typedef const T *val_P;
-    typedef T &val_r;
-    typedef const T &val_R;
-    typedef array_t<T> arr_t;
-    typedef array_t<T> *arr_p;
-    typedef const array_t<T> arr_T;
-    typedef const array_t<T> *arr_P;
-    arr_p arr;
-    arrhold_t(arr_p arr=0)
-      : arr(arr)
-    {
-    };
-    arrhold_t(arrhold_t &rhs)
-      : arr(rhs.arr)
-    {
-    };
-    operator bool() const {
-      return !!arr;
-    };
-    static arrhold_t mk_arr(size_t cap, size_t len=0, T *beg=0, T *end=0)
-    {
-      arrhold_t arr;
-      arr=array_t<T>::mk_array(cap,len,beg,end);
-      return arr;
-    };
-    void ensure_cap(size_t cap)
-    {
-      if(arr->cap>=cap)
-        return;
-    };
-    arr_p operator->() {
-      return arr;
-    };
-    arr_P operator->() const {
-      return arr;
-    };
-    val_p get(size_t pos=0) {
-      return arr->get(pos);
-    };
-    val_P get(size_t pos=0) const {
-      return arr->get(pos);
-    };
-  };
+//     template<class T>
+//       struct arrhold_t : public value_t<T>
+//     {
+//       typedef T val_t;
+//       typedef const T val_T;
+//       typedef T *val_p;
+//       typedef const T *val_P;
+//       typedef T &val_r;
+//       typedef const T &val_R;
+//       typedef array_t<T> arr_t;
+//       typedef array_t<T> *arr_p;
+//       typedef const array_t<T> arr_T;
+//       typedef const array_t<T> *arr_P;
+//       arr_p arr;
+//       arrhold_t(size_t cap)
+//         : arr(array_t<T>::mk_arr(cap))
+//       {
+//       };
+//       arrhold_t(array_t<T> *val)
+//         :arr(val)
+//       {
+//       };
+//       arrhold_t(arrhold_t &rhs)
+//         : arr(rhs.arr)
+//       {
+//       };
+//       operator bool() const {
+//         return !!arr;
+//       };
+//       void ensure_cap(size_t cap)
+//       {
+//         if(arr->cap>=cap)
+//           return;
+//         arrhold_t copy(cap);
+//       };
+//       arr_p operator->() {
+//         return arr;
+//       };
+//       arr_P operator->() const {
+//         return arr;
+//       };
+//       val_p get(size_t pos=0) {
+//         return arr->get(pos);
+//       };
+//       val_P get(size_t pos=0) const {
+//         return arr->get(pos);
+//       };
+//     };
   template<class T>
     struct vector_t : public value_t<T>
     {
@@ -143,43 +128,63 @@ namespace cont {
       typedef value_t<T>::val_P val_P;
       typedef value_t<T>::val_R val_R;
 //         typedef array_t<T> arr_t;
-      typedef arrhold_t<T> arr_t;
-      arr_t arr;
+      typedef array_t<T> body_t;
+      body_t *arr;
+      static array_t<T> *mk_arr(size_t cap)
+      {
+        assert(cap<(1<<20));
+        const size_t size=sizeof(array_t<T>)+cap*sizeof(T);
+        char *chars=new char[size];
+        memset(chars,0,size);
+        array_t<T> *res = (array_t<T>*)chars;
+        ((size_t&)res->cap)=cap;
+        res->len=0;
+        return res;
+      };
+      template<class itr_t>
+      static array_t<T> *mk_arr(size_t cap, itr_t b, itr_t e)
+      {
+        array_t<T> *res = mk_arr(cap);
+        cap=cap?cap:1;
+        cap=cap+31;
+        cap-=cap%32;
+        itr_t p(b);
+        while(p!=e)
+          res->arr[res->len++]=(T)*p++;
+        size_t len=e-b;
+        while(res->len < len)
+          res->arr[res->len++]=T();
+        return res;
+      };
       void ensure_cap(size_t cap)
       {
-        arr.ensure_cap(cap);
+        if(cap<=arr->cap)
+          return;
+        body_t *tmp=arr;
+        arr=mk_arr(cap,beg(),end());
+        delete tmp;
       };
       void swap(vector_t &rhs)
       {
         std::swap(arr,rhs.arr);
       };
       vector_t()
+        :arr(mk_arr(0,(T*)0,(T*)0))
       {
       };
-      template<class oval_p>
-      vector_t(oval_p b, oval_p e)
-      : arr(e-b)
+      template<class itr_t>
+      vector_t(const itr_t &b, const itr_t &e)
+        :arr(mk_arr(e-b,b,e))
       {
-        arr.ensure(e-b); 
-        while(b!=e) {
-          push_back(*b++);
-        };
       };
       vector_t(size_t size)
+        :arr(mk_arr(size))
       {
-        ensure_cap(size);
-      };
-      template<class oval_p>
-      vector_t(size_t size, oval_p b, oval_p e)
-      {
-        ensure_cap(size);
-        while(b!=e)
-          push_back(*b++);
       };
       val_t &operator[](size_t n)
       {
         assert(n<len());
-        return beg()[n];
+        return *get(n);
       };
       const val_t &operator[](size_t n) const
       {
@@ -192,31 +197,24 @@ namespace cont {
       size_t len() const {
         return arr->len;
       };
+      const val_P get(size_t idx) const {
+        assert(idx<(2<<20));
+        return arr->arr+idx;
+      };
+      const val_p get(size_t idx) {
+        assert(idx<(2<<20));
+        return arr->arr+idx;
+      };
       const val_t *beg() const {
-        return arr.get();
+        return get(0);
       };
       const val_t *end() const {
-        return arr.get()+len();
-      };
-      val_t *beg() {
-        return arr.get();
-      };
-      val_t *end() {
-        return beg()+len();
-      };
-      val_r &back() {
-        return beg()[len()-1];
+        return get(len());
       };
       void push_back(val_R obj)
       {
         ensure_cap(len()+1);
-        back()=obj;
-      };
-      val_p get(size_t pos=0) {
-        return arr.get()+pos;
-      };
-      val_P get(size_t pos=0) const {
-        return arr.get()+pos;
+        arr->arr[arr->len++]=obj;
       };
     };
 }

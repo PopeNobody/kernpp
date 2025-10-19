@@ -107,7 +107,7 @@ class dirent_v {
   };
   const dirent_t &operator[](size_t pos)
   {
-    return arr.get()[pos];
+    return *arr.get(pos);
   };
 };
 dirent_v read_dir(fd_t fd)
@@ -142,38 +142,6 @@ const char *format(dirent_t ent, size_t max){
   char *beg(buf);
   char *end(beg+sizeof(buf));
   itr::copy(beg,end,ent.name());
-//     char *pos=cpy(buf,ent.name(),1024);
-//     while(pos<buf+max)
-//       *pos++=' ';
-//     *pos++=' ';
-//     *pos++='|';
-//     *pos++=' ';
-//     fmt::fmt_t fino(ent.ino());
-//     pos=cpy(pos,fino.beg(),buf+sizeof(buf)-1-pos);
-//     *pos++=' ';
-//     *pos++='|';
-//     *pos++=' ';
-//     const char *type;
-//     switch(ent.type()){
-//       case 0: type="zero"; break;
-//       case 1: type="fifo"; break;
-//       case 2: type="cdev"; break;
-//       case 4: type="dir "; break;
-//       case 8: type="file"; break;
-//       default: type="???";
-//     };
-//     pos=cpy(pos,type,buf+sizeof(buf)-1-pos);
-//     *pos++='(';
-//     *pos++=' ';
-//     fmt::fmt_t numtype((size_t)ent.type());
-//     pos=cpy(pos,numtype.beg(),numtype.len());
-//     write(1,numtype.beg());
-//     write(1,fmt::fmt_t(numtype.len()));
-//     *pos++=' ';
-//     *pos++=')';
-//     *pos++=' ';
-//     *pos++='|';
-//     *pos++='\n';
 
   return buf;
 };

@@ -42,34 +42,24 @@ int main(int argc, char**argv,char **envp) {
   {
     cont::vector_t<char *> vec;
     using sys::write;
-    write(2,fmt::fmt_t(vec.cap()));
-    write(2,"\n");
-    write(2,fmt::fmt_t(vec.len()));
-    write(2,"\n");
+    assert(vec.cap()==0);
+    assert(vec.len()==0);
   }
   {
     cont::vector_t<char *> vec(5);
     using sys::write;
-    write(2,fmt::fmt_t(vec.cap()));
-    write(2,"\n");
-    write(2,fmt::fmt_t(vec.len()));
-    write(2,"\n");
+    assert(vec.cap()==5);
+    assert(vec.len()==0);
   }
   {
     const char *pos="help";
     cont::vector_t<char> vec(pos,pos+4);
     using sys::write;
-    write(2,fmt::fmt_t(vec.cap()));
-    write(2,"\n");
-    write(2,fmt::fmt_t(vec.len()));
-    write(2,"\n");
+    assert(vec.cap()==4);
+    assert(vec.len()==4);
     for(int i=0;i<vec.len();i++) {
-      write(2,fmt::fmt_t(i));
-      write(2," ");
-      write(2,&vec[i],1);
-      write(2,"\n");
+      assert(vec[i]==pos[i]);
     };
-    write(2,"\n");
   }
   {
     const char *pos[]={
