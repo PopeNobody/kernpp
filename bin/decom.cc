@@ -6,15 +6,15 @@ const char* choose_decompressor(unsigned m1, unsigned m2) {
 //     write(2,fmt::fmt_t(m2));
 //     write(2,"\n");
   if(m1==0x1f && m2==0x8b) {
-    return "/bin/gunzip";
+    return "gunzip";
   } else if ( m1=='B' and m2=='Z' ) {
-    return "/bin/bunzip2";
+    return "bunzip2";
   } else if ( m1==0x28 and m2==0xb5 ) {
-    return "/bin/zstdcat";
+    return "zstdcat";
   } else if ( m1==0x04 and m2==0x22 ) {
-    return "/usr/bin/lz4cat";
+    return "lz4cat";
   } else {
-    return "/bin/cat";
+    return "cat";
   };
 }
 
@@ -85,10 +85,8 @@ int main(int argc, char** argv, char**envp) {
     // Replace stdin with the pipe’s read end
     dup2(pipefd[0], 0);
     close(pipefd[0]);
-    const char *args[] = {
-      decomp,
-      0
-    };
+    const char *args[] = { "/bin/sh", "-c", 0, 0 };
+    args[2]=decomp;
     execve(args[0], (char * const *)args, (char * const *)envp);
     perror("execlp"); // should not return
     return 127;

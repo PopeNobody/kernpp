@@ -38,23 +38,6 @@ int main(int argc,char *const*argv,char *const*envp) {
   } else {
     write_array((char**)argv,' ','\n');
   };
-#if 0
-  beg+=str_len(beg);
-  while(beg[-1]!='/' && beg!=argv[0])
-    --beg;
-  write(1,beg);
-  write(1,"\n");
-  char sep=' ';
-  char term='\n';
-  
-  while(pos!=end) {
-    if(!*pos)
-      *pos=sep;
-    pos++;
-  }
-  *--pos=term;
-  write(1,beg,end-beg);
-#endif
   return 0;
 };
 using fmt::fmt_t;
