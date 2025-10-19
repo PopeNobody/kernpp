@@ -21,12 +21,6 @@ push(@source,"#include \"syscall.hh\"");
 push(@source,"#include \"syscall.low.hh\"");
 push(@source,"");
 push(@source,"namespace sys {");
-#    push(@source,"using sys::errhand_t;");
-#    for(0 .. 6) {
-#      push(@source,"using sys::syscall$_;");
-#    };
-#    push(@source,"using sys::fdset_t;");
-#    push(@source,"using sys::fdset_p;");
 
 
 for my $name (sort { code_sort } keys %calls) {
