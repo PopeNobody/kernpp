@@ -1,71 +1,78 @@
 #include <syscall.hh>
 using namespace sys;
-union magic_t {
-  char  b[2];
-  short s;
-};
-template<char ch1, char ch2>
-constexpr magic_t magic() {
-   
-};
-const char* choose_decompressor(short magic) {
-  switch(magic) {
-    case 0x1f8b:       
-      return "gzip";
-    case 'B'+256*'Z':  
-      return "bzip2";
-    case 0x28b5:       
-      return "zstd";
-    case 0x0422:       
-      return "lz4";
-    default:
-      return nullptr;  
+const char* choose_decompressor(unsigned m1, unsigned m2) {
+//     write(2,fmt::fmt_t(m1));
+//     write(2,"\n");
+//     write(2,fmt::fmt_t(m2));
+//     write(2,"\n");
+  if(m1==0x1f && m2==0x8b) {
+    return "/bin/gunzip";
+  } else if ( m1=='B' and m2=='Z' ) {
+    return "/bin/bunzip2";
+  } else if ( m1==0x28 and m2==0xb5 ) {
+    return "/bin/zstdcat";
+  } else if ( m1==0x04 and m2==0x22 ) {
+    return "/usr/bin/lz4cat";
+  } else {
+    return "/bin/cat";
   };
 }
 
-int main(int argc, char** argv) {
-    if (argc != 2) {
-      write(2, "Usage: ");
-      write(2, "%s");
-      write(2," <compressed-file>\n", argv[0]);
-      return 1;
-    }
-
+int main(int argc, char** argv, char**envp) {
     const char* filename = argv[1];
-    int fd = open(filename, o_rdonly);
-    if (fd < 0) {
+    if(argc==1) {
+    } else if ( argc==2 ){
+      int fd = open(filename, o_rdonly);
+      if (fd < 0) {
         perror("open");
         return 1;
-    }
+      }
+      if(fd!=0) {
+        dup2(fd,0);
+        close(fd);
+      };
+    } else {
+      write(2,"usage: ");
+      write(2,argv[0]);
+      write(2," <file>\n");
+      exit(1);
+    };
     
-    magic_t magic;
-    ssize_t n = read(fd, (ostr)&magic, 2);
-    if (n != 2) {
-        perror("read");
-        return 1;
-    }
+    unsigned char magic[2];
+    ssize_t n = read(0, (char*)magic, 2);
+//       write(2,"read ");
+//       write(2,fmt::fmt_t(n));
+//       write(2," bytes\n");
+//       if(n!=2){
+//         exit(1);
+//       };
+//       write(2,"value: ");
+//       write(2,fmt::fmt_t(magic[0]&0xff,16));
+//       write(2,"\n");
+//       write(2,"value: ");
+//       write(2,fmt::fmt_t(magic[1]&0xff,16));
+//       write(2,"\n");
 
-    const char* decomp = choose_decompressor(magic);
+    const char* decomp = choose_decompressor(magic[0],unsigned(magic[1]));
     if (!decomp) {
-        fprintf(stderr, "Unknown compression format\n");
-        return 1;
+      decomp="bin/cat";
     }
 
-    int pipefd[2];
+    fd_t pipefd[2];
     if (pipe(pipefd) < 0) {
         perror("pipe");
         return 1;
     }
 
     // write the magic bytes into the pipe
-    if (write(pipefd[1], magic.data(), 2) != 2) {
+    if (write(pipefd[1], (char*)magic, 2) != 2) {
         perror("write");
         return 1;
     }
 
     // splice remaining file contents into the pipe
     while (true) {
-        ssize_t spliced = splice(fd, nullptr, pipefd[1], nullptr, 65536, 0);
+        ssize_t spliced = splice(0, nullptr, pipefd[1], nullptr, 65536, 0);
         if (spliced == 0) break; // EOF
         if (spliced < 0) {
             perror("splice");
@@ -76,10 +83,13 @@ int main(int argc, char** argv) {
     close(pipefd[1]); // finished writing to pipe
 
     // Replace stdin with the pipe’s read end
-    dup2(pipefd[0], STDIN_FILENO);
+    dup2(pipefd[0], 0);
     close(pipefd[0]);
-
-    execlp(decomp, decomp, nullptr);
+    const char *args[] = {
+      decomp,
+      0
+    };
+    execve(args[0], (char * const *)args, (char * const *)envp);
     perror("execlp"); // should not return
     return 127;
 }
