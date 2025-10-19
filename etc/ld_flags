@@ -8,5 +8,5 @@
 -nostartfiles
 -nostdlib
 -static
--Wno-exceptions
+-fno-exceptions
 -fno-rtti

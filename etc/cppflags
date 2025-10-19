@@ -1,6 +1,6 @@
 -Iinc
 -O0
--Wno-exceptions
+-fno-exceptions
 -ffreestanding
 -fno-rtti
 -fno-stack-protector
