@@ -1,55 +1,42 @@
 #include <syscall.hh>
+#include "hex.hh"
 using namespace sys;
 union magic_t {
   char  b[2];
   short s;
-  magic_t(short s=0)
-    :s(s)
+  const char* decomp() {
+    switch(s) {
+      case 0x1f8b:       
+        return "gzip";
+      case 'B'+256*'Z':  
+        return "bzip2";
+      case 0x28b5:       
+        return "zstd";
+      case 0x0422:       
+        return "lz4";
+      default:
+        return 0;
+    };
+  }
+  magic_t(const fd_t &fd)
+    :s(0)
   {
-  };
-  magic_t(char b0, char b1)
-    : b{b0,b1}
-  {
-  };
-};
-struct hex_t {
-  static constexpr char dig[]="0123456789abcdef";
-  char buf[256*4];
-  hex_t() 
-  {
-    char *pos=buf;
-    for(int i=0;i<16;i++){
-      for(int j=0;j<16;j++) {
-        *pos++=dig[i];
-        *pos++=dig[j];
-        *pos++=0;
-        *pos++=0;
-      };
+    ssize_t n=sys::read(fd,&b[0],2,err_fatal);
+    write(2,"read ");
+    write(2,fmt::fmt_t(n));
+    write(2," bytes\n");
+    switch(n){
+      case 2:
+        return;
+      case 1:
+        write(1,&b[0],1);
+      case 0:
+        exit(0);
     };
   };
-  char *get(short val)
-  {
-    return buf+val*4;
-  };
-} hex;
-const char* choose_decompressor(short magic) {
-  write(1,hex.get(magic/256));
-  write(1,hex.get(magic%256));
-  switch(magic) {
-    case 0x1f8b:       
-      return "gzip";
-    case 'B'+256*'Z':  
-      return "bzip2";
-    case 0x28b5:       
-      return "zstd";
-    case 0x0422:       
-      return "lz4";
-    default:
-      return "cat";  
-  };
-}
+};
 
-ssize_t read2(char buf[2]){
+ssize_t read2(char*buf){
   buf[0]=buf[1]=0;
   if(!read(0,&buf[0],1,err_fatal))
     return 0;
@@ -57,26 +44,41 @@ ssize_t read2(char buf[2]){
     return 1;
   return 2;
 };
-int main(int argc, char** argv, char **envp) {
-  if(argc>1) {
-    const char* filename = argv[1];
-    fd_t fd;
-    if(fd=open(filename, o_rdonly,err_fatal)){
-      dup2(fd,0);
-      close(fd);
+
+namespace sys {
+  void open2(fd_t fd0,const char *fn,int flags,errhand_t hand){
+    close(fd0);
+    fd_t fd1=open(fn,flags,0,hand);
+    if(fd0!=fd1) {
+      dup2(fd1,fd0);
+      close(fd1);
     };
   };
-  magic_t magic;
-  ssize_t n=read2(magic.b);
-  switch(n) {
-    case 0: return 0;
-    case 1: write(1,&magic.b[0],1); return 0;
-  };
-  const char* decomp = choose_decompressor(magic.s);
+};
+void do_files(char **beg, char **end){
+  if(end==beg)
+    return;
+  do {
+    char *fn=*beg++;
+    open2(0,fn,o_rdonly,err_fatal);
+    if(beg==end)
+      return;
+    pid_t pid=fork();
+    int status;
+    wait4(pid,&status,0,0);
+  } while(beg!=end);
+};
+
+int main(int argc, char**argv, char**envp) {
+  if(argc==1)
+    return 0;
+  if(argc<2)
+    return 0;
+  close(0);
+  fd_t fd=open(argv[1],o_rdonly,0,err_fatal);
+  magic_t magic(fd);
   fd_t pipefd[2];
-  pipe(pipefd,err_fatal);
-  if(write(pipefd[1],&magic.b[0],2,err_fatal)!=2)
-    pexit("write");
+  pipe(pipefd);
   while (true) {
     ssize_t spliced = splice(0, nullptr, pipefd[1], nullptr, 65536, 0,err_fatal);
     if (spliced == 0) break; // EOF
@@ -85,7 +87,8 @@ int main(int argc, char** argv, char **envp) {
   dup2(pipefd[0], 0);
   close(pipefd[0]);
 
-  const char * const cmd[]={ "/bin/bash", "-c", decomp, 0 };
+
+  const char * const cmd[]={ "/bin/bash", "-c",magic.decomp(), 0 };
   sys::execve(cmd[0], (char*const*)cmd, envp);
   perror("execlp"); // should not return
   return 127;
