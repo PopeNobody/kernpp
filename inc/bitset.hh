@@ -3,7 +3,7 @@
 #include "fmt.hh"
 #include "c_str.hh"
 #include "dbg.hh"
-namespace collect {
+namespace cont {
   using std::uint16_t;
   using std::uint64_t;
   template <size_t N>
@@ -97,7 +97,7 @@ namespace collect {
     };
 }
 namespace sys {
-  struct fdset_t : public collect::bitset_t<32> {
+  struct fdset_t : public cont::bitset_t<32> {
     fdset_t select(timeval_t);
     fdset_t( fd_t fd1=fd_t(), fd_t fd2=fd_t(), fd_t fd3=fd_t(),
         fd_t fd4=fd_t(), fd_t fd5=fd_t(), fd_t fd6=fd_t(),

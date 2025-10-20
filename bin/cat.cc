@@ -13,7 +13,7 @@ void cat(fd_t fd) {
   };
 };
 void cat(const char *file) {
-  int fd=open(file,o_rdonly);
+  int fd=open(file,o_rdonly,err_fatal);
   cat(fd_t(fd));
 };
 extern "C" {

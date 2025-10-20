@@ -1,4 +1,5 @@
 #include "syscall.hh"
+#pragma once
 namespace std {
   enum class align_val_t : size_t {};
 }

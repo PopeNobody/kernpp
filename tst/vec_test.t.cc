@@ -67,17 +67,20 @@ int main(int argc, char**argv,char **envp) {
     };
     cont::vector_t<char*> vec(pos+0,pos+4);
     using sys::write;
-    write(2,fmt::fmt_t(vec.cap()));
-    write(2,"\n");
-    write(2,fmt::fmt_t(vec.len()));
-    write(2,"\n");
+    fmt::buf_t<4096> buf(2);
+    buf
+      .a_str("vec: ")
+      .a_int(vec.cap())
+      .a_nl();
     for(int i=0;i<vec.len();i++) {
-      write(2,fmt::fmt_t(i));
-      write(2," ");
-      write(2,vec[i]);
-      write(2,"\n");
+      buf
+        .a_str("  ")
+        .a_int(i,0)
+        .a_str(" ")
+        .a_str(vec[i])
+        .a_nl();
     };
-    write(2,"\n");
+    buf.a_nl();
   }
   return 0;
 };

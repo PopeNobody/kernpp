@@ -23,10 +23,6 @@ ssize_t sys::write(fd_t fd, const char *buf, const char *end, errhand_t hand)
 ssize_t sys::write(fd_t fd, const iovec &fmt, sys::errhand_t hand){
   return write(fd,(char*)fmt.iov_base, fmt.iov_len,hand);
 };
-ssize_t sys::write(fd_t fd, const fmt::fmt_t &fmt, sys::errhand_t hand){
-  iovec vec=(iovec)fmt;
-  return write(fd,vec,hand);
-};
 ssize_t sys::write(fd_t fd, const str::c_str &fmt, sys::errhand_t hand){
   iovec vec=(iovec)fmt;
   return write(fd,vec,hand);

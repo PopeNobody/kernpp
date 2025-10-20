@@ -185,7 +185,6 @@ namespace std {
   //   typedef char_ptr caddr_t;
   //   typedef int32_t daddr_t;
   typedef int32_t key_t;
-  typedef int32_t pid_t;
   //   typedef int32_t sig_atomic_t;
   //   typedef int64_t blkcnt64_t;
   //   typedef int64_t blkcnt_t;

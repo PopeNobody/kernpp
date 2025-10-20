@@ -27,4 +27,14 @@ namespace std {
     using wrap_t::operator val_t&;
     using wrap_t::operator val_t;
   };
+  struct pid_t : public wrap_t<uint32_t>
+  {
+    pid_t()
+      : wrap_t(0)
+    {
+    };
+    using wrap_t::wrap_t;
+    using wrap_t::operator val_t&;
+    using wrap_t::operator val_t;
+  };
 }

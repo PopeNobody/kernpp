@@ -40,12 +40,3 @@ int main(int argc,char *const*argv,char *const*envp) {
   };
   return 0;
 };
-using fmt::fmt_t;
-struct xxx_t {
-  xxx_t(){
-    sys::write(1,"MAIN: ");
-    sys::write(1,fmt_t((void*)&main));
-    sys::write(1,"\n");
-  };
-  static xxx_t inst;
-};

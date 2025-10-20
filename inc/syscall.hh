@@ -131,8 +131,6 @@ namespace sys {
   ssize_t write(fd_t fd, const char *buf, const char *end, errhand_t hand=err_log);
   ssize_t write(fd_t fd, const fmt::fmt_t &fmt, errhand_t hand = err_log);
   ssize_t write(fd_t fd, const char* buf, errhand_t hand=err_log);
-  inline ssize_t full_write(fd_t fd, const char* const beg, size_t len)
-    AIL;
   inline const char* full_write(fd_t               fd,
                                 const char* const beg,
                                 const char*       end)
@@ -199,13 +197,7 @@ namespace sys {
   fd_t getpt_peer(fd_t fd,open_flags flags,errhand_t hand=err_log);
 };
 
-extern "C" {
-  void *memcpy(void *d, const void *s, size_t n);
-  void *memset(void *b, int v, size_t n);
-  size_t strlen(const char *);
-  char*strcpy(char *d, const char *s);
-  char*strcat(char *d, const char *s);
-}
+#include <cstring>
 #define assert(x) do{\
   if(!(x)){\
     sys::assert_fail(#x,__FILE__,__LINE__);\

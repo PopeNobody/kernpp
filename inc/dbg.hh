@@ -14,7 +14,7 @@ namespace dbg {
   };
   template<typename ...arg_t>
     void __xthrow(arg_t ... args);
-  void __xassert(const char *cond);
+  void __assert(const char *cond);
 };
 
 #define nop()
@@ -29,7 +29,7 @@ namespace dbg {
 #define xconfess(x)   xtrace2(  "confess:             "        x,  dump(true)   )
 #define xcluck(x)     xtrace2(  "cluck:               "        x,  dump(false)  )
 #define xcheckin()    xtrace2(  __PRETTY_FUNCTION__,  nop()  )
-#define xassert(x)    if(!(x)) { dbg::__xassert( #x ); }
+#define xassert(x)    assert(x)
 #define xnv(x) #x   " => "  (x)
 #define dbg() __FILE__  ":"  __LINE__  ":"
 #define  xthrow(x,y) do{ dbg::__xthrow(x,y); }while(false)

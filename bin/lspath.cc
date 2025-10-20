@@ -47,24 +47,15 @@ int main(int argc, char**argv,char **envp) {
   using itr::len;
   using fmt::fmt_t;
   using str::c_str;
+  fmt::buf_t<160> err(2);
   c_str path=getenv("PATH",envp);
-  write(2,path);
-  write(2,"\n");
+  err.a_str(path).a_str("\n").write();
   auto vec=split(path.begin(),path.end(),':',false);
   size_t tot=1;
+  fmt::buf_t<4096> out(1);
   for(auto b(vec.beg()), e(vec.end()); b!=e; b++) {
-    tot+=(b->len()+1);
+    out.a_str(*b).a_nl();
   };
-  write(2,fmt::fmt_t(tot));
-  write(2,"\n");
-  char buf[tot];
-  char *pos=buf;
-  char *end=pos+tot-1;
-  for(auto b(vec.beg()), e(vec.end()); b!=e; b++) {
-    pos=itr::copy(pos,end,*b);        
-    *pos++='\n';
-  };
-  write(1,buf,pos-buf);
-  write(1,"\n");
+  out.a_nl();
   return 0;
 };

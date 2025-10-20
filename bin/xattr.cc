@@ -5,11 +5,13 @@
 
 extern "C" {
   int main(int argc, char **argv, char **envp ) {
-    char buf[1024];
-    using sys::write;
-    size_t sz=sys::listxattr(".",buf,sizeof(buf));
-    write(1,fmt::fmt_t(sz));
-    write(1,"\n");
+    char buf[4096];
+    do {
+      size_t sz=sys::listxattr(".",buf,sizeof(buf));
+      if(!sz)
+        break;
+      sys::full_write(1,buf,sz);
+    } while(1);
     return 0;
   }
 };

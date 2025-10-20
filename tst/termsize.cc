@@ -46,27 +46,25 @@ namespace sys {
 //         return sys::write(fd,vec.data(),vec.size());
 //       };
 };
-
+void show_size(int rows, int cols){
+  fmt::buf_t<1024> buf(1);
+  buf.a_str("LINES=").a_int(rows).a_nl();
+  buf.a_str("COLUMNS=").a_int(cols).a_nl();
+};
 int main(int argc,char *const*argv,char *const*envp) {
   using namespace sys;
   uint16_t rows;
   uint16_t cols;
+  fmt::buf_t<1024> buf(1);
   if(argc==1) {
     if(vpipe::get_term_size(0,rows, cols)) {
       sys::pexit(4,"get_term_size");
-    } else {
-    sys::write(1,"LINES=");
-    sys::write(1,(c_str)fmt_t(rows));
-    sys::write(1,"COLUMNS=");
-    sys::write(1,(c_str)fmt_t(cols));
-    };
+    }
+    show_size(rows,cols);
   } else if ( argc==3) {
-    sys::write(1,"LINES=");
-    sys::write(1,(c_str)fmt_t(rows));
-    sys::write(1,"COLUMNS=");
-    sys::write(1,(c_str)fmt_t(cols));
     rows=atoi(argv[1]);
     cols=atoi(argv[2]);
+    show_size(rows,cols);
     if(vpipe::set_term_size(0,rows,cols)) {
       sys::pexit(4,"set_term_size");
     };

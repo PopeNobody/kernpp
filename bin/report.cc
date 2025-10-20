@@ -32,10 +32,8 @@ int main(int argc,char *const*argv,char *const*envp) {
         res=wait4(0,&tmp,0,0,err_ignore);
         if(res>1) {
           ret=tmp/256;
-          write(efd,"pid ");
-          write(efd,fmt_t(res));
-          write(efd,"  returned ");
-          write(efd,fmt_t(ret));
+          fmt::buf_t<160> err(2);
+          err.a_str("pid ").a_int(res,false).a_str(" returned ").a_int(ret,false).a_nl();
         } else {
           break;
         }

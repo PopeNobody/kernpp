@@ -26,9 +26,8 @@ int main(int argc,char *const*argv,char *const*envp) {
     tm.tv_sec+=tm.tv_nsec/1000000000;
     tm.tv_nsec=tm.tv_nsec%1000000000;
   }
-  fmt_t tm_fmt(tm);
-  write(2,tm_fmt);
-  write(2,"\n");
+  buf_t<32> buf(1);
+  buf.a_tspec(tm);
   nanosleep(&tm,0);
   return 0;
 };
