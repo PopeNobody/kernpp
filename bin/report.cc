@@ -26,7 +26,6 @@ int main(int argc,char *const*argv,char *const*envp) {
     if(pid) {
       int ret=-1;
       do {
-        using fmt::fmt_t;
         fd_t efd(2);
         int tmp;
         res=wait4(0,&tmp,0,0,err_ignore);

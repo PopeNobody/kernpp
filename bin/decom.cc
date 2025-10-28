@@ -1,10 +1,6 @@
 #include <syscall.hh>
 using namespace sys;
 const char* choose_decompressor(unsigned m1, unsigned m2) {
-//     write(2,fmt::fmt_t(m1));
-//     write(2,"\n");
-//     write(2,fmt::fmt_t(m2));
-//     write(2,"\n");
   if(m1==0x1f && m2==0x8b) {
     return "gunzip";
   } else if ( m1=='B' and m2=='Z' ) {
@@ -40,18 +36,6 @@ int main(int argc, char** argv, char**envp) {
     
     unsigned char magic[2];
     ssize_t n = read(0, (char*)magic, 2);
-//       write(2,"read ");
-//       write(2,fmt::fmt_t(n));
-//       write(2," bytes\n");
-//       if(n!=2){
-//         exit(1);
-//       };
-//       write(2,"value: ");
-//       write(2,fmt::fmt_t(magic[0]&0xff,16));
-//       write(2,"\n");
-//       write(2,"value: ");
-//       write(2,fmt::fmt_t(magic[1]&0xff,16));
-//       write(2,"\n");
 
     const char* decomp = choose_decompressor(magic[0],unsigned(magic[1]));
     if (!decomp) {

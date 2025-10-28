@@ -4,7 +4,7 @@
 namespace itr {
   char *copy(char *db, char *de, const str::c_str &str);
   char *copy(char *db, char *de, const fmt::fmt_t &str);
-	template<class dst_t, class val_t>
+  template<class dst_t, class val_t>
   inline dst_t fill(dst_t beg, dst_t end, val_t val){
     while(beg!=end)
       *beg++=val;
@@ -35,19 +35,24 @@ namespace itr {
       res= rcopy_n(db,sb,n);
     return res;
   };
-  template<class dst_t, class src_t>
-  inline dst_t copy(dst_t db, dst_t de, src_t sb)
-  {
-    src_t se(sb);
-    while(*se)
-      se++;
-    return copy_n(db,sb,std::min(se-sb,de-db));
-  };
-  template<class dst_t, class src_t>
-  inline dst_t copy(dst_t db, dst_t de, src_t sb, src_t se)
-  {
-    return copy_n(db,sb,std::min(se-sb,de-db));
-  };
+  // Added: generic copy accepting arbitrary input and output iterators as template parameters.
+  template<class OutputIt, class InputIt>
+  OutputIt copy(OutputIt db, OutputIt de, InputIt sb, InputIt se) {
+    // Copy from [sb,se), writing to db, as much as will fit in [db,de)
+    for(; db != de && sb != se; ++db, ++sb) {
+      *db = *sb;
+    }
+    return db;
+  }
+  // Added: generic copy accepting a range denoted by Input iterators, to output iterator with unknown end (like back_inserter).
+  template<class OutputIt, class InputIt>
+  OutputIt copy(OutputIt db, InputIt sb, InputIt se) {
+    // Copy from [sb,se) to output iterator db
+    for(; sb != se; ++db, ++sb) {
+      *db = *sb;
+    }
+    return db;
+  }
   template<class dst_t>
   inline dst_t copy(dst_t db, dst_t de, const char *sb)
   {
@@ -83,6 +88,7 @@ namespace itr {
       while(db!=de) {
         if(pred(*db))
           break;
+        ++db;
       };
       return db;
     }
@@ -99,6 +105,8 @@ namespace itr {
     while(*lhs && *rhs){
       if(*lhs!=*rhs)
         return (lhs>rhs?-1:1);
+      ++lhs;
+      ++rhs;
     };
     if(*lhs)
       return -1;
@@ -117,3 +125,5 @@ namespace itr {
     return 0;
   };
 };
+
+// Note: The two new copy overloads, using OutputIt/InputIt template parameters, make the copy function usable for copying from e.g. std::list<T>::iterator or any arbitrary input/output iterators, as requested.

@@ -45,7 +45,6 @@ auto split(const char *beg, const char *end, char del, bool zero)
 int main(int argc, char**argv,char **envp) {
   using itr::str_cmp;
   using itr::len;
-  using fmt::fmt_t;
   using str::c_str;
   fmt::buf_t<160> err(2);
   c_str path=getenv("PATH",envp);

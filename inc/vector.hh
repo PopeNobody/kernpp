@@ -69,55 +69,30 @@ namespace cont {
       val_p get(size_t idx=0) {
         return arr+idx;
       };
+      static array_t<T> *mk_arr(size_t cap, size_t len = 0, const T *b = nullptr, const T *e = nullptr)
+      {
+        // Allocates an array_t<T> with capacity 'cap' and optionally fills
+        // in elements from b to e (if provided), up to len.
+        assert(cap < (1<<20));
+        const size_t size = sizeof(array_t<T>) + cap * sizeof(T);
+        char *chars = new char[size];
+        memset(chars, 0, size);
+        array_t<T> *res = (array_t<T>*)chars;
+        ((size_t&)res->cap) = cap;
+        res->len = len > cap ? cap : len;
+        if (b && e) {
+          size_t n = std::min((size_t)(e-b), res->len);
+          for (size_t i=0; i<n; ++i)
+            res->arr[i] = b[i];
+          for (size_t i=n; i<res->len; ++i)
+            res->arr[i] = T();
+        } else {
+          for (size_t i=0; i<res->len; ++i)
+            res->arr[i] = T();
+        }
+        return res;
+      }
     };
-//     template<class T>
-//       struct arrhold_t : public value_t<T>
-//     {
-//       typedef T val_t;
-//       typedef const T val_T;
-//       typedef T *val_p;
-//       typedef const T *val_P;
-//       typedef T &val_r;
-//       typedef const T &val_R;
-//       typedef array_t<T> arr_t;
-//       typedef array_t<T> *arr_p;
-//       typedef const array_t<T> arr_T;
-//       typedef const array_t<T> *arr_P;
-//       arr_p arr;
-//       arrhold_t(size_t cap)
-//         : arr(array_t<T>::mk_arr(cap))
-//       {
-//       };
-//       arrhold_t(array_t<T> *val)
-//         :arr(val)
-//       {
-//       };
-//       arrhold_t(arrhold_t &rhs)
-//         : arr(rhs.arr)
-//       {
-//       };
-//       operator bool() const {
-//         return !!arr;
-//       };
-//       void ensure_cap(size_t cap)
-//       {
-//         if(arr->cap>=cap)
-//           return;
-//         arrhold_t copy(cap);
-//       };
-//       arr_p operator->() {
-//         return arr;
-//       };
-//       arr_P operator->() const {
-//         return arr;
-//       };
-//       val_p get(size_t pos=0) {
-//         return arr->get(pos);
-//       };
-//       val_P get(size_t pos=0) const {
-//         return arr->get(pos);
-//       };
-//     };
   template<class T>
     struct vector_t : public value_t<T>
     {
@@ -127,34 +102,19 @@ namespace cont {
       typedef value_t<T>::val_T val_T;
       typedef value_t<T>::val_P val_P;
       typedef value_t<T>::val_R val_R;
-//         typedef array_t<T> arr_t;
       typedef array_t<T> body_t;
       body_t *arr;
-      static array_t<T> *mk_arr(size_t cap)
+      static array_t<T> *mk_arr(size_t cap, size_t len = 0, const T *b = nullptr, const T *e = nullptr)
       {
-        assert(cap<(1<<20));
-        const size_t size=sizeof(array_t<T>)+cap*sizeof(T);
-        char *chars=new char[size];
-        memset(chars,0,size);
-        array_t<T> *res = (array_t<T>*)chars;
-        ((size_t&)res->cap)=cap;
-        res->len=0;
-        return res;
+        return array_t<T>::mk_arr(cap, len, b, e);
       };
       template<class itr_t>
       static array_t<T> *mk_arr(size_t cap, itr_t b, itr_t e)
       {
-        array_t<T> *res = mk_arr(cap);
-        cap=cap?cap:1;
-        cap=cap+31;
-        cap-=cap%32;
-        itr_t p(b);
-        while(p!=e)
-          res->arr[res->len++]=(T)*p++;
-        size_t len=e-b;
-        while(res->len < len)
-          res->arr[res->len++]=T();
-        return res;
+        // In this variant, cap=0 means we want to match the size (e-b)
+        size_t req = e > b ? size_t(e-b) : 0;
+        if (cap < req) cap = req;
+        return mk_arr(cap, req, b, e);
       };
       void ensure_cap(size_t cap)
       {
@@ -174,7 +134,7 @@ namespace cont {
       };
       template<class itr_t>
       vector_t(const itr_t &b, const itr_t &e)
-        :arr(mk_arr(e-b,b,e))
+        :arr(mk_arr(0,b,e))
       {
       };
       vector_t(size_t size)

@@ -5,27 +5,21 @@
 namespace sys {
   struct timeval_t;
 };
-namespace collect {
-  template<size_t sz>
-    struct bitset_t;
-};
 namespace fmt {
   using std::uint64_t;
-  using collect::bitset_t;
   using sys::fd_t;
   template<size_t N>
     struct buf_t {
       fd_t fd;
       const size_t cap;
-      size_t len;
-      char buf[N];      
+      size_t len={};
+      char buf[N]={};
       buf_t(fd_t fd)
-        :fd(fd), cap(N)
+        :fd(fd),cap(N),len(0)
       {
-        memset(&len,0,sizeof(*this)-sizeof(cap));
       };
       buf_t(const buf_t &rhs)
-        :fd(rhs.fd), cap(rhs.cap),len(rhs.len)
+        :fd(rhs.fd),cap(rhs.cap),len(rhs.len)
       {
         memcpy(buf,rhs.buf,len);
         memset(buf+len,0,cap-len);
@@ -41,11 +35,6 @@ namespace fmt {
       };
       operator iovec_t() const {
         return {buf,len};
-      };
-      char digit(uint64_t &val, int base) {
-        char res=val%base;
-        val/=base;
-        return (res>9)?('A'-10+res):('0'+res);
       };
       buf_t &a_str(const char *beg, const char *end=0) {
         if(!end)
@@ -69,7 +58,8 @@ namespace fmt {
         char *beg=end;
         *--beg=0;
         do {
-          *--beg=digit(val,base);
+          *--beg=val%base;
+          val/=base;
         } while(val);
         if(neg){
           *--beg='-';
