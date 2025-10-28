@@ -1,6 +1,6 @@
 test:
 all:
-include etc/vars.mk
+include etc/vars.mk etc/util.mk
 etc/multi.mk etc/cxxflags etc/ld_flags etc/cppflags etc/asmflags:;
 all: lib bin tst
 
@@ -10,9 +10,9 @@ lib/lib:=lib/libkernpp.aa
 abi/lib:=abi/libabi.aa
 
 show= $(warning $1: $($1))
-$(deps):;
 
 c++/src:=$(wildcard */*.cc)
+c++/dep:=$(c++/src:.cc=.cc.dd)
 c++/obj:=$(c++/src:.cc=.cc.oo)
 
 c++/asm:=$(c++/src:.cc=.cc.SS)
@@ -22,7 +22,6 @@ c++/exe:=$(filter bin/% tst/%,$(c++/src:.cc=))
 c++/tst:=$(filter tst/%,$(c++/obj:.cc.oo=))
 c++/lib:=$(filter lib/%,$(c++/obj))
 c++/abi:=$(filter abi/%,$(c++/obj))
-
 all: $(c++/exe) $(asm/exe)
 
 
@@ -34,19 +33,15 @@ asm/abi:=$(filter abi/%,$(asm/obj))
 $(c++/exe) $(asm/exe): $(lib/lib)
 scr/genheaders.pl:;
 
+$(c++/dep): clean-dep
+include $(wildcard $(c++/dep))
 
-all_deps:=$(wildcard */*.dd)
-c++_deps:=$(foreach s,$(wildcard */*.cc),$(wildcard $s.dd)))
-oth_deps:=$(filter-out $(c++_deps),$(all_deps))
-
-include /dev/null $(wildard $(c++_deps))
-
-all: $(c++/exe) $(asm/exe) $(lib/lib) 
+all: $(c++/exe) $(asm/exe) lib
 
 $(c++/cpp): inc/syscall.gen.hh abi/syscall.gen.cc
 
 obj: $(c++/obj) $(asm/obj) 
-lib: $(lib/lib) $(lib/lsc) $(abi/lib)
+lib: $(lib/lib) $(abi/lib)
 
 all/obj:= $(c++/obj) $(asm/obj)
 
@@ -64,12 +59,13 @@ inc/syscall.gen.hh abi/syscall.gen.cc: scr/genheaders.pl
 	mv gen/syscall.gen.cc abi/syscall.gen.cc
 
 include etc/multi.mk
+xtr/dep:=$(filter-out $(c++/dep),$(wildcard */*.dd))
+clean-dep:
+	$(if $(wildcard $(extra)),rm -f $(wildcard $(extra)))
+clean: clean-dep
+	$(foreach v,c++/obj c++/cpp c++/asm,$(if $(wildcard $v),rm -f $(wildcard $v)))
 
-all: $(c++/obj)
-
-
-T:=
-
+.PHONY: clean clean-dep
 all:
 	@echo made all
 	@cp .gitignore .gitignore.old

@@ -1,9 +1,5 @@
 
-*.S.oo
 *.aa
-*.cc.[Sdio][Sdio]
-.gdb_history
-.gitignore.old
 bin/cat
 bin/decom
 bin/echo
@@ -16,6 +12,10 @@ bin/touch
 bin/true
 bin/usleep
 bin/xattr
+*.cc.[Sdio][Sdio]
+.gdb_history
+.gitignore.old
+*.S.oo
 tst/comparable_min.t
 tst/del-test
 tst/memfd_cat
@@ -25,3 +25,4 @@ tst/termsize
 tst/test-is-t
 tst/throw
 tst/vector.t
+*.out

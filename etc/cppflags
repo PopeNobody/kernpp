@@ -1,4 +1,5 @@
 -Iinc
+-Istd
 -O0
 -fno-exceptions
 -ffreestanding
