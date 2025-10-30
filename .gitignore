@@ -15,6 +15,7 @@ bin/xattr
 *.cc.[Sdio][Sdio]
 .gdb_history
 .gitignore.old
+*.out
 *.S.oo
 tst/comparable_min.t
 tst/del-test
@@ -25,4 +26,3 @@ tst/termsize
 tst/test-is-t
 tst/throw
 tst/vector.t
-*.out
