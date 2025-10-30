@@ -1,4 +1,3 @@
-
 *.aa
 bin/cat
 bin/decom
@@ -7,7 +6,6 @@ bin/false
 bin/ls
 bin/lspath
 bin/report
-bin/throw
 bin/touch
 bin/true
 bin/usleep
@@ -16,14 +14,6 @@ bin/xattr
 .gdb_history
 .gitignore.old
 *.out
+*.log
 *.S.oo
-tst/comparable_min.t
-tst/del-test
-tst/memfd_cat
-tst/stupid-ptr.h
-tst/termctrl
-tst/termsize
-tst/test-is-t
-tst/throw
-tst/vector.t
 tst/*.t
