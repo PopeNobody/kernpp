@@ -36,7 +36,10 @@ int main(int argc, char** argv, char**envp) {
     
     unsigned char magic[2];
     ssize_t n = read(0, (char*)magic, 2);
-
+    switch(n) {
+      case 1: write(1,(char*)magic,1,err_log);
+      case 0: exit(0);
+    };
     const char* decomp = choose_decompressor(magic[0],unsigned(magic[1]));
     if (!decomp) {
       decomp="bin/cat";
