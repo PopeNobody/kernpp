@@ -1,10 +1,6 @@
 #include <syscall.hh>
 #include <new.hh>
-
-namespace std
-{
-  extern "C" void free(void*);
-}
+#include "malloc.hh"
 
 using std::align_val_t;
 using std::nothrow_t;
@@ -30,7 +26,7 @@ void operator delete(void* ptr, size_t, align_val_t al) noexcept
 {
   ::operator delete (ptr, al);
 }
-void operator delete(void* ptr, size_t) noexcept
+void operator delete(void* ptr, size_t)
 {
   ::operator delete (ptr);
 }

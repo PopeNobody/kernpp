@@ -1,48 +1,31 @@
-#include <syscall.hh>
-using sys::write;
-using sys::read;
-using sys::exit;
+#include "syscall.hh"
+using namespace sys;
+static char buf[4096];
+void cat(fd_t fd) {
+  while(1){
+    ssize_t nr=read(fd,buf,sizeof(buf),err_fatal);
+    if(!nr)
+      return;
+    for(char *pos=buf;pos<buf+nr;pos++){
+      int nw=write(1,pos,buf+nr-pos,err_fatal);
+      pos+=nw;
+    };
+  };
+};
+void cat(const char *file) {
+  int fd=open(file,o_rdonly,err_fatal);
+  cat(fd_t(fd));
+};
 extern "C" {
-  int main(int argc, const char**argv, const char**envp);
-};
-static void die(int res,const char *msg) {
-  write(2,msg);
-  exit(res);
-};
-static char buf[64];//*1024];
-int copy(const char *path,int ofd){
-  int ifd = open(path,sys::o_rdonly);
-  if(ifd<0){
-    write(2,"error: open: ");
-    write(2,path);
-    write(2,"\n");
-    return 1;
-  }
-  while(int nr=read(ifd,buf,sizeof(buf))){
-    if(nr<0){
-      write(2,"error: read: ");
-      write(2,path);
-      write(2,"\n");
-      sys::close(ifd);
-      return 1;
-    };
-    int nw;
-    for(int i=0;i<nr;i+=nw){
-      nw=write(ofd,buf+i,nr-i);
-      if(nw<0) {
-        write(2,"error: write: ");
-        write(2,path);
-        write(2,"\n");
-        sys::close(ifd);
-        return 1;
+  int main(int argc,char *const*argv,char *const*envp) {
+    if(argc>1) {
+      for(int i=1;i<argc;i++){
+        cat(argv[i]);
       };
-    };
+    } else {
+      cat(fd_t(0));
+    }
+    return 0;
   };
-  return 0;
-};
-int main(int argc, const char**argv, const char **envp) {
-  while(*++argv){
-    copy(*argv,1);
-  };
-  return 0;
-};
+}
+

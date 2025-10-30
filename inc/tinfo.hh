@@ -22,13 +22,13 @@
 // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#include <syscall.hh>
-#include <typeinfo.hh>
-//#include <cstddef>
+#include "syscall.hh"
+#include "typeinfo.hh"
+//#include "cstddef"
 
 // Class declarations shared between the typeinfo implementation files.
 
-#include <cxxabi.hh>
+#include "cxxabi.hh"
 
 namespace __cxxabiv1 {
 
@@ -36,7 +36,6 @@ namespace {
 
 using namespace std;
 using namespace abi;
-using std::ptrdiff_t;
 
 // Initial part of a vtable, this structure is used with offsetof, so we don't
 // have to keep alignments consistent manually.

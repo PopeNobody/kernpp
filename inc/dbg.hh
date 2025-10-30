@@ -1,26 +1,20 @@
+#pragma once
 #define NDEBUG
-#include <assert.h>
-
-#ifndef debug_hh
-#define debug_hh debug_hh
-
-//#include <iostream>
-//#include <exception>
-//#include <typeinfo>
-
-//using std::ostream;
-//using std::exception;
-//using std::type_info;
-//ostream &operator(ostream &lhs, const exception &rhs);
-//ostream &operator(ostream &lhs, const type_info &rhs);
 
 namespace dbg {
   struct runtime_error
   {
+    struct body_t {
+      const char *what;
+    } body;
+    runtime_error(const char *what)
+      : body{what}
+    {
+    };
   };
   template<typename ...arg_t>
     void __xthrow(arg_t ... args);
-  void __xassert(const char *cond);
+  void __assert(const char *cond);
 };
 
 #define nop()
@@ -35,11 +29,10 @@ namespace dbg {
 #define xconfess(x)   xtrace2(  "confess:             "        x,  dump(true)   )
 #define xcluck(x)     xtrace2(  "cluck:               "        x,  dump(false)  )
 #define xcheckin()    xtrace2(  __PRETTY_FUNCTION__,  nop()  )
-#define xassert(x)    if(!(x)) { dbg::__xassert( #x ); }
+#define xassert(x)    assert(x)
 #define xnv(x) #x   " => "  (x)
 #define dbg() __FILE__  ":"  __LINE__  ":"
 #define  xthrow(x,y) do{ dbg::__xthrow(x,y); }while(false)
 //#define  xthrowre(y) xthrow(runtime_error,y)
 #define  xthrowre(y) xthrow(runtime_error,y)
 
-#endif //debug_hh

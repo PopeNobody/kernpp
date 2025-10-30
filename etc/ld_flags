@@ -1,12 +1,12 @@
 -Llib
 -O0
--Wl,--verbose
+-g3
 -ffreestanding
--fno-exceptions
 -fno-stack-protector
 -ggdb3
 -nodefaultlibs
--nolibc
 -nostartfiles
 -nostdlib
 -static
+-fno-exceptions
+-fno-rtti

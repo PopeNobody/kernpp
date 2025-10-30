@@ -1,11 +1,7 @@
-	.text
-.Ltext0:
-#APP
-	.global _start
+.text
+.global _start
 _start:
-   movq $0,%rdi
-   movl $60,%eax
-   syscall
-   int3
-
-
+  xor %rdi,%rdi
+  call exit
+  int3
+.section .note.GNU-stack

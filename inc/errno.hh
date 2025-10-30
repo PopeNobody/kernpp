@@ -1,54 +1,81 @@
-#ifndef errno_hh
-#define errno_hh errno_hh
+#pragma once
 
-#include <types.hh>
+#include "types.hh"
+#include "errno_enum.hh"
+#include "attrs.hh"
 
-#define	EPERM		 1	/* Operation not permitted */
-#define	ENOENT		 2	/* No such file or directory */
-#define	ESRCH		 3	/* No such process */
-#define	EINTR		 4	/* Interrupted system call */
-#define	EIO		 5	/* I/O error */
-#define	ENXIO		 6	/* No such device or address */
-#define	E2BIG		 7	/* Argument list too long */
-#define	ENOEXEC		 8	/* Exec format error */
-#define	EBADF		 9	/* Bad file number */
-#define	ECHILD		10	/* No child processes */
-#define	EAGAIN		11	/* Try again */
-#define	ENOMEM		12	/* Out of memory */
-#define	EACCES		13	/* Permission denied */
-#define	EFAULT		14	/* Bad address */
-#define	ENOTBLK		15	/* Block device required */
-#define	EBUSY		16	/* Device or resource busy */
-#define	EEXIST		17	/* File exists */
-#define	EXDEV		18	/* Cross-device link */
-#define	ENODEV		19	/* No such device */
-#define	ENOTDIR		20	/* Not a directory */
-#define	EISDIR		21	/* Is a directory */
-#define	EINVAL		22	/* Invalid argument */
-#define	ENFILE		23	/* File table overflow */
-#define	EMFILE		24	/* Too many open files */
-#define	ENOTTY		25	/* Not a typewriter */
-#define	ETXTBSY		26	/* Text file busy */
-#define	EFBIG		27	/* File too large */
-#define	ENOSPC		28	/* No space left on device */
-#define	ESPIPE		29	/* Illegal seek */
-#define	EROFS		30	/* Read-only file system */
-#define	EMLINK		31	/* Too many links */
-#define	EPIPE		32	/* Broken pipe */
-#define	EDOM		33	/* Math argument out of domain of func */
-#define	ERANGE		34	/* Math result not representable */
-
-
-typedef const char *c_str;
-namespace sys {
-  typedef long errno_t;
-  extern errno_t errno;
-  ssize_t set_errno(errno_t err);
-  c_str strerror(errno_t err=errno);
-  void perror(const c_str msg1, const c_str msg2);
-  void pexit(const c_str msg1, const c_str msg2);
-  void perror(const c_str msg1);
-  void pexit(const c_str msg1);
+namespace str {
+  struct c_str;
 };
+namespace sys {
+  using str::c_str;
+  using std::errno_t;
 
-#endif
+  extern std::errno_t errno;
+  const c_str &strerror(std::errno_t err=errno);
+  void perror(const c_str &msg1, const c_str &msg2);
+  inline void perror(const char *msg1, const char *msg2) {
+    perror(c_str(msg1),c_str(msg2));
+  };
+  inline void perror(const c_str &msg1) {
+    perror(msg1,c_str());
+  };
+  inline void perror(const char *msg1) {
+    perror(c_str(msg1),c_str());
+  };
+
+
+  void die(int res, const char *m1) NOR;
+  void die(int res, const char *msg1, const char *msg2) NOR;
+  void die(int res, const char *msg1, const char *msg2, const char *msg3)NOR;
+
+  void die(const char *msg1, const char *msg2) NOR;
+  void die(const char *msg1) NOR;
+  typedef const c_str &cc_str; 
+  void die(int res, cc_str msg1, cc_str msg2, cc_str msg3) NOR;
+  inline void die(int res, const char *msg1, const char *msg2, const char *msg3) {
+    die(res,c_str(msg1),c_str(msg2),c_str(msg3));
+  };
+  inline void die(int res, const char *msg1, const char *msg2){
+    die(res,c_str(msg1),c_str(msg2),c_str());
+  };
+  inline void die(const char *msg1, const char *msg2) {
+    die(1,c_str(msg1),c_str(msg2),c_str());
+  };
+  inline void die(const char *msg1) {
+    die(1,c_str(msg1),c_str(),c_str());
+  };
+  
+  void pexit(int res, const c_str&msg1, const c_str &msg2) NOR;
+  void pexit(int res, const c_str&msg1) NOR;
+
+  void pexit(int res, const char *msg1, const char *msg2) NOR;
+  void pexit(const char *msg1, const char *msg2) NOR;
+  void pexit(int res, const char *msg1) NOR;
+  void pexit(const char *msg1) NOR;
+
+  inline void pexit(int res, const char *msg1, const char *msg2) {
+    pexit(res,c_str(msg1),c_str(msg2));
+  };
+  inline void pexit(int res, const char *msg1) {
+    pexit(res,c_str(msg1));
+  };
+  inline void pexit(const char *msg1) {
+    pexit(1,c_str(msg1));
+  };
+  inline void pexit(const char *msg1, const char *msg2) {
+    pexit(2,c_str(msg1),c_str(msg2));
+  };
+
+  void die(int res, const char * msg1);
+  void die(int res, const char * msg1, const char * msg2);
+  void die(int res, const c_str &msg1);
+  void die(int res, const c_str &msg1, const c_str &msg2);
+  inline void die(const c_str &msg1) {
+    die(99,msg1);
+  };
+  inline void die(const c_str &msg1, const c_str &msg2) {
+    die(99,msg1,msg2);
+  };
+};
+#include "c_str.hh"
