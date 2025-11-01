@@ -1,3 +1,5 @@
+	.globl	syscall3
+syscall3:
 	.globl	_ZN3sys8syscall3Emmmm
 _ZN3sys8syscall3Emmmm:
 	pushq	%rbp

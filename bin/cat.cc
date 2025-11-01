@@ -18,6 +18,7 @@ void cat(const char *file) {
 };
 extern "C" {
   int main(int argc,char *const*argv,char *const*envp) {
+
     if(argc>1) {
       for(int i=1;i<argc;i++){
         cat(argv[i]);

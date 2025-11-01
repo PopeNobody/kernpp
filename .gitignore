@@ -13,7 +13,8 @@ bin/xattr
 *.cc.[Sdio][Sdio]
 .gdb_history
 .gitignore.old
-*.out
 *.log
+*.out
 *.S.oo
 tst/*.t
+*.o

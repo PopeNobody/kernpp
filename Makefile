@@ -4,39 +4,27 @@ include etc/vars.mk etc/util.mk
 etc/multi.mk etc/cxxflags etc/ld_flags etc/cppflags etc/asmflags:;
 all: lib bin tst
 
-test: all
+
 
 lib/lib:=lib/libkernpp.aa
 abi/lib:=abi/libabi.aa
 
 show= $(warning $1: $($1))
-
-c++/src:=$(wildcard */*.cc)
-c++/dep:=$(c++/src:.cc=.cc.dd)
-c++/obj:=$(c++/src:.cc=.cc.oo)
-
-c++/asm:=$(c++/src:.cc=.cc.SS)
-c++/cpp:=$(c++/src:.cc=.cc.ii)
-c++/dep:=$(c++/src:.cc=.cc.dd)
-c++/exe:=$(filter bin/% tst/%,$(c++/src:.cc=))
-c++/tst:=$(filter tst/%,$(c++/obj:.cc.oo=))
-c++/lib:=$(filter lib/%,$(c++/obj))
-c++/abi:=$(filter abi/%,$(c++/obj))
-all: $(c++/exe) $(asm/exe)
-
-
-asm/src:=$(wildcard */*.S)
-asm/obj:=$(asm/src:.S=.S.oo)
-asm/lib:=$(filter lib/%,$(asm/obj))
-asm/exe:=$(filter bin/%,$(asm/src:.S=))
-asm/abi:=$(filter abi/%,$(asm/obj))
-$(c++/exe) $(asm/exe): $(lib/lib)
+include etc/c++.mk
+include etc/pl5.mk
+include etc/asm.mk
+$(c++/exe) $(asm/exe): $(lib/lib) $(abi/lib)
 scr/genheaders.pl:;
 
 $(c++/dep): clean-dep
 include $(wildcard $(c++/dep))
 
 all: $(c++/exe) $(asm/exe) lib
+tst: $(c++/tst) $(asm/tst) $(pl5/tst)
+
+
+test: tst
+	$(foreach e,$(all/tst),./$e;)
 
 $(c++/cpp): inc/syscall.gen.hh abi/syscall.gen.cc
 
@@ -46,8 +34,10 @@ lib: $(lib/lib) $(abi/lib)
 all/obj:= $(c++/obj) $(asm/obj)
 
 all/exe:=$(c++/exe) $(c++/tst) $(asm/exe)
+all/tst:
 #    
 all: $(all/exe)
+$(foreach t,$(all/tst),$(eval $t/run: $t; $t)$(eval test: $t/run))
 
 FORCE:
 
@@ -71,3 +61,23 @@ all:
 	@cp .gitignore .gitignore.old
 	@printf '%s\n' $(all/exe) | sort .gitignore -u -o .gitignore -
 	@report cmp -s .gitignore .gitignore.old || echo ".gitignore changed"
+
+
+define lnk_libs
+	-Wl,--start-group 
+	$(lib/lib) 
+	$(abi/lib) 
+	-Wl,--end-group
+	@etc/ld_flags 
+endef
+$(warning txt: $(lnk_libs))
+
+cur:=$(filt <,etc/lnk_libs)
+$(warning cur: $(cur/lnk_libs))
+export lnk_libs
+#    ifeq ($(txt),$(cur))
+#    etc/lnk_libs:
+#    	echo "$$x" | tee $@
+#    endif
+
+
