@@ -26,3 +26,4 @@ tst/termsize
 tst/test-is-t
 tst/throw
 tst/vector.t
+*.o
