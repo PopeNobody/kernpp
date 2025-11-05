@@ -16,5 +16,13 @@ bin/xattr
 *.log
 *.out
 *.S.oo
+tst/comparable_min.t
+tst/del-test
+tst/memfd_cat
+tst/stupid-ptr.h
 tst/*.t
-*.o
+tst/termctrl
+tst/termsize
+tst/test-is-t
+tst/throw
+tst/vector.t
