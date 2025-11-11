@@ -12,7 +12,7 @@ _start:
   syscall 
 err:
   movq $60,%rax
-  xor %rdi,%rdi
+  movq $0,%rdi
   syscall
   
 .section .note.GNU-stack
