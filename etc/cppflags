@@ -1,0 +1,13 @@
+-Iinc
+-Istd
+-O0
+-fno-exceptions
+-ffreestanding
+-fno-rtti
+-fno-stack-protector
+-g3
+-ggdb
+-ggdb3
+-nostdinc
+-nostdinc++
+-std=c++23

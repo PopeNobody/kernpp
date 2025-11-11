@@ -1,0 +1,12 @@
+-Llib
+-O0
+-g3
+-ffreestanding
+-fno-stack-protector
+-ggdb3
+-nodefaultlibs
+-nostartfiles
+-nostdlib
+-static
+-fno-exceptions
+-fno-rtti
